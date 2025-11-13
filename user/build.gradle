@@ -83,6 +83,10 @@ dependencies {
 
 	//openCsv 라이브러리
 	implementation 'com.opencsv:opencsv:5.5.2'
+
+    // OAuth2 Client
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
 	// test
 	testImplementation 'org.projectlombok:lombok'
 	testAnnotationProcessor 'org.projectlombok:lombok'
