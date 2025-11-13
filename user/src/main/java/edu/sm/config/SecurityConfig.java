@@ -1,6 +1,9 @@
 package edu.sm.config;
 
+import edu.sm.app.security.OAuth2SuccessHandler;
+import edu.sm.app.service.OAuth2UserService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +17,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig  {
+  private final OAuth2UserService oAuth2UserService;
+  private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public static BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -42,6 +47,22 @@ public class SecurityConfig  {
                         .anyRequest().permitAll()
 //                        .anyRequest().authenticated()
         );
+
+      // OAuth2 로그인 설정
+      http.oauth2Login(oauth2 -> oauth2
+          .loginPage("/login")
+          .userInfoEndpoint(userInfo -> userInfo
+              .userService(oAuth2UserService)
+          )
+          .successHandler(oAuth2SuccessHandler)
+          .failureUrl("/login?error=oauth")
+      );
+      // 로그아웃 설정
+      http.logout(logout -> logout
+          .logoutUrl("/logout")
+          .logoutSuccessUrl("/")
+          .invalidateHttpSession(true)
+      );
         return http.build();
     }
 
