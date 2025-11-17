@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.app.repository.IotRepository">
+
+  <select id="findByPatientIdAndMeasuredAtAfterOrderByMeasuredAtDesc" resultType="Iot">
+    SELECT * FROM IOT
+    WHERE patient_id = #{patientId} AND measured_at >= #{measuredAt}
+    ORDER BY measured_at DESC
+  </select>
+
+  <select id="findByPatientId" parameterType="long" resultType="Iot">
+    SELECT * FROM IOT WHERE patient_id = #{patientId} ORDER BY measured_at DESC
+  </select>
+
+  <select id="findByPatientIdAndIsAbnormal" resultType="Iot">
+    SELECT * FROM IOT
+    WHERE patient_id = #{patientId} AND is_abnormal = #{isAbnormal}
+    ORDER BY measured_at DESC
+  </select>
+
+  <select id="findByPatientIdAndVitalType" resultType="Iot">
+    SELECT * FROM IOT
+    WHERE patient_id = #{patientId} AND vital_type = #{vitalType}
+    ORDER BY measured_at DESC
+  </select>
+
+  <select id="selectAll" resultType="Iot">
+    SELECT * FROM IOT ORDER BY measured_at DESC
+  </select>
+
+  <select id="select" parameterType="long" resultType="Iot">
+    SELECT * FROM IOT WHERE iot_id = #{iotId}
+  </select>
+
+  <insert id="insert" parameterType="Iot" useGeneratedKeys="true" keyProperty="iotId">
+    INSERT INTO IOT (patient_id, device_type, vital_type, value, is_abnormal, measured_at)
+    VALUES (#{patientId}, #{deviceType}, #{vitalType}, #{value}, #{isAbnormal}, NOW())
+  </insert>
+
+  <update id="update" parameterType="Iot">
+    UPDATE IOT SET is_abnormal = #{isAbnormal} WHERE data_id = #{iotId}
+  </update>
+
+  <delete id="delete" parameterType="long">
+    DELETE FROM IOT WHERE data_id = #{iotId}
+  </delete>
+
+</mapper>
