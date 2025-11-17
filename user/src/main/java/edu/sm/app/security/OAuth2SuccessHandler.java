@@ -1,6 +1,6 @@
 package edu.sm.app.security;
 
-import edu.sm.app.dto.User;
+import edu.sm.app.dto.Patient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,15 +21,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                       Authentication authentication) throws IOException, ServletException {
 
     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-    User user = principalDetails.getUser();
+    Patient patient = principalDetails.getPatient();;
 
-    log.info("OAuth2 로그인 성공: {}", user.getUserEmail());
+    log.info("OAuth2 로그인 성공: {}", patient.getPatientEmail());
 
     // 세션에 사용자 정보 저장
     HttpSession session = request.getSession();
-    session.setAttribute("loginuser", user);
-    session.setAttribute("loginid", user.getUserEmail());
-    session.setAttribute("loginname", user.getUserName());
+    session.setAttribute("loginuser", patient);
+    session.setAttribute("loginid", patient.getPatientEmail());
+    session.setAttribute("loginname", patient.getPatientName());
 
     // 메인 페이지로 리다이렉트
     response.sendRedirect("/");

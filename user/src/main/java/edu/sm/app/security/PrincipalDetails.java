@@ -1,6 +1,6 @@
 package edu.sm.app.security;
 
-import edu.sm.app.dto.User;
+import edu.sm.app.dto.Patient;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,17 +14,17 @@ import java.util.Map;
 @Getter
 public class PrincipalDetails implements UserDetails, OAuth2User {
 
-  private User user;
+  private Patient patient;
   private Map<String, Object> attributes;
 
   // 일반 로그인
-  public PrincipalDetails(User user) {
-    this.user = user;
+  public PrincipalDetails(Patient patient) {
+    this.patient = patient;
   }
 
   // OAuth2 로그인
-  public PrincipalDetails(User user, Map<String, Object> attributes) {
-    this.user = user;
+  public PrincipalDetails(Patient patient, Map<String, Object> attributes) {
+    this.patient = patient;
     this.attributes = attributes;
   }
 
@@ -35,17 +35,17 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return Collections.singleton(new SimpleGrantedAuthority(user.getUserRole()));
+    return Collections.singleton(new SimpleGrantedAuthority(patient.getUserRole()));
   }
 
   @Override
   public String getPassword() {
-    return user.getUserPwd();
+    return patient.getPatientPwd();
   }
 
   @Override
   public String getUsername() {
-    return user.getUserEmail();
+    return patient.getPatientEmail();
   }
 
   @Override
@@ -55,7 +55,7 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
   @Override
   public boolean isAccountNonLocked() {
-    return "active".equals(user.getUserAccountStatus());
+    return "active".equals(patient.getPatientAccountStatus());
   }
 
   @Override
@@ -65,11 +65,11 @@ public class PrincipalDetails implements UserDetails, OAuth2User {
 
   @Override
   public boolean isEnabled() {
-    return "active".equals(user.getUserAccountStatus());
+    return "active".equals(patient.getPatientAccountStatus());
   }
 
   @Override
   public String getName() {
-    return String.valueOf(user.getUserId());
+    return String.valueOf(patient.getPatientName());
   }
 }

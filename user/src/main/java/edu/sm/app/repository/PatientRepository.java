@@ -1,7 +1,7 @@
 package edu.sm.app.repository;
 
 import com.github.pagehelper.Page;
-import edu.sm.app.dto.User;
+import edu.sm.app.dto.Patient;
 import edu.sm.common.frame.SmRepository;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,13 +12,14 @@ import java.util.Optional;
 
 @Repository
 @Mapper
-public interface UserRepository extends SmRepository<User,Integer> {
+public interface PatientRepository extends SmRepository<Patient,Long> {
   // OAuth
-  Optional<User> findByUserEmail(@Param("email") String email) throws Exception;
-  Optional<User> findByProviderAndProviderId(@Param("provider") String provider,@Param("providerId") String providerId) throws Exception;
-
+  Optional<Patient> findByPatientEmail(@Param("email") String email) throws Exception;
+  Optional<Patient> findByProviderAndProviderId(@Param("provider") String provider,
+                                                @Param("providerId") String providerId) throws Exception;
   void deleteByEmail(@Param("email") String email) throws Exception;
 
+  Optional<Patient> findByPatientId(@Param("patientId") Long patientId) throws Exception;
 //    Page<User> getpage() throws Exception;
 //    Page<User> getpageSearch(UserSearch userSearch) throws Exception;
 //    List<User> searchUserList(UserSearch userSearch) throws Exception;

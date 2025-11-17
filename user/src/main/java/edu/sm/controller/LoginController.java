@@ -1,7 +1,7 @@
 package edu.sm.controller;
 
-import edu.sm.app.dto.User;
-import edu.sm.app.service.UserService;
+import edu.sm.app.dto.Patient;
+import edu.sm.app.service.PatientService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,79 +16,85 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
-    final UserService userService;
-    final BCryptPasswordEncoder bCryptPasswordEncoder;
-    final StandardPBEStringEncryptor standardPBEStringEncryptor;
+  final PatientService patientService;
+  final BCryptPasswordEncoder bCryptPasswordEncoder;
+  final StandardPBEStringEncryptor standardPBEStringEncryptor;
 
   @RequestMapping("/")
-  public String home(Model model){
+  public String home(Model model) {
     return "index";
   }
 
-    @RequestMapping("/login")
-    public String login(Model model){
-        model.addAttribute("center","login");
-        return "index";
+  @RequestMapping("/login")
+  public String login(Model model) {
+    model.addAttribute("center", "login");
+    return "index";
+  }
+
+  @RequestMapping("/logout")
+  public String logout(Model model, HttpSession session) {
+    if (session != null) {
+      session.invalidate();
+    }
+    return "redirect:/";
+  }
+
+  @RequestMapping("/loginimpl")
+  public String loginimpl(Model model,
+                          @RequestParam("email") String email,
+                          @RequestParam("pwd") String pwd,
+                          HttpSession session) throws Exception {
+
+    Patient patient = patientService.getByEmail(email);
+
+    if (patient != null && bCryptPasswordEncoder.matches(pwd, patient.getPatientPwd())) {
+      session.setAttribute("loginuser", patient);
+      session.setAttribute("patientId", patient.getPatientId());
+      log.info(patient.getPatientId() + "," + patient.getPatientEmail() + "," + patient.getPatientName());
+      return "redirect:/";
     }
 
-    @RequestMapping("/logout")
-    public String logout(Model model, HttpSession session){
-        if(session != null){
-            session.invalidate();
-        }
-        return "redirect:/";
+    model.addAttribute("center", "login");
+    model.addAttribute("loginstate", "fail");
+    return "index";
+  }
+
+  @RequestMapping("/register")
+  public String register(Model model) {
+    model.addAttribute("center", "register");
+    return "index";
+  }
+
+  @RequestMapping("/registerimpl")
+  public String registerimpl(Model model, Patient patient) throws Exception {
+    patient.setPatientPwd(bCryptPasswordEncoder.encode(patient.getPatientPwd()));
+    patient.setPatientAddr(standardPBEStringEncryptor.encrypt(patient.getPatientAddr()));
+    patientService.register(patient);
+    return "redirect:/login";
+  }
+
+  @RequestMapping("/deleteimpl")
+  public String deleteimpl(@RequestParam("currentPwd") String currentPwd,
+                           HttpSession session, Model model) throws Exception {
+
+    Patient loginPatient = (Patient) session.getAttribute("loginuser");
+    if (loginPatient == null) return "redirect:/login";
+
+    Patient dbPatient = patientService.getByEmail(loginPatient.getPatientEmail());
+
+    if (bCryptPasswordEncoder.matches(currentPwd, dbPatient.getPatientPwd())) {
+      patientService.removeByEmail(loginPatient.getPatientEmail());
+      session.invalidate();
+      return "redirect:/";
+    } else {
+      Patient patient = patientService.getByEmail(loginPatient.getPatientEmail());
+      patient.setPatientAddr(standardPBEStringEncryptor.decrypt(patient.getPatientAddr()));
+      model.addAttribute("patient", patient);
+      model.addAttribute("center", "info");
+      model.addAttribute("error", "회원 탈퇴를 위해 정확한 비밀번호를 입력해야 합니다.");
+      return "index";
     }
-
-    @RequestMapping("/loginimpl")
-    public String loginimpl(Model model,
-                            @RequestParam("email") String email,
-                            @RequestParam("pwd") String pwd,
-                            HttpSession session) throws Exception {
-        User user = userService.getByEmail(email);
-        if(user != null && bCryptPasswordEncoder.matches(pwd,user.getUserPwd())){
-            session.setAttribute("loginuser", user);
-            log.info(user.getUserId()+","+user.getUserEmail()+","+user.getUserName());
-            return "redirect:/";
-        }
-        model.addAttribute("center", "login");
-        model.addAttribute("loginstate","fail");
-        return "index";
-    }
-
-    @RequestMapping("/register")
-    public String register(Model model){
-        model.addAttribute("center","register");
-        return "index";
-    }
-
-    @RequestMapping("/registerimpl")
-    public String registerimpl(Model model,User user) throws Exception {
-        user.setUserPwd(bCryptPasswordEncoder.encode(user.getUserPwd()));
-        user.setUserAddr(standardPBEStringEncryptor.encrypt(user.getUserAddr()));
-        userService.register(user);
-        return "redirect:/login";
-    }
-
-    @RequestMapping("/deleteimpl")
-    public String deleteimpl(@RequestParam("currentPwd") String currentPwd, HttpSession session, Model model) throws Exception {
-        User loginUser = (User) session.getAttribute("loginuser");
-        if (loginUser == null) return "redirect:/login";
-
-        User dbUser = userService.getByEmail(loginUser.getUserEmail());
-
-        if (bCryptPasswordEncoder.matches(currentPwd, dbUser.getUserPwd())) {
-            userService.removeByEmail(loginUser.getUserEmail());
-            session.invalidate();
-            return "redirect:/";
-        } else {
-            User user = userService.getByEmail(loginUser.getUserEmail());
-            user.setUserAddr(standardPBEStringEncryptor.decrypt(user.getUserAddr()));
-            model.addAttribute("user", user);
-            model.addAttribute("center", "info");
-            model.addAttribute("error", "회원 탈퇴를 위해 정확한 비밀번호를 입력해야 합니다.");
-            return "index";
-        }
-    }
+  }
 
 //    @RequestMapping("/info")
 //    public String info(Model model, @RequestParam("id") String id, HttpSession session) throws Exception {
