@@ -219,38 +219,7 @@
       </div>
     </section>
 
-    <section class="notice-section">
-      <div class="notice-box">
-        <h3>📢 공지사항</h3>
-        <div class="notice-item">
-          <div class="title">AI 의료 매칭 서비스 정식 오픈</div>
-          <div class="date">2025.11.10</div>
-        </div>
-        <div class="notice-item">
-          <div class="title">의료 취약계층 지원 프로그램 안내</div>
-          <div class="date">2025.11.05</div>
-        </div>
-        <div class="notice-item">
-          <div class="title">자가진단 시스템 업데이트 완료</div>
-          <div class="date">2025.11.01</div>
-        </div>
-      </div>
-      <div class="notice-box">
-        <h3>📰 보도자료</h3>
-        <div class="notice-item">
-          <div class="title">SPRING AI 기반 병원 매칭 시스템 도입</div>
-          <div class="date">2025.11.08</div>
-        </div>
-        <div class="notice-item">
-          <div class="title">의료 사각지대 해소를 위한 혁신 서비스</div>
-          <div class="date">2025.10.28</div>
-        </div>
-        <div class="notice-item">
-          <div class="title">공공기관 협력 병원 네트워크 확대</div>
-          <div class="date">2025.10.20</div>
-        </div>
-      </div>
-    </section>
+    <%@ include file="schedule.jsp" %>
 
     <section class="treatment-guide" id="services">
       <h2>진료 안내</h2>
