@@ -384,7 +384,12 @@
               if (data.success) {
                   addMessage(data.message, 'ai');
               } else {
-                  addMessage('오류가 발생했습니다. 다시 시도해주세요.', 'ai');
+                  if (data.redirect) {
+                      alert(data.message);
+                      window.location.href = data.redirect;
+                  } else {
+                      addMessage(data.message || '오류가 발생했습니다.', '건강상담');
+                  }
               }
 
           } catch (error) {
@@ -440,18 +445,24 @@
           }
       }
 
-      // Enter 키로 전송
-      document.getElementById('userInput').addEventListener('keydown', function(e) {
-          if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
-          }
-      });
+      window.addEventListener('DOMContentLoaded', function() {
+          const userInput = document.getElementById('userInput');
 
-      // 텍스트 영역 자동 높이 조절
-      document.getElementById('userInput').addEventListener('input', function() {
-          this.style.height = 'auto';
-          this.style.height = (this.scrollHeight) + 'px';
+          if (userInput) {
+              // Enter 키로 전송 (Shift+Enter는 줄바꿈)
+              userInput.addEventListener('keydown', function(e) {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                  }
+              });
+
+              // 텍스트 영역 자동 높이 조절
+              userInput.addEventListener('input', function() {
+                  this.style.height = 'auto';
+                  this.style.height = (this.scrollHeight) + 'px';
+              });
+          }
       });
 
       // // 페이지 로드 시 이전 대화 내역 불러오기
@@ -476,6 +487,7 @@
 
 </head>
 <body>
+
 <div class="container">
   <!-- 헤더 -->
   <div class="header">

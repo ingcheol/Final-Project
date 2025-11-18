@@ -23,15 +23,23 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
     Patient patient = principalDetails.getPatient();;
 
-    log.info("OAuth2 로그인 성공: {}", patient.getPatientEmail());
-
     // 세션에 사용자 정보 저장
     HttpSession session = request.getSession();
     session.setAttribute("loginuser", patient);
+    session.setAttribute("patientId", patient.getPatientId());
     session.setAttribute("loginid", patient.getPatientEmail());
     session.setAttribute("loginname", patient.getPatientName());
 
-    // 메인 페이지로 리다이렉트
-    response.sendRedirect("/");
+    // redirect
+    String redirectUrl = (String) session.getAttribute("redirectUrl");
+
+    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+      // 세션에서 URL 제거
+      session.removeAttribute("redirectUrl");
+      response.sendRedirect(redirectUrl);
+    } else {
+      // 저장된 URL이 없으면 홈으로
+      response.sendRedirect("/");
+    }
   }
 }
