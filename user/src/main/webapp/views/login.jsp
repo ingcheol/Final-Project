@@ -158,7 +158,7 @@
     </div>
   </c:if>
 
-  <form id="login_form" action="/loginimpl" method="post">
+  <form id="login_form" action="<c:url value='/loginimpl'/>?redirect=${param.redirect}" method="post">
     <div class="form-group">
       <label for="email">이메일</label>
       <input type="email"

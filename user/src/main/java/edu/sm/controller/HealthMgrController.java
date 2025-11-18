@@ -1,10 +1,12 @@
 package edu.sm.controller;
 
 import edu.sm.app.service.HealthMgrService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -21,7 +23,21 @@ public class HealthMgrController {
   private final HealthMgrService healthMgrService;
 
   @GetMapping
-  public String healthPage() {
+  public String healthPage(HttpSession session, Model model, HttpServletRequest request) {
+    Long patientId = (Long) session.getAttribute("patientId");
+
+    if (patientId == null) {
+      // 현재 URL을 세션에 저장 (OAuth2용)
+      String currentUrl = request.getRequestURI();
+      String queryString = request.getQueryString();
+      if (queryString != null) {
+        currentUrl += "?" + queryString;
+      }
+      session.setAttribute("redirectUrl", currentUrl);
+
+      return "redirect:/login";
+    }
+
     return "healthmgr";
   }
 
@@ -33,9 +49,6 @@ public class HealthMgrController {
       HttpSession session) throws Exception {
 
     Long patientId = (Long) session.getAttribute("patientId");
-    if (patientId == null) {
-      patientId = 1L; // 테스트용
-    }
 
     String userMessage = request.get("message");
     log.info("채팅 메시지 수신 - 환자 ID: {}, 메시지: {}", patientId, userMessage);
@@ -53,7 +66,7 @@ public class HealthMgrController {
     // AI 응답 생성
     String aiResponse = healthMgrService.processChat(patientId, userMessage, chatHistory);
 
-    // 대화 내역에 추가 (사용자 메시지 + AI 응답)
+    // 대화 내역에 추가
     Map<String, String> userMsg = new HashMap<>();
     userMsg.put("role", "user");
     userMsg.put("content", userMessage);

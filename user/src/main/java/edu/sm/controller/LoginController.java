@@ -43,6 +43,7 @@ public class LoginController {
   public String loginimpl(Model model,
                           @RequestParam("email") String email,
                           @RequestParam("pwd") String pwd,
+                          @RequestParam(value = "redirect", required = false) String redirectParam,
                           HttpSession session) throws Exception {
 
     Patient patient = patientService.getByEmail(email);
@@ -51,6 +52,19 @@ public class LoginController {
       session.setAttribute("loginuser", patient);
       session.setAttribute("patientId", patient.getPatientId());
       log.info(patient.getPatientId() + "," + patient.getPatientEmail() + "," + patient.getPatientName());
+
+      // 로그인 폼에서 전달
+      if (redirectParam != null && !redirectParam.isEmpty()) {
+        return "redirect:" + redirectParam;
+      }
+
+      // 세션의 redirectUrl 확인 (컨트롤러에서 저장)
+      String redirectUrl = (String) session.getAttribute("redirectUrl");
+      if (redirectUrl != null && !redirectUrl.isEmpty()) {
+        session.removeAttribute("redirectUrl");
+        return "redirect:" + redirectUrl;
+      }
+
       return "redirect:/";
     }
 
@@ -58,6 +72,7 @@ public class LoginController {
     model.addAttribute("loginstate", "fail");
     return "index";
   }
+
 
   @RequestMapping("/register")
   public String register(Model model) {

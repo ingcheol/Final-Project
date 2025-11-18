@@ -29,39 +29,31 @@ public class HealthMgrService {
   private final IotRepository iotRepository;
 
   public String processChat(Long patientId, String userMessage, List<Map<String, String>> chatHistory) throws Exception {
-    log.info("AI 채팅 처리 시작 - 환자 ID: {}", patientId);
+    log.info("AI 채팅 처리 - 환자 ID: {}", patientId);
 
-    // 환자 기본 정보
     Patient patient = patientRepository.findByPatientId(patientId).orElse(null);
     if (patient == null) {
       return "환자 정보를 찾을 수 없습니다.";
     }
 
-    // 시스템 프롬프트 구성
     String systemPrompt = buildSystemPrompt(patient, patientId);
 
-    // ChatClient 생성
     ChatClient chatClient = chatClientBuilder.build();
 
-    // 대화 내역을 포함한 프롬프트 구성
     StringBuilder conversationContext = new StringBuilder();
-
-    // 이전 대화 내역 추가
     for (Map<String, String> msg : chatHistory) {
       String role = msg.get("role");
       String content = msg.get("content");
       if ("user".equals(role)) {
-        conversationContext.append("환자: ").append(content).append("\n");
+        conversationContext.append("사용자: ").append(content).append("\n");
       } else if ("assistant".equals(role)) {
         conversationContext.append("AI: ").append(content).append("\n");
       }
     }
 
-    // 현재 사용자 메시지 추가
-    conversationContext.append("환자: ").append(userMessage).append("\n");
+    conversationContext.append("사용자: ").append(userMessage).append("\n");
     conversationContext.append("AI: ");
 
-    // AI 호출
     String aiResponse = chatClient.prompt()
         .system(systemPrompt)
         .user(conversationContext.toString())
@@ -74,30 +66,68 @@ public class HealthMgrService {
 
   private String buildSystemPrompt(Patient patient, Long patientId) throws Exception {
     StringBuilder prompt = new StringBuilder();
+    prompt.append("당신은 전문적이고 친절한 AI 건강 상담사입니다.\n\n");
+    prompt.append("=== 환자 기본 정보 ===\n");
 
-    prompt.append("당신은 친절한 재활 의학 및 영양학 전문 AI 건강 상담사입니다.\n\n");
+    // 이름
+    prompt.append(String.format("- 이름: %s\n",
+        patient.getPatientName() != null ? patient.getPatientName() : "정보 없음"));
 
-    prompt.append("# 환자 기본 정보\n");
-    prompt.append(String.format("- 이름: %s\n", patient.getPatientName()));
-    prompt.append(String.format("- 나이: %d세\n", calculateAge(patient.getPatientDob())));
-    prompt.append(String.format("- 성별: %s\n", patient.getPatientGender()));
-    prompt.append(String.format("- 질병 이력: %s\n", patient.getPatientMedicalHistory()));
-    prompt.append(String.format("- 생활습관: %s\n", patient.getPatientLifestyleHabits()));
+    // 나이 (null 체크)
+    if (patient.getPatientDob() != null) {
+      prompt.append(String.format("- 나이: %d세\n", calculateAge(patient.getPatientDob())));
+    } else {
+      prompt.append("- 나이: 정보 없음\n");
+    }
 
-    // 최근 진료 기록
+    // 성별
+    prompt.append(String.format("- 성별: %s\n",
+        patient.getPatientGender() != null ? patient.getPatientGender() : "정보 없음"));
+
+    // 선호 언어
+    String preferredLanguage = patient.getLanguagePreference();
+    if (preferredLanguage != null && !preferredLanguage.isEmpty()) {
+      prompt.append(String.format("- 선호 언어: %s\n", preferredLanguage));
+    } else {
+      prompt.append("- 선호 언어: 한국어 (기본값)\n");
+      preferredLanguage = "ko"; // 기본값 설정
+    }
+
+    // 병력
+    if (patient.getPatientMedicalHistory() != null && !patient.getPatientMedicalHistory().isEmpty()) {
+      prompt.append(String.format("- 병력: %s\n", patient.getPatientMedicalHistory()));
+    } else {
+      prompt.append("- 병력: 정보 없음\n");
+    }
+
+    // 생활습관
+    if (patient.getPatientLifestyleHabits() != null && !patient.getPatientLifestyleHabits().isEmpty()) {
+      prompt.append(String.format("- 생활습관: %s\n", patient.getPatientLifestyleHabits()));
+    } else {
+      prompt.append("- 생활습관: 정보 없음\n");
+    }
+
+    // EMR 기록
+    prompt.append("\n=== 최근 진료 기록 ===\n");
     emrRepository.findTopByPatientIdOrderByCreatedAtDesc(patientId)
-        .ifPresent(emr -> {
-          prompt.append(String.format("\n## 최근 진단 기록\n%s\n", emr.getFinalRecord()));
-          prompt.append(String.format("## 최근 처방 내역\n%s\n", emr.getPrescriptionDetails()));
-        });
+        .ifPresentOrElse(
+            emr -> {
+              prompt.append(String.format("진단: %s\n", emr.getFinalRecord()));
+              prompt.append(String.format("처방: %s\n", emr.getPrescriptionDetails()));
+            },
+            () -> prompt.append("진료 기록이 없습니다.\n")
+        );
 
-    // 최근 설문 결과
+    // 설문조사
+    prompt.append("\n=== 최근 건강 설문 ===\n");
     surveyRepository.findTopByPatientIdOrderBySubmittedAtDesc(patientId)
-        .ifPresent(survey -> {
-          prompt.append(String.format("\n## 건강 설문 결과\n%s\n", survey.getAnswers()));
-        });
+        .ifPresentOrElse(
+            survey -> prompt.append(String.format("설문 응답: %s\n", survey.getAnswers())),
+            () -> prompt.append("설문 기록이 없습니다.\n")
+        );
 
-    // 최근 7일 IoT 데이터
+    // IoT 바이탈 데이터 (최근 7일)
+    prompt.append("\n=== 최근 7일 바이탈 데이터 ===\n");
     LocalDateTime weekAgo = LocalDateTime.now().minusDays(7);
     List<Iot> recentVitals = iotRepository
         .findByPatientIdAndMeasuredAtAfterOrderByMeasuredAtDesc(patientId, weekAgo);
@@ -106,22 +136,54 @@ public class HealthMgrService {
       String vitalsString = recentVitals.stream()
           .map(iot -> String.format("%s: %.2f", iot.getVitalType(), iot.getValue()))
           .collect(Collectors.joining(", "));
-      prompt.append(String.format("\n## 최근 바이탈 데이터 (7일간)\n%s\n", vitalsString));
+      prompt.append(String.format("최근 7일 바이탈: %s\n", vitalsString));
+    } else {
+      prompt.append("최근 바이탈 데이터가 없습니다.\n");
     }
 
-    prompt.append("\n# 역할 및 주의사항\n");
-    prompt.append("1. 공감하고 친절한 톤으로 대화하세요\n");
-    prompt.append("2. 환자의 질문에 명확하고 이해하기 쉽게 답변하세요\n");
-    prompt.append("3. 필요시 추가 질문으로 상세 정보를 수집하세요\n");
-    prompt.append("4. 운동 추천 시: 방법, 횟수, 빈도, 주의사항 포함\n");
-    prompt.append("5. 식단 추천 시: 아침/점심/저녁 구성, 피해야 할 음식 명시\n");
-    prompt.append("6. 위험 증상 감지 시 즉시 병원 방문 권유\n");
-    prompt.append("7. 의학적 진단은 절대 하지 말 것\n");
+    prompt.append("\n=== 상담 가이드라인 ===\n");
+    prompt.append("1. 환자의 정보가 부족한 경우, 정보가 없다고 명확히 안내해주세요.\n");
+    prompt.append("2. 의료 정보를 제공할 때는 항상 전문의 상담을 권장하세요.\n");
+    prompt.append("3. 환자의 현재 상태를 고려한 맞춤형 조언을 제공하세요.\n");
+    prompt.append("4. 건강 데이터가 없는 경우, 일반적인 건강 관리 팁을 제공하세요.\n");
+    prompt.append("5. 친절하고 이해하기 쉬운 언어를 사용하세요.\n");
+    prompt.append("6. 긴급한 증상이 의심되면 즉시 병원 방문을 권장하세요.\n");
+
+    // 언어별 응답 지침
+    prompt.append(String.format("7. 반드시 %s로 답변하세요.\n", getLanguageName(preferredLanguage)));
 
     return prompt.toString();
   }
 
+  // 언어 코드를 언어 이름으로 변환하는 헬퍼 메서드
+  private String getLanguageName(String languageCode) {
+    if (languageCode == null || languageCode.isEmpty()) {
+      return "한국어";
+    }
+
+    switch (languageCode.toLowerCase()) {
+      case "ko":
+        return "한국어";
+      case "en":
+        return "영어 (English)";
+      case "ja":
+        return "일본어 (日本語)";
+      case "zh":
+        return "중국어 (中文)";
+      case "es":
+        return "스페인어 (Español)";
+      case "fr":
+        return "프랑스어 (Français)";
+      default:
+        return languageCode;
+    }
+  }
+
   private int calculateAge(java.time.LocalDate dob) {
+    if (dob == null) {
+      return 0;
+    }
     return Period.between(dob, java.time.LocalDate.now()).getYears();
   }
+
 }
