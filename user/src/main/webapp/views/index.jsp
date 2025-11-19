@@ -24,7 +24,7 @@
         padding: 15px 15px; /* 좌우 패딩을 더 줄임 */
     }
     .logo {
-        font-size: 24px; /* 로고 폰트 크기 미세 조정 */
+        font-size: 20px; /* 로고 폰트 크기 미세 조정 */
         font-weight: bold;
         color: #5B6FB5;
         white-space: nowrap;
@@ -46,7 +46,7 @@
         color: #333;
         font-weight: 500;
         transition: color 0.3s;
-        font-size: 15px; /* 메뉴 텍스트 크기 축소 */
+        font-size: 18px; /* 메뉴 텍스트 크기 축소 */
     }
     .nav-menu a:hover { color: #5B6FB5; }
 
