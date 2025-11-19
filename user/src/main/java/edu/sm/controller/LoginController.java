@@ -20,11 +20,6 @@ public class LoginController {
   final BCryptPasswordEncoder bCryptPasswordEncoder;
   final StandardPBEStringEncryptor standardPBEStringEncryptor;
 
-  @RequestMapping("/")
-  public String home(Model model) {
-    return "index";
-  }
-
   @RequestMapping("/login")
   public String login(Model model) {
     model.addAttribute("center", "login");

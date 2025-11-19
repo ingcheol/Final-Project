@@ -10,3 +10,40 @@ INSERT INTO IOT (device_type, vital_type, value, is_abnormal, measured_at, patie
 
 INSERT INTO survey (survey_type, questions, answers, created_at, submitted_at, patient_id) VALUES
     ('생활습관 평가', '{"q1": "규칙적으로 운동하시나요?", "q2": "흡연하시나요?", "q3": "수면 시간은?"}', '{"a1": "주 3회", "a2": "아니오", "a3": "7시간"}', NOW(), NOW(), 1);
+
+INSERT INTO admin (
+    password,
+    name,
+    phone,
+    email,
+    account_status,
+    created_at,
+    patient_id  -- 7번째 컬럼
+)
+VALUES (
+           '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+           'admin01',
+           '010-1234-5678',
+           'admin01@sm.edu',
+           'ACTIVE',
+           NOW(),
+           1 -- patient_id에 명시적으로 1을 지정
+       );
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser01',
+             '010-9876-5432', -- 임의의 연락처
+             'adviser01@sm.edu',
+             'A12345B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
