@@ -70,8 +70,8 @@ logging:
 # Application Config
 app:
   url:
-    adminserver: https://127.0.0.1:8444/
-    websocketurl: https://127.0.0.1:8443/
+    adminserver: https://127.0.0.1:8443/
+    websocketurl: https://127.0.0.1:8444/
     disease-info-endpoint: "https://apis.data.go.kr/B551182/diseaseInfoService1/getDissByGenderAgeStats1"
   dir:
     imgsdir: file:///C:/smspring/imgs/     # 화면 출력 용

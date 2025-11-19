@@ -54,8 +54,9 @@ logging:
 # Application Config
 app:
   url:
-    adminserver: https://127.0.0.1:8444/
-    websocketurl: https://127.0.0.1:8443/
+    sse: https://127.0.0.1:8443/   # admin
+    mainsse: https://127.0.0.1:8444/   #shop
+    websocketurl: https://127.0.0.1:8444/  #shop
   dir:
     imgsdir: file:///C:/smspring/imgs/     # 화면 출력 용
     uploadimgsdir: C:/smspring/imgs/    # 파일 Write 용
