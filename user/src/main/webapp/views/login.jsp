@@ -7,6 +7,35 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <style>
+    .nav-buttons {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #e0e0e0;
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        color: #666;
+        font-size: 18px;
+    }
+
+    .nav-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+
     .login-container {
         max-width: 500px;
         margin: 100px auto;
@@ -109,6 +138,39 @@
         background: #f8d7da;
         border-radius: 5px;
     }
+
+    .signup-section {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+
+    .signup-section p {
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .btn-signup {
+        width: 100%;
+        padding: 12px;
+        background: white;
+        border: 2px solid #667eea;
+        border-radius: 5px;
+        color: #667eea;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+        text-align: center;
+    }
+
+    .btn-signup:hover {
+        background: #667eea;
+        color: white;
+    }
 </style>
 
 <script>
@@ -122,6 +184,11 @@
                 if(e.which === 13) {
                     login.send();
                 }
+            });
+
+            // 뒤로가기 버튼
+            $('#back_btn').click(function() {
+                window.history.back();
             });
         },
         send:function(){
@@ -150,6 +217,9 @@
 </script>
 
 <div class="login-container">
+  <button type="button" id="back_btn" class="nav-btn" title="뒤로가기">
+    🔙
+  </button>
   <h2>로그인</h2>
 
   <c:if test="${loginstate == 'fail'}">
@@ -190,4 +260,9 @@
   <a href="/oauth2/authorization/kakao" class="btn-kakao">
     카카오로 로그인
   </a>
+
+  <div class="signup-section">
+    <p>아직 계정이 없으신가요?</p>
+    <a href="<c:url value='/register'/>" class="btn-signup">이메일로 회원가입</a>
+  </div>
 </div>

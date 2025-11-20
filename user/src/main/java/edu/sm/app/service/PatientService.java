@@ -17,7 +17,7 @@ public class PatientService implements SmService<Patient, Long> {
 
   public Patient getByEmail(String email) throws Exception {
     return patientRepository.findByPatientEmail(email)
-        .orElseThrow(() -> new Exception("사용자를 찾을 수 없습니다: " + email));
+        .orElse(null);
   }
   public void removeByEmail(String email) throws Exception {
     patientRepository.deleteByEmail(email);

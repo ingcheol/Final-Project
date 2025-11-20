@@ -31,6 +31,7 @@ public class EmrController {
   public String emrPage(Model model, HttpSession session) {
     Patient loginUser = (Patient) session.getAttribute("loginuser");
     if (loginUser == null) {
+      session.setAttribute("redirectUrl","/emr");
       return "redirect:/login";
     }
 

@@ -80,9 +80,12 @@
   <!-- 환자 정보 수정 -->
   <update id="update" parameterType="Patient">
     UPDATE patient
-    SET password = #{patientPwd},
-        name = #{patientName},
+    SET name = #{patientName},
+        phone = #{patientPhone},
         address = #{patientAddr},
+        medical_history = #{patientMedicalHistory},
+        lifestyle_habits = #{patientLifestyleHabits},
+        language_preference = #{languagePreference},
         updated_at = NOW()
     WHERE patient_id = #{patientId}
   </update>

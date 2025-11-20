@@ -2,6 +2,7 @@ package edu.sm.config;
 
 import edu.sm.app.security.OAuth2SuccessHandler;
 import edu.sm.app.service.OAuth2UserService;
+import jakarta.servlet.http.HttpSession;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
@@ -48,9 +49,29 @@ public class SecurityConfig  {
 //                        .anyRequest().authenticated()
         );
 
+      // 인증되지 않은 사용자가 보호된 리소스 접근 시 처리 (람다식으로 직접 구현)
+      http.exceptionHandling(exception -> exception
+          .authenticationEntryPoint((request, response, authException) -> {
+            // 현재 요청 URL 저장
+            String requestUrl = request.getRequestURI();
+            String queryString = request.getQueryString();
+
+            if (queryString != null) {
+              requestUrl += "?" + queryString;
+            }
+
+            // 세션에 리다이렉트 URL 저장
+            HttpSession session = request.getSession();
+            session.setAttribute("redirectUrl", requestUrl);
+
+            // 로그인 페이지로 리다이렉트
+            response.sendRedirect("/login?redirect=" + requestUrl);
+          })
+      );
+
       // OAuth2 로그인 설정
       http.oauth2Login(oauth2 -> oauth2
-          .loginPage("/login")
+          .loginPage("/")
           .userInfoEndpoint(userInfo -> userInfo
               .userService(oAuth2UserService)
           )
