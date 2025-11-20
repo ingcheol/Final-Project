@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @Builder
 public class Iot {
-  private Long iotId;
+  private Long dataId;
   private Long patientId;
   private String deviceType;
   private String vitalType;

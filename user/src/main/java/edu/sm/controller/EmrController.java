@@ -48,6 +48,7 @@ public class EmrController {
       @RequestParam(value = "consultationId", required = false) Long consultationId,
       @RequestParam(value = "testResults", required = false) String testResults,
       @RequestParam(value = "prescription", required = false) String prescription,
+      @RequestParam(value = "language", defaultValue = "ko") String language,
       HttpSession session) {
 
     Map<String, Object> response = new HashMap<>();
@@ -64,7 +65,7 @@ public class EmrController {
 
       // ✅ EMR 생성 (DB 저장 안 함)
       Emr emr = emrService.generateEmrFromAudio(
-          consultationId, patientId, audioFile, testResults, prescription);
+          consultationId, patientId, audioFile, testResults, prescription, language);
 
       // ✅ 세션에 임시 저장 (최종 저장 시 사용)
       session.setAttribute("tempEmr", emr);

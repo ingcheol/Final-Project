@@ -9,6 +9,34 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <style>
+    /* 언어 선택 버튼 스타일 */
+    .language-btn {
+        padding: 12px 24px;
+        border: 2px solid #cbd5e0;
+        background: white;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .language-btn:hover {
+        border-color: #4299e1;
+        background: #ebf8ff;
+    }
+
+    .language-btn.active {
+        border-color: #4299e1;
+        background: #4299e1;
+        color: white;
+    }
+
+    .language-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     .emr-container {
         max-width: 1400px;
         margin: 20px auto;
@@ -266,8 +294,20 @@
   <div class="section-card" id="recordingSection">
     <div class="section-title">상담 녹음</div>
 
+    <div style="text-align: center; margin-bottom: 20px;">
+      <label class="form-label">EMR 작성 언어 선택</label>
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: 8px;">
+        <button class="language-btn active" data-lang="ko" onclick="selectLanguage('ko')">
+          한국어
+        </button>
+        <button class="language-btn" data-lang="en" onclick="selectLanguage('en')">
+          English
+        </button>
+      </div>
+    </div>
+
     <button class="recording-btn ready" id="recordBtn" onclick="toggleRecording()">
-      🎤
+      🎙️
     </button>
     <div class="status-text" id="statusText">녹음 시작하려면 버튼을 클릭하세요</div>
 
@@ -349,6 +389,7 @@
     let isRecording = false;
     let audioBlob = null;
     let currentEmrId = null;
+    let selectedLanguage = 'ko';
 
     // Drag & Drop 이벤트
     const uploadArea = document.getElementById('uploadArea');
@@ -456,6 +497,24 @@
         }
     }
 
+    // 언어 선택 함수
+    function selectLanguage(lang) {
+        selectedLanguage = lang;
+
+        // 버튼 활성화 상태 변경
+        document.querySelectorAll('.language-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`.language-btn[data-lang="${lang}"]`).classList.add('active');
+
+        // 상태 텍스트 업데이트
+        const langText = {
+            'ko': '한국어',
+            'en': 'English',
+        };
+        console.log(`선택된 언어: ${langText[lang]}`);
+    }
+
     // EMR 자동 생성
     async function generateEmr() {
         if (!audioBlob) {
@@ -471,13 +530,20 @@
         // FormData 생성
         const formData = new FormData();
         formData.append('audioFile', audioBlob, 'recording.wav');
+        formData.append('language', selectedLanguage);
         if (consultationId) formData.append('consultationId', consultationId);
         if (testResults) formData.append('testResults', testResults);
         if (prescription) formData.append('prescription', prescription);
 
         // 버튼 비활성화
         generateBtn.disabled = true;
-        generateBtn.innerHTML = '<span class="spinner"></span> AI 생성 중...';
+
+        // 선택된 언어에 따라 메시지 표시
+        const langMessages = {
+            'ko': 'AI 생성 중 (한국어)...',
+            'en': 'Generating with AI (English)...',
+        };
+        generateBtn.innerHTML = `<span class="spinner"></span> ${langMessages[selectedLanguage]}`;
 
         try {
             const response = await fetch('/emr/generate', {
