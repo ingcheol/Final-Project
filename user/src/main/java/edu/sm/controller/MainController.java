@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class MainController {
@@ -79,4 +80,10 @@ public class MainController {
             return "index";
         }
     }
+
+  @GetMapping("/monitor")
+  public String monitor(@RequestParam("patientId") Long patientId, Model model) {
+    model.addAttribute("patientId", patientId);
+    return "iot/monitor";  // JSP 경로 (iot 폴더 안의 monitor.jsp)
+  }
 }
