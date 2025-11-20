@@ -164,6 +164,8 @@
           <li><a href="#diagnosis">자가진단</a></li>
           <li><a href="#hospitals">병원찾기</a></li>
           <li><a href="#contact">문의하기</a></li>
+          <li><a href="<c:url value='/statview'/>">통계 확인</a></li>
+          <li><a href="<c:url value='/consul'/>">상담하기</a></li>
           <c:choose>
             <c:when test="${loginuser != null}">
               <li><a href="<c:url value='/info?userId=${loginuser.userId}'/>">${loginuser.userName}님</a></li>
