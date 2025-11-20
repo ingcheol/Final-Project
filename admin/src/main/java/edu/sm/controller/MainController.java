@@ -1,26 +1,22 @@
 package edu.sm.controller;
 
-//import edu.sm.app.dto.Chat;
-//import edu.sm.app.dto.Product;
-//import edu.sm.app.service.ChatService;
+import edu.sm.app.dto.Patient;
+import edu.sm.app.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
-import java.util.Random;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
 public class MainController {
-
-//    private final ChatService chatService;
+    private final PatientService patientService;
 
     @Value("${app.url.sse}")
     String sseUrl;
@@ -29,37 +25,166 @@ public class MainController {
     @Value("${app.url.websocketurl}")
     String websocketurl;
 
+    /**
+     * 메인 페이지 (Welcome 화면)
+     */
     @RequestMapping("/")
     public String main(Model model) {
         model.addAttribute("sseUrl", sseUrl);
-        model.addAttribute("center", "dashboard");
         return "index";
     }
 
-//    @RequestMapping("/chart")
-//    public String chart(Model model) {
-//        model.addAttribute("mainsseUrl",mainsseUrl);
-//        model.addAttribute("center","chart");
-//        return "index";
-//    }
-//
-//    @RequestMapping("/chat")
-//    public String chat(Model model) {
-//        model.addAttribute("websocketurl",websocketurl);
-//        model.addAttribute("center","chat");
-//        return "index";
-//    }
-
     /**
-     * 상담 페이지 요청을 처리하고, views/consultation.jsp로 이동합니다.
-     * (기존 /websocket 요청을 대체합니다.)
+     * 화상 상담 페이지
      */
     @RequestMapping("/consultation")
     public String consultation(Model model) {
-        // WebSocket URL은 상담 페이지에서도 사용될 수 있으므로 그대로 전달합니다.
-        model.addAttribute("websocketurl",websocketurl);
-        // views/consultation.jsp로 이동하기 위해 center 속성을 "consultation"으로 설정합니다.
-        model.addAttribute("center","consultation");
+        model.addAttribute("websocketurl", websocketurl);
+        model.addAttribute("sseUrl", sseUrl);
+        model.addAttribute("center", "consultation");
         return "index";
+    }
+
+    /**
+     * 환자 관리 메인 페이지 - 전체 목록
+     */
+    @GetMapping("/manage")
+    public String manageList(Model model) {
+        try {
+            List<Patient> patients = patientService.getAllPatients();
+            model.addAttribute("patients", patients);
+            model.addAttribute("center", "manage");
+            return "index";
+        } catch (Exception e) {
+            log.error("환자 목록 조회 실패", e);
+            model.addAttribute("error", "환자 목록을 불러오는데 실패했습니다.");
+            model.addAttribute("center", "error");
+            return "index";
+        }
+    }
+
+    /**
+     * 환자 검색
+     */
+    @GetMapping("/manage/search")
+    public String searchPatients(@RequestParam(required = false) String keyword,
+                                 @RequestParam(required = false) String status,
+                                 Model model) {
+        try {
+            List<Patient> patients;
+
+            if (status != null && !status.trim().isEmpty() && !status.equals("all")) {
+                patients = patientService.getPatientsByStatus(status);
+            } else if (keyword != null && !keyword.trim().isEmpty()) {
+                patients = patientService.searchPatients(keyword);
+            } else {
+                patients = patientService.getAllPatients();
+            }
+
+            model.addAttribute("patients", patients);
+            model.addAttribute("keyword", keyword);
+            model.addAttribute("status", status);
+            model.addAttribute("center", "manage");
+            return "index";
+        } catch (Exception e) {
+            log.error("환자 검색 실패", e);
+            model.addAttribute("error", "검색에 실패했습니다.");
+            model.addAttribute("center", "error");
+            return "index";
+        }
+    }
+
+    /**
+     * 특정 환자 상세 관리 페이지
+     */
+    @GetMapping("/manage/{id}")
+    public String managePatient(Model model, @PathVariable("id") Long id) {
+        try {
+            Patient patient = patientService.get(id);
+            if (patient == null) {
+                throw new Exception("환자를 찾을 수 없습니다.");
+            }
+            model.addAttribute("patient", patient);
+            model.addAttribute("center", "manage_detail");
+            return "index";
+        } catch (Exception e) {
+            log.error("환자 조회 실패: {}", id, e);
+            model.addAttribute("error", "환자 정보를 불러오는데 실패했습니다.");
+            model.addAttribute("center", "error");
+            return "index";
+        }
+    }
+
+    /**
+     * 환자 정보 수정 페이지
+     */
+    @GetMapping("/manage/edit/{id}")
+    public String editPatientForm(Model model, @PathVariable("id") Long id) {
+        try {
+            Patient patient = patientService.get(id);
+            if (patient == null) {
+                throw new Exception("환자를 찾을 수 없습니다.");
+            }
+            model.addAttribute("patient", patient);
+            model.addAttribute("center", "manage_edit");
+            return "index";
+        } catch (Exception e) {
+            log.error("환자 수정 페이지 로드 실패: {}", id, e);
+            model.addAttribute("error", "환자 정보를 불러오는데 실패했습니다.");
+            model.addAttribute("center", "error");
+            return "index";
+        }
+    }
+
+    /**
+     * 환자 정보 수정 처리
+     */
+    @PostMapping("/manage/edit")
+    public String updatePatient(@ModelAttribute Patient patient,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            patientService.modify(patient);
+            redirectAttributes.addFlashAttribute("message", "환자 정보가 수정되었습니다.");
+            return "redirect:/manage/" + patient.getPatientId();
+        } catch (Exception e) {
+            log.error("환자 정보 수정 실패: {}", patient.getPatientId(), e);
+            redirectAttributes.addFlashAttribute("error", "환자 정보 수정에 실패했습니다.");
+            return "redirect:/manage/edit/" + patient.getPatientId();
+        }
+    }
+
+    /**
+     * 계정 상태 변경
+     */
+    @PostMapping("/manage/status")
+    public String changeStatus(@RequestParam Long patientId,
+                               @RequestParam String status,
+                               RedirectAttributes redirectAttributes) {
+        try {
+            patientService.changeAccountStatus(patientId, status);
+            redirectAttributes.addFlashAttribute("message", "계정 상태가 변경되었습니다.");
+            return "redirect:/manage/" + patientId;
+        } catch (Exception e) {
+            log.error("계정 상태 변경 실패: patientId={}, status={}", patientId, status, e);
+            redirectAttributes.addFlashAttribute("error", "계정 상태 변경에 실패했습니다.");
+            return "redirect:/manage/" + patientId;
+        }
+    }
+
+    /**
+     * 환자 삭제
+     */
+    @PostMapping("/manage/delete/{id}")
+    public String deletePatient(@PathVariable("id") Long id,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            patientService.remove(id);
+            redirectAttributes.addFlashAttribute("message", "환자 정보가 삭제되었습니다.");
+            return "redirect:/manage";
+        } catch (Exception e) {
+            log.error("환자 삭제 실패: {}", id, e);
+            redirectAttributes.addFlashAttribute("error", "환자 삭제에 실패했습니다.");
+            return "redirect:/manage/" + id;
+        }
     }
 }

@@ -23,7 +23,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Dashboard | Osen</title>
+    <title>OSEN Admin</title>
     <style>
         * {
             margin: 0;
@@ -89,6 +89,7 @@
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            text-decoration: none;
         }
 
         .nav-item:hover {
@@ -176,278 +177,6 @@
             background: #e2e8f0;
         }
 
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-        }
-
-        .stat-label {
-            color: #64748b;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .stat-card:nth-child(1) .stat-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(2) .stat-icon {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(3) .stat-icon {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(4) .stat-icon {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: #fff;
-        }
-
-        .stat-change {
-            font-size: 13px;
-            color: #22c55e;
-        }
-
-        .stat-change.negative {
-            color: #ef4444;
-        }
-
-        .stat-change::before {
-            content: "↑ ";
-        }
-
-        .stat-change.negative::before {
-            content: "↓ ";
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Chart Placeholder */
-        .chart-container {
-            height: 300px;
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            height: 200px;
-        }
-
-        .chart-bar {
-            width: 40px;
-            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 8px 8px 0 0;
-            animation: growBar 1s ease-out;
-        }
-
-        @keyframes growBar {
-            from { height: 0; }
-            to { height: var(--height); }
-        }
-
-        /* Traffic Chart */
-        .traffic-chart {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            position: relative;
-        }
-
-        .donut-chart {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                    #6366f1 0deg 130deg,
-                    #8b5cf6 130deg 230deg,
-                    #22c55e 230deg 290deg,
-                    #ef4444 290deg 360deg
-            );
-            position: relative;
-        }
-
-        .donut-chart::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60%;
-            height: 60%;
-            background: #fff;
-            border-radius: 50%;
-        }
-
-        .traffic-legend {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f8fafc;
-        }
-
-        th {
-            padding: 15px;
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #64748b;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 18px 15px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #475569;
-        }
-
-        tr:hover {
-            background: #f8fafc;
-        }
-
-        .brand-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
@@ -523,6 +252,21 @@
             cursor: pointer;
         }
 
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+            padding: 100px;
+            color: #64748b;
+        }
+
+        .welcome-screen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            font-size: 18px;
+        }
 
         /* Responsive */
         @media (max-width: 1200px) {
@@ -539,10 +283,6 @@
             .main-content {
                 margin-left: 0;
             }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -553,15 +293,15 @@
 
         <div class="nav-section">
             <div class="nav-title">DASH</div>
-            <div class="nav-item active">
+            <a href="<c:url value='/'/>" class="nav-item">
                 <span class="icon">📊</span>
                 <span>Sales</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">🏥</span>
-                <span>Clinic</span>
-            </div>
-            <a href="<c:url value='/consultation'/>" class="nav-item" style="text-decoration: none;">
+            </a>
+            <a href="<c:url value='/manage'/>" class="nav-item">
+                <span class="icon">📱</span>
+                <span>Patient Manage</span>
+            </a>
+            <a href="<c:url value='/consultation'/>" class="nav-item">
                 <span class="icon">📱</span>
                 <span>Consultation</span>
             </a>
@@ -632,176 +372,42 @@
         </script>
         <% } %>
 
-
+        <%-- 동적 콘텐츠 영역 --%>
         <c:choose>
-            <%-- 1. center 값이 'dashboard'일 경우, index.jsp의 기본 대시보드 HTML 출력 --%>
-            <c:when test="${center eq 'dashboard'}">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Total Orders</div>
-                        <div class="stat-value">
-                            <div class="stat-icon">📦</div>
-                            <span>687.3k</span>
-                        </div>
-                        <div class="stat-change">9.19% Since last month</div>
-                    </div>
+            <%-- 1. 환자 관리 페이지 --%>
+            <c:when test="${center == 'manage'}">
+                <jsp:include page="patient/manage.jsp" />
+            </c:when>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Total Returns</div>
-                        <div class="stat-value">
-                            <div class="stat-icon">↩️</div>
-                            <span>9.62k</span>
-                        </div>
-                        <div class="stat-change negative">26.87% Since last month</div>
-                    </div>
+            <%-- 2. 환자 상세 페이지 --%>
+            <c:when test="${center == 'manage_detail'}">
+                <jsp:include page="patient/detail.jsp" />
+            </c:when>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Avg. Sales Earnings</div>
-                        <div class="stat-value">
-                            <div class="stat-icon">💰</div>
-                            <span>$98.24</span>
-                        </div>
-                        <div class="stat-change">3.51% Since last month</div>
-                    </div>
+            <%-- 3. 환자 수정 페이지 --%>
+            <c:when test="${center == 'manage_edit'}">
+                <jsp:include page="patient/edit.jsp" />
+            </c:when>
 
-                    <div class="stat-card">
-                        <div class="stat-label">Number of Visits</div>
-                        <div class="stat-value">
-                            <div class="stat-icon">👁️</div>
-                            <span>87.94M</span>
-                        </div>
-                        <div class="stat-change">1.05% Since last month</div>
-                    </div>
-                </div>
+            <%-- 4. 화상 상담 페이지 --%>
+            <c:when test="${center == 'consultation'}">
+                <jsp:include page="consultation.jsp" />
+            </c:when>
 
-                <div class="cards-grid">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Overview</h3>
-                            <div class="card-actions">
-                                <button class="icon-btn">⋮</button>
-                            </div>
-                        </div>
-                        <div class="chart-container">
-                            <div class="chart-bars">
-                                <div class="chart-bar" style="--height: 80px"></div>
-                                <div class="chart-bar" style="--height: 120px"></div>
-                                <div class="chart-bar" style="--height: 100px"></div>
-                                <div class="chart-bar" style="--height: 150px"></div>
-                                <div class="chart-bar" style="--height: 90px"></div>
-                                <div class="chart-bar" style="--height: 130px"></div>
-                                <div class="chart-bar" style="--height: 110px"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Top Traffic by Source</h3>
-                            <div class="card-actions">
-                                <button class="icon-btn">⋮</button>
-                            </div>
-                        </div>
-                        <div class="traffic-chart">
-                            <div class="donut-chart"></div>
-                        </div>
-                        <div class="traffic-legend">
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #6366f1"></span>
-                                <span>Direct</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #8b5cf6"></span>
-                                <span>Marketing</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #22c55e"></span>
-                                <span>Social</span>
-                            </div>
-                            <div class="legend-item">
-                                <span class="legend-color" style="background: #ef4444"></span>
-                                <span>Affiliates</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Brands Listing</h3>
-                        <button class="btn-primary">+ Add Brand</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Brand Name</th>
-                                <th>Established</th>
-                                <th>Stores</th>
-                                <th>Products</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td>
-                                    <div class="brand-cell">
-                                        <div class="brand-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Z</div>
-                                        <div>
-                                            <div style="font-weight: 600">Clothing</div>
-                                            <div style="font-size: 12px; color: #94a3b8">Zaroan - Brazil</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Since 2020</td>
-                                <td>1.5k</td>
-                                <td>8,950</td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td><button class="icon-btn">⋮</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="brand-cell">
-                                        <div class="brand-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">J</div>
-                                        <div>
-                                            <div style="font-weight: 600">Clothing</div>
-                                            <div style="font-size: 12px; color: #94a3b8">Jocky-Johns - USA</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Since 1985</td>
-                                <td>205</td>
-                                <td>1,258</td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td><button class="icon-btn">⋮</button></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div class="brand-cell">
-                                        <div class="brand-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">G</div>
-                                        <div>
-                                            <div style="font-weight: 600">Lifestyle</div>
-                                            <div style="font-size: 12px; color: #94a3b8">Ginne - India</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Since 2001</td>
-                                <td>89</td>
-                                <td>338</td>
-                                <td><span class="status-badge status-active">Active</span></td>
-                                <td><button class="icon-btn">⋮</button></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <%-- 5. 에러 페이지 --%>
+            <c:when test="${center == 'error'}">
+                <div class="welcome-screen">
+                    <h1 style="color: #ef4444;">오류 발생</h1>
+                    <p>${error}</p>
                 </div>
             </c:when>
 
-            <%-- 2. center 값이 'dashboard'가 아닐 경우, 해당 파일을 인클루드합니다. (예: /views/consultation.jsp) --%>
+            <%-- 6. 그 외의 경우 (초기 접속 등) --%>
             <c:otherwise>
-                <c:import url="/views/${center}.jsp" />
+                <div class="welcome-screen">
+                    <h1>OSEN</h1>
+                    <p>좌측 메뉴를 선택하여 작업을 시작하세요.</p>
+                </div>
             </c:otherwise>
         </c:choose>
     </main>
