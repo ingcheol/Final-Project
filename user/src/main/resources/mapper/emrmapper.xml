@@ -29,9 +29,9 @@
 
   <insert id="insert" parameterType="Emr" useGeneratedKeys="true" keyProperty="emrId">
     INSERT INTO emr (consultation_id, patient_statement, test_results,
-                     prescription_details, ai_generated_draft, final_record, created_at)
+                     prescription_details, ai_generated_draft, final_record, created_at, patient_id)
     VALUES (#{consultationId}, #{patientStatement}, #{testResults},
-            #{prescriptionDetails}, #{aiGeneratedDraft}, #{finalRecord}, NOW())
+            #{prescriptionDetails}, #{aiGeneratedDraft}, #{finalRecord}, NOW(), #{patientId})
   </insert>
 
   <update id="update" parameterType="Emr">

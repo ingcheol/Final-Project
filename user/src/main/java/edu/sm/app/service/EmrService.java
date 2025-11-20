@@ -36,7 +36,8 @@ public class EmrService {
       Long patientId,
       MultipartFile audioFile,
       String testResults,
-      String prescriptionDetails) throws Exception {
+      String prescriptionDetails,
+      String language) throws Exception {
 
     log.info("EMR 생성 시작 - consultationId: {}, patientId: {}", consultationId, patientId);
 
@@ -45,11 +46,11 @@ public class EmrService {
     log.info("STT 변환 완료: {} 자", sttText.length());
 
     // 2. Few-Shot + RAG: EMR JSON 생성
-    String emrJson = generateEmrJsonWithFewShot(sttText, testResults, prescriptionDetails);
+    String emrJson = generateEmrJsonWithFewShot(sttText, testResults, prescriptionDetails, language);
     log.info("EMR JSON 생성 완료");
 
     // 3. JSON 파싱
-    Emr emr = parseEmrJson(emrJson);
+    Emr emr = parseEmrJson(emrJson, language);
     emr.setConsultationId(consultationId);
     emr.setPatientId(patientId);
     emr.setPatientStatement(sttText);
@@ -67,53 +68,52 @@ public class EmrService {
   private String generateEmrJsonWithFewShot(
       String sttText,
       String testResults,
-      String prescriptionDetails) {
+      String prescriptionDetails,
+      String language) {
 
     ChatClient chatClient = chatClientBuilder.build();
 
-    String systemPrompt = """
-            당신은 전문 의료 기록 작성 AI입니다.
-            환자 상담 내용을 EMR JSON 형식으로 변환하세요.
+    String systemPrompt = switch (language) {
+      case "en" -> """
+            You are a professional medical records AI following Korea's EMR certification standards (F041).
+            Generate medical records in English only in SOAP format.
+            Output must be a single JSON object starting with { and ending with }.
+            
+            ### JSON Schema ###
+            {
+              "subjective": "Patient's subjective symptoms",
+              "objective": "Objective examination findings",
+              "assessment": "Assessment and diagnosis",
+              "plan": "Treatment plan"
+            }
+            """;
+      default -> """
+            당신은 보건복지부 전자의무기록(EMR) 인증기준을 준수하는 의료 기록 작성 AI입니다.
+            환자 상담 내용을 한국어로만 표준 의무기록 형식(SOAP)으로 구조화하여 출력하세요.
             반드시 { 로 시작하고 } 로 끝나는 하나의 JSON 객체만 출력하세요.
             
             ### JSON 스키마 ###
             {
-              "chiefComplaint": "주 호소",
-              "presentIllness": "현병력",
-              "diagnosis": "진단명",
-              "treatmentPlan": "치료 계획",
-              "counselingNote": "상담 기록"
-            }
-            
-            ### 예시 1 ###
-            입력:
-            - STT: "어제부터 허리가 아파서 잠을 못 잤어요"
-            - 검사: MRI - 요추 4-5번 추간판 팽윤
-            - 처방: 소염진통제 1일 3회
-            
-            출력:
-            {
-              "chiefComplaint": "허리 통증",
-              "presentIllness": "어제부터 허리 통증 시작, 수면 장애 동반",
-              "diagnosis": "요추 추간판 탈출증 (L4-L5)",
-              "treatmentPlan": "약물 치료 및 물리 치료 권장",
-              "counselingNote": "통증 호전 없을 시 1주일 후 재방문"
+              "subjective": "환자 주관적 증상 (S)",
+              "objective": "객관적 검사 소견 (O)",
+              "assessment": "평가 및 진단 (A)",
+              "plan": "치료 계획 (P)"
             }
             """;
+    };
 
     String userPrompt = String.format("""
-            입력:
-            - STT: "%s"
-            - 검사 결과: %s
-            - 처방: %s
-            
-            위 정보를 바탕으로 EMR JSON을 생성하세요.
-            """,
+          입력:
+          - 환자 진술 (STT): "%s"
+          - 검사 결과: %s
+          - 처방 내역: %s
+          
+          위 정보를 SOAP 형식의 표준 의무기록 JSON으로 생성하세요.
+          """,
         sttText,
-        testResults != null ? testResults : "검사 결과 없음",
+        testResults != null ? testResults : "검사 없음",
         prescriptionDetails != null ? prescriptionDetails : "처방 없음");
 
-    // RAG Advisor 추가
     SearchRequest searchRequest = SearchRequest.builder()
         .similarityThreshold(0.7)
         .topK(2)
@@ -171,69 +171,91 @@ public class EmrService {
   /**
    * JSON 파싱하여 EMR 엔티티 생성
    */
-  private Emr parseEmrJson(String jsonStr) throws Exception {
+  private Emr parseEmrJson(String jsonStr, String language) throws Exception {
     JsonNode jsonNode = objectMapper.readTree(jsonStr);
-
     Emr emr = new Emr();
     StringBuilder finalRecord = new StringBuilder();
 
-    if (jsonNode.has("chiefComplaint")) {
-      finalRecord.append("[주 호소]\n")
-          .append(jsonNode.get("chiefComplaint").asText())
-          .append("\n\n");
-    }
+    if ("en".equals(language)) {
+      finalRecord.append("=== Electronic Medical Record (EMR) ===\n\n");
 
-    if (jsonNode.has("presentIllness")) {
-      finalRecord.append("[현병력]\n")
-          .append(jsonNode.get("presentIllness").asText())
-          .append("\n\n");
-    }
+      if (jsonNode.has("subjective")) {
+        finalRecord.append("[S - Subjective]\n")
+            .append(jsonNode.get("subjective").asText()).append("\n\n");
+      }
 
-    if (jsonNode.has("diagnosis")) {
-      finalRecord.append("[진단명]\n")
-          .append(jsonNode.get("diagnosis").asText())
-          .append("\n\n");
-    }
+      if (jsonNode.has("objective")) {
+        finalRecord.append("[O - Objective]\n")
+            .append(jsonNode.get("objective").asText()).append("\n\n");
+      }
 
-    if (jsonNode.has("treatmentPlan")) {
-      finalRecord.append("[치료 계획]\n")
-          .append(jsonNode.get("treatmentPlan").asText())
-          .append("\n\n");
-    }
+      if (jsonNode.has("assessment")) {
+        finalRecord.append("[A - Assessment]\n")
+            .append(jsonNode.get("assessment").asText()).append("\n\n");
+      }
 
-    if (jsonNode.has("counselingNote")) {
-      finalRecord.append("[상담 기록]\n")
-          .append(jsonNode.get("counselingNote").asText());
+      if (jsonNode.has("plan")) {
+        finalRecord.append("[P - Plan]\n")
+            .append(jsonNode.get("plan").asText());
+      }
+    } else {
+      // 한국어 (기본값)
+      finalRecord.append("=== 전자의무기록 (EMR) ===\n\n");
+
+      if (jsonNode.has("subjective")) {
+        finalRecord.append("[S - 주관적 증상]\n")
+            .append(jsonNode.get("subjective").asText()).append("\n\n");
+      }
+
+      if (jsonNode.has("objective")) {
+        finalRecord.append("[O - 객관적 소견]\n")
+            .append(jsonNode.get("objective").asText()).append("\n\n");
+      }
+
+      if (jsonNode.has("assessment")) {
+        finalRecord.append("[A - 평가]\n")
+            .append(jsonNode.get("assessment").asText()).append("\n\n");
+      }
+
+      if (jsonNode.has("plan")) {
+        finalRecord.append("[P - 계획]\n")
+            .append(jsonNode.get("plan").asText());
+      }
     }
 
     emr.setFinalRecord(finalRecord.toString());
     return emr;
   }
 
-//  EMR 최종 기록 분배용 프롬프트를 넣어서 호출
-public String generateAiParsedJsonFromFinalRecord(String aiPrompt) {
-  ChatClient chatClient = chatClientBuilder.build();
-  String response = chatClient.prompt()
-      .system("의료 기록 구조화 AI입니다.")
-      .user(aiPrompt)
-      .call()
-      .content();
-  return extractJsonFromResponse(response);
-}
+
+  //  EMR 최종 기록 분배용 프롬프트를 넣어서 호출
+  public String generateAiParsedJsonFromFinalRecord(String aiPrompt) {
+    ChatClient chatClient = chatClientBuilder.build();
+    String response = chatClient.prompt()
+        .system("의료 기록 구조화 AI입니다.")
+        .user(aiPrompt)
+        .call()
+        .content();
+    return extractJsonFromResponse(response);
+  }
 
   public void saveEmrWithAIAutoParsing(Long consultationId, Long patientId, String finalRecord) throws Exception {
-    // AI 프롬프트 작성
     String aiPrompt = """
-    다음은 한 환자의 EMR 기록 전체입니다.
-    각 항목(patient_statement, test_results, prescription_details, ai_generated_draft)으로 나눠 JSON으로 출력하세요.
-    없는 항목은 빈 문자열로 하세요.
-    [EMR 기록]
-    """ + finalRecord;
+        다음은 환자의 전자의무기록(EMR) 전체 내용입니다.
+        각 항목을 아래 JSON 형식으로 정확히 분류하여 출력하세요.
+        반드시 { 로 시작하고 } 로 끝나는 하나의 JSON만 출력하세요.
+        
+        {
+          "patient_statement": "환자가 직접 진술한 내용",
+          "test_results": "검사 결과 및 수치",
+          "prescription_details": "처방된 약물 및 용법",
+          "ai_generated_draft": "AI가 생성한 초안 기록"
+        }
+        
+        [EMR 전체 기록]
+        """ + finalRecord;
 
-    // AI 호출
     String aiResultJson = generateAiParsedJsonFromFinalRecord(aiPrompt);
-
-    // JSON 파싱 후 Map 변환
     Map<String, String> fields = objectMapper.readValue(aiResultJson, Map.class);
 
     Emr emr = new Emr();
@@ -248,6 +270,7 @@ public String generateAiParsedJsonFromFinalRecord(String aiPrompt) {
     emr.setUpdatedAt(LocalDateTime.now());
 
     emrRepository.insert(emr);
+    log.info("EMR 최종 저장 완료 - emrId: {}", emr.getEmrId());
   }
 
   /**
