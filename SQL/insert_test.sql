@@ -47,3 +47,19 @@ INSERT INTO adviser (
              'ACTIVE',
              NOW()
          );
+
+
+-- ==========================================
+-- 5. 초기 데이터: 의료 PDF 10종 등록
+-- ==========================================
+INSERT INTO medical_documents (file_name, doc_title, file_path, file_size, created_at) VALUES
+                                                                                           ('계절인플루엔자의항바이러스제사용지침.pdf', '계절 인플루엔자의 항바이러스제 사용지침', 'src/main/resources/medical-data/계절인플루엔자의항바이러스제사용지침.pdf', '984KB', NOW()),
+                                                                                           ('대한감염학회권장성인예방접종개정안.pdf', '대한감염학회 권장 성인예방접종 개정안', 'src/main/resources/medical-data/대한감염학회권장성인예방접종개정안.pdf', '664KB', NOW()),
+                                                                                           ('만성코로나19증후군.pdf', '만성 코로나19 증후군', 'src/main/resources/medical-data/만성코로나19증후군.pdf', '3,538KB', NOW()),
+                                                                                           ('성인급성상기도감염 항생제사용지침권고안.pdf', '성인 급성 상기도 감염 항생제 사용지침 권고안', 'src/main/resources/medical-data/성인급성상기도감염 항생제사용지침권고안.pdf', '970KB', NOW()),
+                                                                                           ('성인복강내감염.pdf', '성인 복강 내 감염', 'src/main/resources/medical-data/성인복강내감염.pdf', '2,496KB', NOW()),
+                                                                                           ('성인지역사회획득폐렴항생제사용지침.pdf', '성인 지역사회획득 폐렴 항생제 사용지침', 'src/main/resources/medical-data/성인지역사회획득폐렴항생제사용지침.pdf', '643KB', NOW()),
+                                                                                           ('의료관련감염.pdf', '의료관련감염', 'src/main/resources/medical-data/의료관련감염.pdf', '6,300KB', NOW()),
+                                                                                           ('코로나19환자치료를위한 최신.pdf', '코로나19 환자 치료를 위한 최신', 'src/main/resources/medical-data/코로나19환자치료를위한 최신.pdf', '6,773KB', NOW()),
+                                                                                           ('피부연조직감염항생제사용지침.pdf', '피부·연조직 감염 항생제 사용지침', 'src/main/resources/medical-data/피부연조직감염항생제사용지침.pdf', '842KB', NOW()),
+                                                                                           ('한국에서의항생제스튜어드십프로그램 .pdf', '한국에서의 항생제 스튜어드십 프로그램', 'src/main/resources/medical-data/한국에서의항생제스튜어드십프로그램 .pdf', '2,779KB', NOW());
