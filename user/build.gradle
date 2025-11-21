@@ -24,6 +24,7 @@ configurations {
 repositories {
 	mavenCentral()
 	maven { url = 'https://repo.spring.io/snapshot' }
+	maven { url = 'https://repo.spring.io/milestone' }  // ← 이 줄 추가!
 }
 
 ext {
@@ -31,6 +32,16 @@ ext {
 }
 
 dependencies {
+
+	// Google Gson 의존성 추가 (JSON 파싱을 위해)
+	implementation 'com.google.code.gson:gson:2.10.1'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql'
+
+	// pdf 텍스트 추출
+	implementation 'org.apache.pdfbox:pdfbox:3.0.3'
+
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
