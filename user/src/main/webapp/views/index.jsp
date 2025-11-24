@@ -331,20 +331,20 @@
       <div class="footer-content">
         <div class="footer-info">
           <h3>AI 기반 의료 매칭 시스템</h3>
-          <p>주소: 서울특별시 강남구, 대한민국 우편번호 06234</p>
-          <p>이메일: contact@medical-ai.kr</p>
-          <p>대표자: 홍길동</p>
+          <p>주소: 충청남도 아산시 탕정면 선문로221번길 70, 대한민국 우편번호 31460</p>
+          <p>이메일: comtaek@gmail.com</p>
+          <p>대표자: 이택</p>
         </div>
         <div class="footer-contact">
-          <h3>전문 의료상담</h3>
-          <div class="contact-number">1234-5678</div>
-          <p>평일: AM 9:00 - PM 6:00</p>
-          <p>토요일: AM 9:00 - PM 1:00</p>
-          <p>일요일: PM 1:00 - PM 6:00</p>
+          <h3>문의사항</h3>
+          <div class="contact-number">010-1234-5678</div>
+          <p>평일: AM 9:00 - PM 9:00</p>
+          <p>토요일: 휴식</p>
+          <p>일요일: 휴식</p>
         </div>
       </div>
       <div class="footer-bottom">
-        <p>Copyright © 2025 AI 의료 매칭 시스템. All Rights Reserved.</p>
+        <p>© 2025 파이널 프로젝트 AI 의료 매칭 시스템</p>
       </div>
     </footer>
 

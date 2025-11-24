@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI 약물 일정 관리</title>
+    <title>일정 관리</title>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js'></script>
@@ -105,8 +105,8 @@
 <body>
 
 <section class="calendar-section">
-    <h2 id="header-title">📅 AI 약물 일정 관리</h2>
-    <p id="header-desc">약봉투를 업로드하거나 음성으로 일정을 추가해보세요.</p>
+    <h2 id="header-title">📅 일정 관리</h2>
+    <p id="header-desc">약봉투를 업로드하거나 음성 및 텍스트로 일정을 추가해보세요.</p>
 
     <div class="calendar-controls">
         <div id="header-controls">
