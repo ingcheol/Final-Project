@@ -47,15 +47,19 @@
     configuration:{iceServers:[{urls:'stun:stun.l.google.com:19302'}]},
 
     init:async function(){
+      console.log('=== Patient Consultation Init ===');
       console.log('Patient Init - ID:', this.id);
+      console.log('Room ID:', this.roomId);
 
       // WebRTC 초기화
       $('#startButton').click(()=>this.startCall());
       $('#endButton').click(()=>this.endCall());
       $('#adviserArea').hide();
 
-      // 채팅 초기화
+      // 채팅 초기화 (먼저 연결)
+      console.log('Initializing chat connection...');
       this.connectChat();
+
       $('#sendto').click(()=>this.sendMessage());
       $('#totext').keypress((e)=>{
         if(e.which === 13){
@@ -63,32 +67,50 @@
         }
       });
 
-      // WebRTC 연결 후 자동 통화 시작
+      // 채팅 연결 후 WebRTC 연결
       await this.connectWebRTC();
     },
 
     connectChat:function(){
-      let socket = new SockJS('${websocketurl}chat');
+      // Shop 서버(8444)의 채팅 엔드포인트 사용 (상대 경로)
+      console.log('Patient connecting to chat endpoint: /chat');
+      let socket = new SockJS('/chat');  // 상대 경로 (현재 서버 기준)
       this.stompClient = Stomp.over(socket);
       let self = this;
+
+      // 디버그 모드 활성화
+      this.stompClient.debug = function(str) {
+        console.log('STOMP Debug:', str);
+      };
 
       this.stompClient.connect({}, function(frame){
         console.log('Patient Chat Connected: ' + frame);
         self.setChatConnected(true);
 
         // 방 채팅 구독
-        self.stompClient.subscribe('/send/chat/' + self.roomId, function(msg){
+        const subscriptionPath = '/send/chat/' + self.roomId;
+        console.log('Patient subscribing to:', subscriptionPath);
+
+        self.stompClient.subscribe(subscriptionPath, function(msg){
           const data = JSON.parse(msg.body);
-          console.log('Received room message:', data);
+          console.log('Patient received room message:', data);
 
           if (data.sendid !== self.id) {
             self.addMessage(data.content1, 'received', data.sendid);
           }
         });
 
+        console.log('Patient chat setup completed');
+
       }, function(error){
         console.error('STOMP connection error:', error);
         self.setChatConnected(false);
+
+        // 재연결 시도
+        setTimeout(function() {
+          console.log('Attempting to reconnect chat...');
+          self.connectChat();
+        }, 3000);
       });
     },
 
@@ -126,7 +148,19 @@
 
     connectWebRTC:async function(){
       try{
-        this.websocket = new WebSocket('${websocketurl}signal');
+        // Shop 서버(8444)의 WebSocket에 연결 - 명시적 URL
+        let wsUrl;
+        if (window.location.protocol === 'https:') {
+          wsUrl = 'wss://' + window.location.host + '/signal';
+        } else {
+          wsUrl = 'ws://' + window.location.host + '/signal';
+        }
+
+        console.log('Patient connecting to WebSocket:', wsUrl);
+        console.log('Protocol:', window.location.protocol);
+        console.log('Host:', window.location.host);
+
+        this.websocket = new WebSocket(wsUrl);
 
         this.websocket.onopen = ()=>{
           console.log('Patient WebRTC WebSocket connected');
