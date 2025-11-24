@@ -2,6 +2,7 @@ package edu.sm.rtc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -10,110 +11,139 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Slf4j
+@Component
 public class WebRTCSignalingHandler extends TextWebSocketHandler {
+
+    // roomId -> Set of sessions in that room
+    private static final Map<String, CopyOnWriteArraySet<WebSocketSession>> roomSessions = new ConcurrentHashMap<>();
+    // sessionId -> roomId mapping
+    private static final Map<String, String> sessionRoomMap = new ConcurrentHashMap<>();
+
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
-    private final Map<String, String> roomSessions = new ConcurrentHashMap<>();
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        log.info("New WebSocket connection established: {}", session.getId());
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        log.info("WebRTC WebSocket connected: {}", session.getId());
     }
 
     @Override
-    public void handleTextMessage(WebSocketSession wsession, TextMessage message) {
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+        String payload = message.getPayload();
+        log.info("Received message from client {}: {}", session.getId(), payload);
+
         try {
-            log.info("Received message from client {}: {}", wsession.getId(), message.getPayload());
+            Map<String, Object> messageData = objectMapper.readValue(payload, Map.class);
+            String type = (String) messageData.get("type");
+            String roomId = (String) messageData.get("roomId");
 
-            SignalMessage signalMessage = objectMapper.readValue(message.getPayload(), SignalMessage.class);
-            String roomId = signalMessage.getRoomId();
+            if (roomId == null) {
+                log.error("RoomId is null in message from {}", session.getId());
+                return;
+            }
 
-            log.info("Processing {} message for room: {}", signalMessage.getType(), roomId);
-
-            switch (signalMessage.getType()) {
+            switch (type) {
                 case "join":
-                    handleJoinMessage(wsession, roomId);
-                    signalMessage.setType("join");
-                    broadcastToRoom(wsession, new TextMessage(objectMapper.writeValueAsString(signalMessage)), roomId);
-                    break;
-                case "bye":
-                    log.info("Received bye from: {}", wsession.getId());
-//                    Map<String, Object> chatData = new HashMap<>();
-//                    chatData.put("content", "Bye ...");
-//                    signalMessage.setData(chatData);
-                    signalMessage.setType("bye");
-                    broadcastToRoom(wsession, new TextMessage(objectMapper.writeValueAsString(signalMessage)), roomId);
+                    handleJoin(session, roomId);
                     break;
                 case "offer":
-                    log.info("1Received offer from: {}", wsession.getId());
-                    log.info("2Received offer from: {}", message);
-                    broadcastToRoom(wsession, message, roomId);
-                    break;
                 case "answer":
-                    log.info("Received answer from: {}", wsession.getId());
-                    broadcastToRoom(wsession, message, roomId);
-                    break;
                 case "ice-candidate":
-                    log.info("Received ICE candidate from: {}", wsession.getId());
-                    broadcastToRoom(wsession, message, roomId);
+                    broadcastToRoom(session, roomId, payload);
+                    break;
+                case "bye":
+                    handleBye(session, roomId);
                     break;
                 default:
-                    log.warn("Unknown message type: {}", signalMessage.getType());
+                    log.warn("Unknown message type: {}", type);
             }
         } catch (Exception e) {
-            log.error("Error handling message: ", e);
+            log.error("Error handling message from {}: {}", session.getId(), e.getMessage(), e);
         }
     }
 
-    private void broadcastToRoom(WebSocketSession sender, TextMessage message, String roomId) {
-        sessions.forEach((sessionId, webSocketSession) -> {
-            if (!sender.getId().equals(sessionId) &&
-                    roomId.equals(roomSessions.get(sessionId))) {
+    private void handleJoin(WebSocketSession session, String roomId) throws IOException {
+        // Add session to room
+        roomSessions.computeIfAbsent(roomId, k -> new CopyOnWriteArraySet<>()).add(session);
+        sessionRoomMap.put(session.getId(), roomId);
+
+        log.info("Session {} joined room {}. Room now has {} participants",
+                session.getId(), roomId, roomSessions.get(roomId).size());
+
+        // Notify others in the room
+        Map<String, Object> joinMessage = Map.of(
+                "type", "join",
+                "roomId", roomId,
+                "sessionId", session.getId()
+        );
+
+        broadcastToRoom(session, roomId, objectMapper.writeValueAsString(joinMessage));
+    }
+
+    private void handleBye(WebSocketSession session, String roomId) throws IOException {
+        removeSession(session);
+
+        // Notify others in the room
+        Map<String, Object> byeMessage = Map.of(
+                "type", "bye",
+                "roomId", roomId,
+                "sessionId", session.getId()
+        );
+
+        broadcastToRoom(session, roomId, objectMapper.writeValueAsString(byeMessage));
+    }
+
+    private void broadcastToRoom(WebSocketSession sender, String roomId, String message) {
+        CopyOnWriteArraySet<WebSocketSession> sessions = roomSessions.get(roomId);
+        if (sessions == null) {
+            log.warn("No sessions found for room: {}", roomId);
+            return;
+        }
+
+        int sentCount = 0;
+        for (WebSocketSession session : sessions) {
+            if (session.isOpen() && !session.getId().equals(sender.getId())) {
                 try {
-                    log.info("Broadcasting message to session {} in room {}", sessionId, roomId);
-                    webSocketSession.sendMessage(message);
+                    session.sendMessage(new TextMessage(message));
+                    sentCount++;
                 } catch (IOException e) {
-                    log.error("Error sending message to session {}: {}", sessionId, e.getMessage());
+                    log.error("Error sending message to session {}: {}", session.getId(), e.getMessage());
+                    removeSession(session);
                 }
             }
-        });
-    }
+        }
 
-    private void handleJoinMessage(WebSocketSession session, String roomId) {
-        sessions.put(session.getId(), session);
-        roomSessions.put(session.getId(), roomId);
-        log.info("Client {} joined room: {}", session.getId(), roomId);
-
-        // 같은 방의 참가자 수 로깅
-        long roomParticipants = roomSessions.values()
-                .stream()
-                .filter(room -> room.equals(roomId))
-                .count();
-        log.info("Room {} now has {} participants", roomId, roomParticipants);
+        log.info("Broadcasted message to {} participants in room {}", sentCount, roomId);
     }
 
     @Override
-    public void afterConnectionClosed(WebSocketSession wsession, CloseStatus status) {
-        String roomId = roomSessions.get(wsession.getId());
-        sessions.remove(wsession.getId());
-        roomSessions.remove(wsession.getId());
-        log.info("Client {} disconnected from room {}", wsession.getId(), roomId);
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        log.info("WebRTC WebSocket disconnected: {} with status {}", session.getId(), status);
+        removeSession(session);
+    }
 
-        // 남은 참가자 수 로깅
+    private void removeSession(WebSocketSession session) {
+        String roomId = sessionRoomMap.remove(session.getId());
         if (roomId != null) {
-            long remainingParticipants = roomSessions.values()
-                    .stream()
-                    .filter(room -> room.equals(roomId))
-                    .count();
-            log.info("Room {} now has {} participants remaining", roomId, remainingParticipants);
+            CopyOnWriteArraySet<WebSocketSession> sessions = roomSessions.get(roomId);
+            if (sessions != null) {
+                sessions.remove(session);
+                log.info("Removed session {} from room {}. Room now has {} participants",
+                        session.getId(), roomId, sessions.size());
 
+                if (sessions.isEmpty()) {
+                    roomSessions.remove(roomId);
+                    log.info("Room {} is now empty and removed", roomId);
+                }
+            }
         }
     }
 
     @Override
-    public void handleTransportError(WebSocketSession session, Throwable exception) {
-        log.error("Transport error for session {}: {}", session.getId(), exception.getMessage());
+    public void handleTransportError(WebSocketSession session, Throwable exception) throws Exception {
+        log.error("WebSocket transport error for session {}: {}", session.getId(), exception.getMessage());
+        removeSession(session);
     }
 }

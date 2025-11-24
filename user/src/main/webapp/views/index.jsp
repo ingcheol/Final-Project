@@ -23,39 +23,37 @@
         z-index: 1000;
     }
 
-    /* === 헤더 레이아웃 최적화 (깨짐 방지) === */
+    /* === 헤더 레이아웃 최적화 === */
     nav {
         max-width: 1200px;
         margin: 0 auto;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 15px 15px; /* 좌우 패딩 축소 */
+        padding: 15px 15px;
     }
     .logo {
         font-size: 20px;
         font-weight: bold;
         color: #5B6FB5;
-        white-space: nowrap; /* 줄 바꿈 방지 */
+        white-space: nowrap;
         margin-right: 20px;
     }
     .nav-menu {
         display: flex;
-        gap: 15px; /* 메뉴 간격 */
+        gap: 15px;
         list-style: none;
         align-items: center;
-        flex-wrap: nowrap; /* 줄 바꿈 방지 */
-        margin-left: auto; /* 우측 정렬 */
+        flex-wrap: nowrap;
+        margin-left: auto;
     }
-    .nav-menu li {
-        white-space: nowrap;
-    }
+    .nav-menu li { white-space: nowrap; }
     .nav-menu a {
         text-decoration: none;
         color: #333;
         font-weight: 500;
         transition: color 0.3s;
-        font-size: 14px; /* 폰트 크기 적절히 조절 */
+        font-size: 14px;
     }
     .nav-menu a:hover { color: #5B6FB5; }
 
@@ -67,11 +65,24 @@
         font-size: 13px;
         cursor: pointer;
     }
-    /* === // 헤더 레이아웃 최적화 끝 === */
 
+    /* 메인 컨텐츠 래퍼 (헤더 높이만큼 여백 확보) */
+    .main-content-wrapper {
+        margin-top: 80px; /* 헤더 높이 */
+        min-height: 800px;
+    }
 
     /* 메인 히어로 섹션 */
-    .hero { margin-top: 80px; height: 600px; background: linear-gradient(rgba(91, 111, 181, 0.1), rgba(91, 111, 181, 0.2)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f0f4f8" width="1200" height="600"/></svg>'); background-size: cover; background-position: center; display: flex; align-items: center; position: relative; }
+    .hero {
+        /* margin-top은 wrapper에서 처리하므로 제거하거나 조정 */
+        height: 600px;
+        background: linear-gradient(rgba(91, 111, 181, 0.1), rgba(91, 111, 181, 0.2)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23f0f4f8" width="1200" height="600"/></svg>');
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
     .hero-content { max-width: 1200px; margin: 0 auto; padding: 0 40px; width: 100%; display: flex; justify-content: space-between; align-items: center; }
     .hero-text { flex: 1; }
     .hero-text h1 { font-size: 48px; color: #333; margin-bottom: 20px; line-height: 1.3; }
@@ -144,343 +155,361 @@
       .chatbot-modal { width: 90%; height: 70%; right: 5%; bottom: 80px; }
       .chatbot-button { width: 60px; height: 60px; bottom: 20px; right: 20px; }
       .chatbot-button svg { width: 30px; height: 30px; }
-      nav { flex-direction: column; gap: 10px; } /* 모바일에서는 세로 배치 */
+      nav { flex-direction: column; gap: 10px; }
       .nav-menu { width: 100%; justify-content: center; flex-wrap: wrap; }
     }
   </style>
 </head>
 <body>
-<c:choose>
-  <c:when test="${center != null}">
-    <jsp:include page="${center}.jsp"/>
-  </c:when>
-  <c:otherwise>
-    <header>
-      <nav>
-        <div class="logo">🏥 AI 의료 매칭 시스템</div>
-        <ul class="nav-menu">
-          <li><a href="#home">홈</a></li>
-          <li><a href="#services">서비스 소개</a></li>
-          <li><a href="#diagnosis">자가진단</a></li>
-          <li><a href="#hospitals">병원찾기</a></li>
-          <li><a href="#contact">문의하기</a></li>
-          <c:choose>
-            <c:when test="${loginuser != null}">
-              <li><a href="<c:url value='/info?userId=${loginuser.userId}'/>">${loginuser.userName}님</a></li>
-              <li><a href="<c:url value='/logout'/>">로그아웃</a></li>
-            </c:when>
-            <c:otherwise>
-              <li><a href="<c:url value='/login'/>">로그인</a></li>
-            </c:otherwise>
-          </c:choose>
 
-          <li>
-            <select id="language-select">
-                <option value="ko">🇰🇷 한국어</option>
-                <option value="en">🇺🇸 English</option>
-                <option value="ja">🇯🇵 Japanese</option>
-                <option value="zh">🇨🇳 Chinese</option>
-            </select>
-          </li>
-        </ul>
-      </nav>
-    </header>
+<header>
+  <nav>
+    <div class="logo">🏥 AI 의료 매칭 시스템</div>
+    <ul class="nav-menu">
+      <li><a href="<c:url value='/'/>#home">홈</a></li>
+      <li><a href="<c:url value='/'/>#services">서비스 소개</a></li>
 
-    <section class="hero" id="home">
-      <div class="hero-content">
-        <div class="hero-text">
-          <h1>
-            <span class="highlight">행복한 삶을 위한 치료</span><br>
-          </h1>
-          <p>AI 기반 스마트 병원 매칭으로<br>의료 취약계층의 건강을 지킵니다</p>
-        </div>
-        <div class="quick-menu">
-          <div class="quick-item" onclick="location.href='matching.jsp'">
-            <svg fill="white" viewBox="0 0 24 24">
-              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-            </svg>
-            <div>병원 추천</div>
+      <li><a href="<c:url value="/dia/dia1"/>">자가진단</a></li>
+      <li><a href="<c:url value="/map/map1"/>">병원찾기</a></li>
+
+      <li><a href="<c:url value='/'/>#contact">문의하기</a></li>
+      <li><a href="<c:url value='/statview'/>">통계 확인</a></li>
+      <li><a href="<c:url value='/consul'/>">상담하기</a></li>
+
+      <c:choose>
+        <c:when test="${loginuser != null}">
+          <li><a href="<c:url value='/info?userId=${loginuser.patientId}'/>">${loginuser.patientName}님</a></li>
+          <li><a href="<c:url value='/logout'/>">로그아웃</a></li>
+        </c:when>
+        <c:otherwise>
+          <li><a href="<c:url value='/login'/>">로그인</a></li>
+        </c:otherwise>
+      </c:choose>
+
+      <li>
+        <select id="language-select">
+            <option value="ko">🇰🇷 한국어</option>
+            <option value="en">🇺🇸 English</option>
+            <option value="ja">🇯🇵 Japanese</option>
+            <option value="zh">🇨🇳 Chinese</option>
+        </select>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<div class="main-content-wrapper">
+    <c:choose>
+      <%-- 1. center 변수가 있으면 해당 페이지를 여기에 끼워넣음 (statview 등) --%>
+      <c:when test="${center != null}">
+        <jsp:include page="${center}.jsp"/>
+      </c:when>
+
+      <%-- 2. center 변수가 없으면 메인 홈페이지 내용을 표시 --%>
+      <c:otherwise>
+        <section class="hero" id="home">
+          <div class="hero-content">
+            <div class="hero-text">
+              <h1>
+                <span class="highlight">행복한 삶을 위한 치료</span><br>
+              </h1>
+              <p>AI 기반 스마트 병원 매칭으로<br>의료 취약계층의 건강을 지킵니다</p>
+            </div>
+            <div class="quick-menu">
+              <div class="quick-item" onclick="location.href='matching.jsp'">
+                <svg fill="white" viewBox="0 0 24 24">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <div>병원 추천</div>
+              </div>
+              <div class="quick-item" onclick="location.href='#diagnosis'">
+                <svg fill="white" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <div>자가 진단</div>
+              </div>
+              <div class="quick-item" onclick="location.href='#contact'">
+                <svg fill="white" viewBox="0 0 24 24">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <div>문의 하기</div>
+              </div>
+              <div class="quick-item" onclick="alert('준비 중입니다.')">
+                <svg fill="white" viewBox="0 0 24 24">
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                </svg>
+                <div>응급의료</div>
+              </div>
+            </div>
           </div>
-          <div class="quick-item" onclick="location.href='#diagnosis'">
-            <svg fill="white" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <div>자가 진단</div>
+        </section>
+
+        <%@ include file="schedule.jsp" %>
+
+        <section class="treatment-guide" id="services">
+          <h2>진료 안내</h2>
+          <p class="subtitle">AI 기반 스마트 매칭으로 최적의 매칭 및 헬스케어 서비스를 제공합니다</p>
+          <div class="guide-cards">
+            <div class="guide-card featured">
+              <svg fill="#5B6FB5" viewBox="0 0 24 24">
+                <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 16h2v-2h-2v2zm0-4h2V7h-2v7z"/>
+              </svg>
+              <h4>노약자, 시니어 맞춤 제공</h4>
+              <p>노약자를 위한 음성 시스템과 외국인을 위한 언어 변경 시스템을 제공합니다</p>
+            </div>
+            <div class="guide-card">
+              <svg fill="#666" viewBox="0 0 24 24">
+                <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+              </svg>
+              <h4>차트제공</h4>
+              <p>원하는 질병 발병률을 차트화하여 시각적으로 도출합니다</p>
+            </div>
+            <div class="guide-card">
+              <svg fill="#666" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
+              </svg>
+              <h4>캘린더 제공</h4>
+              <p>매칭된 병원의 진료 날짜를 시각화해주고 사용자가 직접 약 복용날짜 기입과 같은 일정 추가가 가능합니다</p>
+            </div>
+            <div class="guide-card">
+              <svg fill="#666" viewBox="0 0 24 24">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+              </svg>
+              <h4>챗봇서비스</h4>
+              <p>AI챗봇을 통해 사이트에서 찾기 어려운 부분이나 궁금한 사항을 텍스트, 음성, 버튼으로 검색합니다</p>
+            </div>
           </div>
-          <div class="quick-item" onclick="location.href='#contact'">
-            <svg fill="white" viewBox="0 0 24 24">
-              <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-            </svg>
-            <div>문의 하기</div>
+        </section>
+
+        <section class="about-section">
+          <div class="about-image">
+            여기엔 화면사진 붙여 넣읍시다
           </div>
-          <div class="quick-item" onclick="alert('준비 중입니다.')">
-            <svg fill="white" viewBox="0 0 24 24">
-              <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
-            </svg>
-            <div>응급의료</div>
+          <div class="about-content">
+            <h2>🤖 SPRING AI 기술을 이용한 자가진단 진행</h2>
+            <h3>높은 적중률과 근거를 제시한 진단</h3>
+            <p>
+              SPRING AI 기술을 활용하여 의료 취약계층을 위한<br>
+              최적의 병원을 매칭해드립니다.<br><br>
+              자가진단을 통해 증상을 분석하고,<br>
+              보건소의 검증을 거쳐 가장 적합한 공공기관 병원을<br>
+              추천받으세요.
+            </p>
+            <a href="#diagnosis" class="btn-primary">자가 진단하기</a>
           </div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <%@ include file="schedule.jsp" %>
-
-    <section class="treatment-guide" id="services">
-      <h2>진료 안내</h2>
-      <p class="subtitle">AI 기반 스마트 매칭으로 최적의 매칭 및 헬스케어 서비스를 제공합니다</p>
-      <div class="guide-cards">
-        <div class="guide-card featured">
-          <svg fill="#5B6FB5" viewBox="0 0 24 24">
-            <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 16h2v-2h-2v2zm0-4h2V7h-2v7z"/>
-          </svg>
-          <h4>노약자, 시니어 맞춤 제공</h4>
-          <p>노약자를 위한 음성 시스템과 외국인을 위한 언어 변경 시스템을 제공합니다</p>
-        </div>
-        <div class="guide-card">
-          <svg fill="#666" viewBox="0 0 24 24">
-            <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-          </svg>
-          <h4>차트제공</h4>
-          <p>원하는 질병 발병률을 차트화하여 시각적으로 도출합니다</p>
-        </div>
-        <div class="guide-card">
-          <svg fill="#666" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
-          </svg>
-          <h4>캘린더 제공</h4>
-          <p>매칭된 병원의 진료 날짜를 시각화해주고 사용자가 직접 약 복용날짜 기입과 같은 일정 추가가 가능합니다</p>
-        </div>
-        <div class="guide-card">
-          <svg fill="#666" viewBox="0 0 24 24">
-            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-          </svg>
-          <h4>챗봇서비스</h4>
-          <p>AI챗봇을 통해 사이트에서 찾기 어려운 부분이나 궁금한 사항을 텍스트, 음성, 버튼으로 검색합니다</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="about-section">
-      <div class="about-image">
-        여기엔 화면사진 붙여 넣읍시다
-      </div>
-      <div class="about-content">
-        <h2>🤖 SPRING AI 기술을 이용한 자가진단 진행</h2>
-        <h3>높은 적중률과 근거를 제시한 진단</h3>
-        <p>
-          SPRING AI 기술을 활용하여 의료 취약계층을 위한<br>
-          최적의 병원을 매칭해드립니다.<br><br>
-          자가진단을 통해 증상을 분석하고,<br>
-          보건소의 검증을 거쳐 가장 적합한 공공기관 병원을<br>
-          추천받으세요.
-        </p>
-        <a href="#diagnosis" class="btn-primary">자가 진단하기</a>
-      </div>
-    </section>
-
-    <section class="about-section">
-      <div class="about-content">
-        <h2>🏥 MAP API를 이용한 병원 찾기 시스템</h2>
-        <h3>공공기관이 배정한 병원</h3>
-        <p>
-          의료 사각지대 해소를 위해<br>
-          보건소에서 배정해주는 병원 네트워크를 구축했습니다.<br><br>
-          IoT 기기 연동으로 실시간 건강 데이터를 수집하고,<br>
-          부서와 맞는 정확한 병원 추천을 제공합니다.
-        </p>
-        <a href="#hospitals" class="btn-primary">병원 찾아보기</a>
-      </div>
-      <div class="about-image">
-        여기엔 화면사진 붙여 넣읍시다2
-      </div>
-    </section>
-
-    <button class="chatbot-button" onclick="toggleChatbot()">
-      <svg viewBox="0 0 24 24">
-        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-      </svg>
-    </button>
-
-    <div class="chatbot-modal" id="chatbotModal">
-      <div class="chatbot-header">
-        <h3>🏥 AI 의료 상담</h3>
-        <button class="chatbot-close" onclick="toggleChatbot()">×</button>
-      </div>
-      <div class="chatbot-body" id="chatBody">
-        <div class="chat-message bot">
-          <div class="message-bubble">
-            안녕하세요! AI 의료 상담 챗봇입니다.<br>
-            궁금하신 내용을 자유롭게 물어보세요.
+        <section class="about-section">
+          <div class="about-content">
+            <h2>🏥 MAP API를 이용한 병원 찾기 시스템</h2>
+            <h3>공공기관이 배정한 병원</h3>
+            <p>
+              의료 사각지대 해소를 위해<br>
+              보건소에서 배정해주는 병원 네트워크를 구축했습니다.<br><br>
+              IoT 기기 연동으로 실시간 건강 데이터를 수집하고,<br>
+              부서와 맞는 정확한 병원 추천을 제공합니다.
+            </p>
+            <a href="#hospitals" class="btn-primary">병원 찾아보기</a>
           </div>
-        </div>
-        <div class="typing-indicator" id="typingIndicator">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-      <div class="chatbot-footer">
-        <input type="text" class="chatbot-input" id="chatInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
-        <button class="chatbot-send" onclick="sendMessage()" id="sendBtn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-          </svg>
-        </button>
+          <div class="about-image">
+            여기엔 화면사진 붙여 넣읍시다2
+          </div>
+        </section>
+      </c:otherwise>
+    </c:choose>
+</div>
+
+<button class="chatbot-button" onclick="toggleChatbot()">
+  <svg viewBox="0 0 24 24">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
+  </svg>
+</button>
+
+<div class="chatbot-modal" id="chatbotModal">
+  <div class="chatbot-header">
+    <h3>🏥 AI 의료 상담</h3>
+    <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+  </div>
+  <div class="chatbot-body" id="chatBody">
+    <div class="chat-message bot">
+      <div class="message-bubble">
+        안녕하세요! AI 의료 상담 챗봇입니다.<br>
+        궁금하신 내용을 자유롭게 물어보세요.
       </div>
     </div>
+    <div class="typing-indicator" id="typingIndicator">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+  <div class="chatbot-footer">
+    <input type="text" class="chatbot-input" id="chatInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
+    <button class="chatbot-send" onclick="sendMessage()" id="sendBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
+</div>
 
-    <footer id="contact">
-      <div class="footer-content">
-        <div class="footer-info">
-          <h3>AI 기반 의료 매칭 시스템</h3>
-          <p>주소: 충청남도 아산시 탕정면 선문로221번길 70, 대한민국 우편번호 31460</p>
-          <p>이메일: comtaek@gmail.com</p>
-          <p>대표자: 이택</p>
-        </div>
-        <div class="footer-contact">
-          <h3>문의사항</h3>
-          <div class="contact-number">010-1234-5678</div>
-          <p>평일: AM 9:00 - PM 9:00</p>
-          <p>토요일: 휴식</p>
-          <p>일요일: 휴식</p>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2025 파이널 프로젝트 AI 의료 매칭 시스템</p>
-      </div>
-    </footer>
+<footer id="contact">
+  <div class="footer-content">
+    <div class="footer-info">
+      <h3>AI 기반 의료 매칭 시스템</h3>
+      <p>주소: 서울특별시 강남구, 대한민국 우편번호 06234</p>
+      <p>이메일: contact@medical-ai.kr</p>
+      <p>대표자: 홍길동</p>
+    </div>
+    <div class="footer-contact">
+      <h3>전문 의료상담</h3>
+      <div class="contact-number">1234-5678</div>
+      <p>평일: AM 9:00 - PM 6:00</p>
+      <p>토요일: AM 9:00 - PM 1:00</p>
+      <p>일요일: PM 1:00 - PM 6:00</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>Copyright © 2025 AI 의료 매칭 시스템. All Rights Reserved.</p>
+  </div>
+</footer>
 
-    <script>
-      const translationManager = {
-        currentLang: 'ko',
-        cache: {}, // { 'en': Promise object, ... }
+<script>
+  const translationManager = {
+    currentLang: 'ko',
+    cache: {}, // { 'en': Promise object, ... }
 
-        // 텍스트 추출 (기존과 동일)
-        extractTextNodes: function() {
-            const textNodes = [];
-            const nodeRefs = [];
-            const walker = document.createTreeWalker(
-                document.body, NodeFilter.SHOW_TEXT,
-                { acceptNode: node => {
-                    const t = node.nodeValue.trim();
-                    if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
-                    return NodeFilter.FILTER_ACCEPT;
-                }}, false
-            );
-            while(node = walker.nextNode()) {
-                textNodes.push(node.nodeValue.trim());
-                nodeRefs.push({ type: 'text', node: node });
+    // 텍스트 추출 (기존과 동일)
+    extractTextNodes: function() {
+        const textNodes = [];
+        const nodeRefs = [];
+        const walker = document.createTreeWalker(
+            document.body, NodeFilter.SHOW_TEXT,
+            { acceptNode: node => {
+                const t = node.nodeValue.trim();
+                if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
+                return NodeFilter.FILTER_ACCEPT;
+            }}, false
+        );
+        while(node = walker.nextNode()) {
+            textNodes.push(node.nodeValue.trim());
+            nodeRefs.push({ type: 'text', node: node });
+        }
+        document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
+            if (el.placeholder && el.placeholder.trim()) {
+                textNodes.push(el.placeholder);
+                nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
             }
-            document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
-                if (el.placeholder && el.placeholder.trim()) {
-                    textNodes.push(el.placeholder);
-                    nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
-                }
-                if (el.value && (el.type === 'button' || el.type === 'submit')) {
-                    textNodes.push(el.value);
-                    nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
-                }
-            });
-            return { textNodes, nodeRefs };
-        },
-
-        // 공통 요청 함수 (캐싱 로직 통합)
-        fetchTranslation: function(targetLangCode) {
-            // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
-            if (this.cache[targetLangCode]) {
-                return this.cache[targetLangCode];
+            if (el.value && (el.type === 'button' || el.type === 'submit')) {
+                textNodes.push(el.value);
+                nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
             }
+        });
+        return { textNodes, nodeRefs };
+    },
 
-            const { textNodes } = this.extractTextNodes();
-            if (textNodes.length === 0) return Promise.resolve([]);
+    // 공통 요청 함수 (캐싱 로직 통합)
+    fetchTranslation: function(targetLangCode) {
+        // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
+        if (this.cache[targetLangCode]) {
+            return this.cache[targetLangCode];
+        }
 
-            // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
-            const requestPromise = fetch('/api/translate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    targetLang: this.getLangName(targetLangCode),
-                    texts: textNodes
-                })
+        const { textNodes } = this.extractTextNodes();
+        if (textNodes.length === 0) return Promise.resolve([]);
+
+        // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
+        const requestPromise = fetch('/api/translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                targetLang: this.getLangName(targetLangCode),
+                texts: textNodes
             })
-            .then(res => res.json())
-            .then(data => data.translatedTexts)
-            .catch(err => {
-                console.error(err);
-                delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
-                return null;
-            });
+        })
+        .then(res => res.json())
+        .then(data => data.translatedTexts)
+        .catch(err => {
+            console.error(err);
+            delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
+            return null;
+        });
 
-            this.cache[targetLangCode] = requestPromise; // 캐시 저장
-            return requestPromise;
-        },
+        this.cache[targetLangCode] = requestPromise; // 캐시 저장
+        return requestPromise;
+    },
 
-        getLangName: function(code) {
-            const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
-            return map[code] || code;
-        },
+    getLangName: function(code) {
+        const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
+        return map[code] || code;
+    },
 
-        // 접속 시 자동 실행 (백그라운드)
-        preloadTranslations: function() {
-            console.log("🚀 백그라운드 번역 시작...");
-            ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
-        },
+    // 접속 시 자동 실행 (백그라운드)
+    preloadTranslations: function() {
+        console.log("🚀 백그라운드 번역 시작...");
+        ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
+    },
 
-        // 언어 변경 클릭 시
-        translatePage: async function(targetLangCode) {
-            if (targetLangCode === 'ko') {
-                location.reload();
-                return;
-            }
+    // 언어 변경 클릭 시
+    translatePage: async function(targetLangCode) {
+        if (targetLangCode === 'ko') {
+            location.reload();
+            return;
+        }
 
-            this.currentLang = targetLangCode;
-            document.body.style.cursor = 'wait';
-            document.body.style.opacity = '0.6';
+        this.currentLang = targetLangCode;
+        document.body.style.cursor = 'wait';
+        document.body.style.opacity = '0.6';
 
-            try {
-                // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
-                const translatedTexts = await this.fetchTranslation(targetLangCode);
+        try {
+            // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
+            const translatedTexts = await this.fetchTranslation(targetLangCode);
 
-                if (translatedTexts) {
-                    const { nodeRefs } = this.extractTextNodes();
-                    if (translatedTexts.length === nodeRefs.length) {
-                        nodeRefs.forEach((ref, index) => {
-                            if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
-                            else ref.node[ref.attr] = translatedTexts[index];
-                        });
+            if (translatedTexts) {
+                const { nodeRefs } = this.extractTextNodes();
+                if (translatedTexts.length === nodeRefs.length) {
+                    nodeRefs.forEach((ref, index) => {
+                        if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
+                        else ref.node[ref.attr] = translatedTexts[index];
+                    });
 
-                        // 캘린더 언어 설정
-                        if (window.calendarManager && window.calendarManager.calendar) {
-                            let calLang = 'en';
-                            if (targetLangCode === 'ja') calLang = 'ja';
-                            if (targetLangCode === 'zh') calLang = 'zh-cn';
-                            window.calendarManager.calendar.setOption('locale', calLang);
-                        }
+                    // 캘린더 언어 설정
+                    if (window.calendarManager && window.calendarManager.calendar) {
+                        let calLang = 'en';
+                        if (targetLangCode === 'ja') calLang = 'ja';
+                        if (targetLangCode === 'zh') calLang = 'zh-cn';
+                        window.calendarManager.calendar.setOption('locale', calLang);
                     }
                 }
-            } catch (e) {
-                console.error(e);
-                alert("번역 적용 실패");
-            } finally {
-                document.body.style.cursor = 'default';
-                document.body.style.opacity = '1';
             }
+        } catch (e) {
+            console.error(e);
+            alert("번역 적용 실패");
+        } finally {
+            document.body.style.cursor = 'default';
+            document.body.style.opacity = '1';
         }
-    };
+    }
+  };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
+  document.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
 
-        // 1초 뒤 백그라운드 번역 시작
-        setTimeout(() => translationManager.preloadTranslations(), 1000);
+      // 1초 뒤 백그라운드 번역 시작
+      setTimeout(() => translationManager.preloadTranslations(), 1000);
 
-        const langSelect = document.getElementById('language-select');
-        if (langSelect) {
-            langSelect.addEventListener('change', function() {
-                translationManager.translatePage(this.value);
-            });
-        }
-    });
-    </script>
-  </c:otherwise>
-</c:choose>
+      const langSelect = document.getElementById('language-select');
+      if (langSelect) {
+          langSelect.addEventListener('change', function() {
+              translationManager.translatePage(this.value);
+          });
+      }
+  });
+
+  // 챗봇 관련 함수 (toggleChatbot, sendMessage 등 필요하다면 여기에 추가)
+  function toggleChatbot() {
+      const modal = document.getElementById('chatbotModal');
+      if(modal) modal.classList.toggle('active');
+  }
+</script>
+
 </body>
 </html>

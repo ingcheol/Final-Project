@@ -1,10 +1,29 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="edu.sm.app.dto.Admin" %>
+<%@ page import="edu.sm.app.dto.Adviser" %>
+<%
+    // 세션에서 로그인 정보 가져오기
+    Admin loggedInAdmin = (Admin) session.getAttribute("admin");
+    Adviser loggedInAdviser = (Adviser) session.getAttribute("adviser");
+    String userRole = (String) session.getAttribute("role"); // ADMIN 또는 ADVISER
+
+    // 로그인 상태 확인
+    boolean isLoggedIn = (loggedInAdmin != null || loggedInAdviser != null);
+    String userName = "";
+
+    if (loggedInAdmin != null) {
+        userName = loggedInAdmin.getName() + " (관리자)";
+    } else if (loggedInAdviser != null) {
+        userName = loggedInAdviser.getName() + " (상담사)";
+    }
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Dashboard | Osen</title>
+    <title>OSEN Admin</title>
     <style>
         * {
             margin: 0;
@@ -70,6 +89,7 @@
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            text-decoration: none;
         }
 
         .nav-item:hover {
@@ -157,278 +177,6 @@
             background: #e2e8f0;
         }
 
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6);
-        }
-
-        .stat-label {
-            color: #64748b;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .stat-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-
-        .stat-card:nth-child(1) .stat-icon {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(2) .stat-icon {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(3) .stat-icon {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: #fff;
-        }
-
-        .stat-card:nth-child(4) .stat-icon {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            color: #fff;
-        }
-
-        .stat-change {
-            font-size: 13px;
-            color: #22c55e;
-        }
-
-        .stat-change.negative {
-            color: #ef4444;
-        }
-
-        .stat-change::before {
-            content: "↑ ";
-        }
-
-        .stat-change.negative::before {
-            content: "↓ ";
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .card-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        /* Chart Placeholder */
-        .chart-container {
-            height: 300px;
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            height: 200px;
-        }
-
-        .chart-bar {
-            width: 40px;
-            background: linear-gradient(180deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 8px 8px 0 0;
-            animation: growBar 1s ease-out;
-        }
-
-        @keyframes growBar {
-            from { height: 0; }
-            to { height: var(--height); }
-        }
-
-        /* Traffic Chart */
-        .traffic-chart {
-            width: 200px;
-            height: 200px;
-            margin: 20px auto;
-            position: relative;
-        }
-
-        .donut-chart {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: conic-gradient(
-                    #6366f1 0deg 130deg,
-                    #8b5cf6 130deg 230deg,
-                    #22c55e 230deg 290deg,
-                    #ef4444 290deg 360deg
-            );
-            position: relative;
-        }
-
-        .donut-chart::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60%;
-            height: 60%;
-            background: #fff;
-            border-radius: 50%;
-        }
-
-        .traffic-legend {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-        }
-
-        /* Table Styles */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f8fafc;
-        }
-
-        th {
-            padding: 15px;
-            text-align: left;
-            font-size: 12px;
-            text-transform: uppercase;
-            color: #64748b;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        td {
-            padding: 18px 15px;
-            border-bottom: 1px solid #f1f5f9;
-            color: #475569;
-        }
-
-        tr:hover {
-            background: #f8fafc;
-        }
-
-        .brand-cell {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .status-active {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
         .btn-primary {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
@@ -443,6 +191,81 @@
         .btn-primary:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* --- 로그인 모달 스타일 추가 --- */
+        .modal {
+            display: none; /* 기본 숨김 */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4); /* 배경 흐림 */
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 상단에서 15% 위치, 가운데 정렬 */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 350px; /* 모달 너비 */
+            text-align: center;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #1e293b;
+        }
+
+        .modal-content input[type="text"],
+        .modal-content input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 15px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .modal-content .btn-primary {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Welcome Screen */
+        .welcome-screen {
+            text-align: center;
+            padding: 100px;
+            color: #64748b;
+        }
+
+        .welcome-screen h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            font-size: 18px;
         }
 
         /* Responsive */
@@ -460,33 +283,32 @@
             .main-content {
                 margin-left: 0;
             }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">OSEN</div>
 
         <div class="nav-section">
             <div class="nav-title">DASH</div>
-            <div class="nav-item active">
+            <a href="<c:url value='/'/>" class="nav-item">
                 <span class="icon">📊</span>
                 <span>Sales</span>
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="<c:url value='/manage'/>" class="nav-item">
                 <span class="icon">🏥</span>
-                <span>Clinic</span>
-            </div>
-            <div class="nav-item">
+                <span>Patient Manage</span>
+            </a>
+            <a href="<c:url value='/anage'/>" class="nav-item">
+                <span class="icon">👨‍⚕️</span>
+                <span>Adviser Manage</span>
+            </a>
+            <a href="<c:url value='/consultation'/>" class="nav-item">
                 <span class="icon">📱</span>
-                <span>eWallet</span>
-            </div>
+                <span>Consultation</span>
+            </a>
         </div>
 
         <div class="nav-section">
@@ -526,9 +348,7 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="main-content">
-        <!-- Header -->
         <header class="header">
             <div class="search-bar">
                 <span>🔍</span>
@@ -538,175 +358,116 @@
                 <button class="icon-btn">🌙</button>
                 <button class="icon-btn">🔔</button>
                 <button class="icon-btn">⚙️</button>
-                <button class="icon-btn">👤</button>
+
+                <% if (isLoggedIn) { %>
+                <button class="btn-primary" onclick="location.href='logoutimpl'">
+                    <%= userName %> | 로그아웃
+                </button>
+                <% } else { %>
+                <button class="icon-btn" id="loginBtn">👤</button>
+                <% } %>
             </div>
         </header>
 
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Total Orders</div>
-                <div class="stat-value">
-                    <div class="stat-icon">📦</div>
-                    <span>687.3k</span>
-                </div>
-                <div class="stat-change">9.19% Since last month</div>
-            </div>
+        <%-- 로그인 실패 메시지 출력 (LoginController에서 넘어옴) --%>
+        <% if (request.getAttribute("loginfail") != null) { %>
+        <script>
+            alert("<%= request.getAttribute("msg") %>");
+        </script>
+        <% } %>
 
-            <div class="stat-card">
-                <div class="stat-label">Total Returns</div>
-                <div class="stat-value">
-                    <div class="stat-icon">↩️</div>
-                    <span>9.62k</span>
-                </div>
-                <div class="stat-change negative">26.87% Since last month</div>
-            </div>
+        <%-- 동적 콘텐츠 영역 --%>
+        <c:choose>
+            <%-- 1. 환자 관리 페이지 --%>
+            <c:when test="${center == 'manage'}">
+                <jsp:include page="patient/manage.jsp" />
+            </c:when>
 
-            <div class="stat-card">
-                <div class="stat-label">Avg. Sales Earnings</div>
-                <div class="stat-value">
-                    <div class="stat-icon">💰</div>
-                    <span>$98.24</span>
-                </div>
-                <div class="stat-change">3.51% Since last month</div>
-            </div>
+            <%-- 2. 환자 상세 페이지 --%>
+            <c:when test="${center == 'manage_detail'}">
+                <jsp:include page="patient/detail.jsp" />
+            </c:when>
 
-            <div class="stat-card">
-                <div class="stat-label">Number of Visits</div>
-                <div class="stat-value">
-                    <div class="stat-icon">👁️</div>
-                    <span>87.94M</span>
-                </div>
-                <div class="stat-change">1.05% Since last month</div>
-            </div>
-        </div>
+            <%-- 3. 환자 수정 페이지 --%>
+            <c:when test="${center == 'manage_edit'}">
+                <jsp:include page="patient/edit.jsp" />
+            </c:when>
 
-        <!-- Cards Grid -->
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Overview</h3>
-                    <div class="card-actions">
-                        <button class="icon-btn">⋮</button>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <div class="chart-bars">
-                        <div class="chart-bar" style="--height: 80px"></div>
-                        <div class="chart-bar" style="--height: 120px"></div>
-                        <div class="chart-bar" style="--height: 100px"></div>
-                        <div class="chart-bar" style="--height: 150px"></div>
-                        <div class="chart-bar" style="--height: 90px"></div>
-                        <div class="chart-bar" style="--height: 130px"></div>
-                        <div class="chart-bar" style="--height: 110px"></div>
-                    </div>
-                </div>
-            </div>
+            <%-- 4. 상담사 관리 페이지 --%>
+            <c:when test="${center == 'anage'}">
+                <jsp:include page="adviser/anage.jsp" />
+            </c:when>
 
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Top Traffic by Source</h3>
-                    <div class="card-actions">
-                        <button class="icon-btn">⋮</button>
-                    </div>
-                </div>
-                <div class="traffic-chart">
-                    <div class="donut-chart"></div>
-                </div>
-                <div class="traffic-legend">
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: #6366f1"></span>
-                        <span>Direct</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: #8b5cf6"></span>
-                        <span>Marketing</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: #22c55e"></span>
-                        <span>Social</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-color" style="background: #ef4444"></span>
-                        <span>Affiliates</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <%-- 5. 상담사 상세 페이지 --%>
+            <c:when test="${center == 'anage_detail'}">
+                <jsp:include page="adviser/detail.jsp" />
+            </c:when>
 
-        <!-- Brands Listing Table -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Brands Listing</h3>
-                <button class="btn-primary">+ Add Brand</button>
-            </div>
-            <div class="table-container">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Category</th>
-                        <th>Brand Name</th>
-                        <th>Established</th>
-                        <th>Stores</th>
-                        <th>Products</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <div class="brand-cell">
-                                <div class="brand-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)">Z</div>
-                                <div>
-                                    <div style="font-weight: 600">Clothing</div>
-                                    <div style="font-size: 12px; color: #94a3b8">Zaroan - Brazil</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Since 2020</td>
-                        <td>1.5k</td>
-                        <td>8,950</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td><button class="icon-btn">⋮</button></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="brand-cell">
-                                <div class="brand-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">J</div>
-                                <div>
-                                    <div style="font-weight: 600">Clothing</div>
-                                    <div style="font-size: 12px; color: #94a3b8">Jocky-Johns - USA</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Since 1985</td>
-                        <td>205</td>
-                        <td>1,258</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td><button class="icon-btn">⋮</button></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="brand-cell">
-                                <div class="brand-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">G</div>
-                                <div>
-                                    <div style="font-weight: 600">Lifestyle</div>
-                                    <div style="font-size: 12px; color: #94a3b8">Ginne - India</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td>Since 2001</td>
-                        <td>89</td>
-                        <td>338</td>
-                        <td><span class="status-badge status-active">Active</span></td>
-                        <td><button class="icon-btn">⋮</button></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+            <%-- 6. 상담사 수정 페이지 --%>
+            <c:when test="${center == 'anage_edit'}">
+                <jsp:include page="adviser/edit.jsp" />
+            </c:when>
+
+            <%-- 7. 화상 상담 페이지 --%>
+            <c:when test="${center == 'consultation'}">
+                <jsp:include page="consultation.jsp" />
+            </c:when>
+
+            <%-- 8. 에러 페이지 --%>
+            <c:when test="${center == 'error'}">
+                <div class="welcome-screen">
+                    <h1 style="color: #ef4444;">오류 발생</h1>
+                    <p>${error}</p>
+                </div>
+            </c:when>
+
+            <%-- 9. 그 외의 경우 (초기 접속 등) --%>
+            <c:otherwise>
+                <div class="welcome-screen">
+                    <h1>OSEN</h1>
+                    <p>좌측 메뉴를 선택하여 작업을 시작하세요.</p>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </main>
 </div>
+
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeModalBtn">&times;</span>
+        <h2>로그인</h2>
+        <form action="loginimpl" method="post">
+            <input type="text" id="id" name="id" placeholder="아이디 (관리자/상담사)" required>
+            <input type="password" id="pwd" name="pwd" placeholder="비밀번호" required>
+            <button type="submit" class="btn-primary">로그인</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // 모달 관련 JavaScript
+    var modal = document.getElementById("loginModal");
+    var btn = document.getElementById("loginBtn");
+    var span = document.getElementById("closeModalBtn");
+
+    // 👤 버튼 클릭 시 모달 열기 (로그아웃 상태일 때만 존재)
+    if (btn) {
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+    }
+
+    // X 버튼 클릭 시 모달 닫기
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // 모달 외부 클릭 시 모달 닫기
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 </body>
 </html>

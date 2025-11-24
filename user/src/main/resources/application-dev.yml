@@ -9,7 +9,6 @@ server:
     encoding:
       charset: UTF-8
       force: true
-
 spring:
   messages:
     basename: message
@@ -26,6 +25,24 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: ENC(idIWCdznEM3ggslDeTmLJw==)
+    driver-class-name: org.postgresql.Driver  # 추가
+
+  # ========== 여기부터 새로 추가! ==========
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+  # ========== 여기까지 추가 ==========
+
   ai:
     vectorstore:
       pgvector:
@@ -36,7 +53,7 @@ spring:
         options:
           model: gpt-4o
           temperature: 0.1
-          max_tokens: 10
+          max-tokens: 1000
   security:
     oauth2:
       client:
@@ -72,6 +89,7 @@ app:
   url:
     adminserver: https://127.0.0.1:8444/
     websocketurl: https://127.0.0.1:8443/
+    disease-info-endpoint: "https://apis.data.go.kr/B551182/diseaseInfoService1/getDissByGenderAgeStats1"
   dir:
     imgsdir: file:///C:/smspring/imgs/     # 화면 출력 용
     uploadimgsdir: C:/smspring/imgs/    # 파일 Write 용
@@ -82,6 +100,16 @@ app:
     algo: PBEWithMD5AndDES
     wkey: ENC(2hVNthZA5KlX7Hi6ow3pPTHPbML3w9MiiFjcZC76z1gV/iHPACQMY89q0CfK/knK0F1bFQuQ2tsarrZVbOkvjFbkkVzTOyYtCgo2qza+hu6k9WBQrShR7blvGPohoWQdjRe5ahrC8rbLhrhC7MHZlg==)
     owkey: ENC(vIqd9CSeOJ2B+RNZB8q8uX2gqVeotK1BVjLTnpvApIu0QKfrK4PIS+zKhZuQbERZ)
+    disease-api-key: PPVzwqp/YiiOp0ShY6gY4Vkm0b/PaPg1bEJgcEVMBYbMYAQ2lVC/BRbGmi4/XTeID5pJBs9ShXOQ+P1Ve/FTbw==
 
 
-
+# ========== 맨 아래에 추가! ==========
+medical:
+  documents:
+    path: classpath:medical-data/
+naver:
+  client:
+    id: "8vJOuNRk0sthKotdrbO8"
+    secret: "hXzNYNdgKS"
+  url:
+    search: "https://openapi.naver.com/v1/search/news.json"

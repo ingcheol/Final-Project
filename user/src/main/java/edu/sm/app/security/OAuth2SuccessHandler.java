@@ -1,6 +1,6 @@
 package edu.sm.app.security;
 
-import edu.sm.app.dto.User;
+import edu.sm.app.dto.Patient;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,17 +21,25 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                                       Authentication authentication) throws IOException, ServletException {
 
     PrincipalDetails principalDetails = (PrincipalDetails) authentication.getPrincipal();
-    User user = principalDetails.getUser();
-
-    log.info("OAuth2 로그인 성공: {}", user.getUserEmail());
+    Patient patient = principalDetails.getPatient();;
 
     // 세션에 사용자 정보 저장
     HttpSession session = request.getSession();
-    session.setAttribute("loginuser", user);
-    session.setAttribute("loginid", user.getUserEmail());
-    session.setAttribute("loginname", user.getUserName());
+    session.setAttribute("loginuser", patient);
+    session.setAttribute("patientId", patient.getPatientId());
+    session.setAttribute("loginid", patient.getPatientEmail());
+    session.setAttribute("loginname", patient.getPatientName());
 
-    // 메인 페이지로 리다이렉트
-    response.sendRedirect("/");
+    // redirect
+    String redirectUrl = (String) session.getAttribute("redirectUrl");
+
+    if (redirectUrl != null && !redirectUrl.isEmpty()) {
+      // 세션에서 URL 제거
+      session.removeAttribute("redirectUrl");
+      response.sendRedirect(redirectUrl);
+    } else {
+      // 저장된 URL이 없으면 홈으로
+      response.sendRedirect("/");
+    }
   }
 }

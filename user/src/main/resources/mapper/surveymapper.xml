@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.app.repository.SurveyRepository">
+
+  <select id="findTopByPatientIdOrderBySubmittedAtDesc" parameterType="long" resultType="Survey">
+    SELECT * FROM survey
+    WHERE patient_id = #{patientId} AND submitted_at IS NOT NULL
+    ORDER BY submitted_at DESC
+    LIMIT 1
+  </select>
+
+  <select id="findByPatientId" parameterType="long" resultType="Survey">
+    SELECT * FROM survey WHERE patient_id = #{patientId} ORDER BY created_at DESC
+  </select>
+
+  <select id="findByPatientIdAndSurveyType" resultType="Survey">
+    SELECT * FROM survey
+    WHERE patient_id = #{patientId} AND survey_type = #{surveyType}
+    ORDER BY created_at DESC
+  </select>
+
+  <select id="selectAll" resultType="Survey">
+    SELECT * FROM survey ORDER BY created_at DESC
+  </select>
+
+  <select id="select" parameterType="long" resultType="Survey">
+    SELECT * FROM survey WHERE survey_id = #{surveyId}
+  </select>
+
+  <insert id="insert" parameterType="Survey" useGeneratedKeys="true" keyProperty="surveyId">
+    INSERT INTO survey (patient_id, survey_type, questions, answers, created_at, submitted_at)
+    VALUES (#{patientId}, #{surveyType}, #{questions}, #{answers}, NOW(), #{submittedAt})
+  </insert>
+
+  <update id="update" parameterType="Survey">
+    UPDATE survey SET answers = #{answers}, submitted_at = NOW()
+    WHERE survey_id = #{surveyId}
+  </update>
+
+  <delete id="delete" parameterType="long">
+    DELETE FROM survey WHERE survey_id = #{surveyId}
+  </delete>
+
+</mapper>
