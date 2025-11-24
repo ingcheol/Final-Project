@@ -178,6 +178,8 @@
 
       <c:choose>
         <c:when test="${loginuser != null}">
+          <li><a href="/healthmgr">AI 건강 상담</a></li>
+          <li><a href="/monitor?patientId=${loginuser.patientId}">IoT 모니터링</a></li>
           <li><a href="<c:url value='/info?userId=${loginuser.patientId}'/>">${loginuser.patientName}님</a></li>
           <li><a href="<c:url value='/logout'/>">로그아웃</a></li>
         </c:when>
