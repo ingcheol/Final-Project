@@ -5,6 +5,7 @@ import edu.sm.common.frame.SmRepository;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Repository
@@ -74,4 +75,57 @@ public interface AdviserRepository extends SmRepository<Adviser, Long> {
     @Select("SELECT adviser_id, password, name, phone, email, license_number, account_status, created_at " +
             "FROM adviser WHERE name=#{adviserId}")
     Adviser selectByAdviserId(String adviserId) throws Exception;
+
+    // ===== 관리자 기능 추가 =====
+
+    /**
+     * 전체 상담사 목록 조회
+     */
+    List<Adviser> selectAllAdvisers() throws Exception;
+
+    /**
+     * 계정 상태별 상담사 조회
+     * @param status active, inactive 등
+     */
+    List<Adviser> selectByAccountStatus(@Param("status") String status) throws Exception;
+
+    /**
+     * 계정 상태 변경
+     * @param adviserId 상담사 ID
+     * @param status 변경할 상태
+     */
+    void updateAccountStatus(@Param("adviserId") Long adviserId,
+                             @Param("status") String status) throws Exception;
+
+    /**
+     * 상담사 검색 (이름, 이메일, 전화번호, 자격증 번호)
+     * @param keyword 검색 키워드
+     */
+    List<Adviser> searchAdvisers(@Param("keyword") String keyword) throws Exception;
+
+    /**
+     * 상담사 상세 정보 조회
+     * @param adviserId 상담사 ID
+     */
+    Adviser selectAdviserDetail(@Param("adviserId") Long adviserId) throws Exception;
+
+    /**
+     * 복합 조건 검색
+     */
+    List<Adviser> searchAdvisersAdvanced(
+            @Param("keyword") String keyword,
+            @Param("status") String status,
+            @Param("startDate") Timestamp startDate,
+            @Param("endDate") Timestamp endDate
+    ) throws Exception;
+
+    /**
+     * 통계 정보 - 계정 상태별 카운트
+     */
+    int countByAccountStatus(@Param("status") String status) throws Exception;
+
+    /**
+     * 통계 정보 - 전체 상담사 수
+     */
+    int countTotalAdvisers() throws Exception;
 }

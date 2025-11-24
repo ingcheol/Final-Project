@@ -298,8 +298,12 @@
                 <span>Sales</span>
             </a>
             <a href="<c:url value='/manage'/>" class="nav-item">
-                <span class="icon">📱</span>
+                <span class="icon">🏥</span>
                 <span>Patient Manage</span>
+            </a>
+            <a href="<c:url value='/anage'/>" class="nav-item">
+                <span class="icon">👨‍⚕️</span>
+                <span>Adviser Manage</span>
             </a>
             <a href="<c:url value='/consultation'/>" class="nav-item">
                 <span class="icon">📱</span>
@@ -389,12 +393,27 @@
                 <jsp:include page="patient/edit.jsp" />
             </c:when>
 
-            <%-- 4. 화상 상담 페이지 --%>
+            <%-- 4. 상담사 관리 페이지 --%>
+            <c:when test="${center == 'anage'}">
+                <jsp:include page="adviser/anage.jsp" />
+            </c:when>
+
+            <%-- 5. 상담사 상세 페이지 --%>
+            <c:when test="${center == 'anage_detail'}">
+                <jsp:include page="adviser/detail.jsp" />
+            </c:when>
+
+            <%-- 6. 상담사 수정 페이지 --%>
+            <c:when test="${center == 'anage_edit'}">
+                <jsp:include page="adviser/edit.jsp" />
+            </c:when>
+
+            <%-- 7. 화상 상담 페이지 --%>
             <c:when test="${center == 'consultation'}">
                 <jsp:include page="consultation.jsp" />
             </c:when>
 
-            <%-- 5. 에러 페이지 --%>
+            <%-- 8. 에러 페이지 --%>
             <c:when test="${center == 'error'}">
                 <div class="welcome-screen">
                     <h1 style="color: #ef4444;">오류 발생</h1>
@@ -402,7 +421,7 @@
                 </div>
             </c:when>
 
-            <%-- 6. 그 외의 경우 (초기 접속 등) --%>
+            <%-- 9. 그 외의 경우 (초기 접속 등) --%>
             <c:otherwise>
                 <div class="welcome-screen">
                     <h1>OSEN</h1>

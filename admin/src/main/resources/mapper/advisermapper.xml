@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.app.repository.AdviserRepository">
+
+    <!-- Result Map -->
+    <resultMap id="adviserResultMap" type="edu.sm.app.dto.Adviser">
+        <id property="adviserId" column="adviser_id"/>
+        <result property="password" column="password"/>
+        <result property="name" column="name"/>
+        <result property="phone" column="phone"/>
+        <result property="email" column="email"/>
+        <result property="licenseNumber" column="license_number"/>
+        <result property="accountStatus" column="account_status"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- 관리자 기능: 전체 상담사 목록 조회 -->
+    <select id="selectAllAdvisers" resultMap="adviserResultMap">
+        SELECT * FROM adviser
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 관리자 기능: 계정 상태별 상담사 조회 -->
+    <select id="selectByAccountStatus" parameterType="String" resultMap="adviserResultMap">
+        SELECT * FROM adviser
+        WHERE account_status = #{status}
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 관리자 기능: 계정 상태 변경 -->
+    <update id="updateAccountStatus">
+        UPDATE adviser SET
+            account_status = #{status}
+        WHERE adviser_id = #{adviserId}
+    </update>
+
+    <!-- 관리자 기능: 상담사 검색 (이름, 이메일, 전화번호, 자격증 번호) -->
+    <select id="searchAdvisers" parameterType="String" resultMap="adviserResultMap">
+        SELECT * FROM adviser
+        WHERE name LIKE CONCAT('%', #{keyword}, '%')
+           OR email LIKE CONCAT('%', #{keyword}, '%')
+           OR phone LIKE CONCAT('%', #{keyword}, '%')
+           OR license_number LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 관리자 기능: 상담사 상세 정보 조회 -->
+    <select id="selectAdviserDetail" parameterType="Long" resultMap="adviserResultMap">
+        SELECT * FROM adviser WHERE adviser_id = #{adviserId}
+    </select>
+
+    <!-- 관리자 기능: 복합 조건 검색 -->
+    <select id="searchAdvisersAdvanced" resultMap="adviserResultMap">
+        SELECT * FROM adviser
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (name LIKE CONCAT('%', #{keyword}, '%')
+                OR email LIKE CONCAT('%', #{keyword}, '%')
+                OR phone LIKE CONCAT('%', #{keyword}, '%')
+                OR license_number LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="status != null and status != ''">
+                AND account_status = #{status}
+            </if>
+            <if test="startDate != null">
+                AND created_at >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                AND created_at &lt;= #{endDate}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 관리자 기능: 통계 정보 - 계정 상태별 카운트 -->
+    <select id="countByAccountStatus" parameterType="String" resultType="int">
+        SELECT COUNT(*) FROM adviser WHERE account_status = #{status}
+    </select>
+
+    <!-- 관리자 기능: 통계 정보 - 전체 상담사 수 -->
+    <select id="countTotalAdvisers" resultType="int">
+        SELECT COUNT(*) FROM adviser
+    </select>
+
+</mapper>
