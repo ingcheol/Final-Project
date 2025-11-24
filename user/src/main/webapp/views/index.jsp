@@ -166,16 +166,11 @@
   <nav>
     <div class="logo">🏥 AI 의료 매칭 시스템</div>
     <ul class="nav-menu">
-      <li><a href="<c:url value='/'/>#home">홈</a></li>
-      <li><a href="<c:url value='/'/>#services">서비스 소개</a></li>
-
+      <li><a href="<c:url value='/'/>">홈</a></li>
       <li><a href="<c:url value="/dia/dia1"/>">자가진단</a></li>
       <li><a href="<c:url value="/map/map1"/>">병원찾기</a></li>
-
-      <li><a href="<c:url value='/'/>#contact">문의하기</a></li>
       <li><a href="<c:url value='/statview'/>">통계 확인</a></li>
       <li><a href="<c:url value='/consul'/>">상담하기</a></li>
-
       <c:choose>
         <c:when test="${loginuser != null}">
           <li><a href="<c:url value='/info?userId=${loginuser.patientId}'/>">${loginuser.patientName}님</a></li>
@@ -216,62 +211,74 @@
               <p>AI 기반 스마트 병원 매칭으로<br>의료 취약계층의 건강을 지킵니다</p>
             </div>
             <div class="quick-menu">
-              <div class="quick-item" onclick="location.href='matching.jsp'">
-                <svg fill="white" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                </svg>
-                <div>병원 추천</div>
-              </div>
-              <div class="quick-item" onclick="location.href='#diagnosis'">
+              <c:choose>
+                <c:when test="${loginuser != null}">
+                  <div class="quick-item" onclick="location.href='logout'">
+                    <svg fill="white" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <div>로그아웃</div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                  <div class="quick-item" onclick="location.href='login'">
+                    <svg fill="white" viewBox="0 0 24 24">
+                      <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <div>로그인</div>
+                  </div>
+                </c:otherwise>
+              </c:choose>
+              <div class="quick-item" onclick="location.href='consul'">
                 <svg fill="white" viewBox="0 0 24 24">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
-                <div>자가 진단</div>
+                <div>상담 하기</div>
               </div>
-              <div class="quick-item" onclick="location.href='#contact'">
+              <div class="quick-item" onclick="document.getElementById('services').scrollIntoView({ behavior: 'smooth' })">
                 <svg fill="white" viewBox="0 0 24 24">
                   <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
                 </svg>
-                <div>문의 하기</div>
+                <div>서비스 소개</div>
               </div>
-              <div class="quick-item" onclick="alert('준비 중입니다.')">
+              <div class="quick-item" onclick="document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })">
                 <svg fill="white" viewBox="0 0 24 24">
                   <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                 </svg>
-                <div>응급의료</div>
+                <div>문의 하기</div>
               </div>
             </div>
           </div>
         </section>
-
-        <%@ include file="schedule.jsp" %>
-
+        <div id="calendar-section">
+          <%@ include file="schedule.jsp" %>
+        </div>
         <section class="treatment-guide" id="services">
           <h2>진료 안내</h2>
           <p class="subtitle">AI 기반 스마트 매칭으로 최적의 매칭 및 헬스케어 서비스를 제공합니다</p>
           <div class="guide-cards">
-            <div class="guide-card featured">
-              <svg fill="#5B6FB5" viewBox="0 0 24 24">
+          <div class="guide-card featured" onclick="const el = document.getElementById('language-select'); el.focus();">
+          <svg fill="#5B6FB5" viewBox="0 0 24 24">
                 <path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 16h2v-2h-2v2zm0-4h2V7h-2v7z"/>
               </svg>
               <h4>노약자, 시니어 맞춤 제공</h4>
               <p>노약자를 위한 음성 시스템과 외국인을 위한 언어 변경 시스템을 제공합니다</p>
             </div>
-            <div class="guide-card">
+            <div class="guide-card" onclick="location.href='statview'">
               <svg fill="#666" viewBox="0 0 24 24">
                 <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
               </svg>
               <h4>차트제공</h4>
               <p>원하는 질병 발병률을 차트화하여 시각적으로 도출합니다</p>
             </div>
-            <div class="guide-card">
-              <svg fill="#666" viewBox="0 0 24 24">
+            <div class="guide-card" onclick="document.getElementById('calendar-section').scrollIntoView({ behavior: 'smooth' })">
+            <svg fill="#666" viewBox="0 0 24 24">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
-              </svg>
+                </svg>
               <h4>캘린더 제공</h4>
               <p>매칭된 병원의 진료 날짜를 시각화해주고 사용자가 직접 약 복용날짜 기입과 같은 일정 추가가 가능합니다</p>
             </div>
-            <div class="guide-card">
+            <div class="guide-card" onclick="toggleChatbot()">
               <svg fill="#666" viewBox="0 0 24 24">
                 <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -295,8 +302,8 @@
               보건소의 검증을 거쳐 가장 적합한 공공기관 병원을<br>
               추천받으세요.
             </p>
-            <a href="#diagnosis" class="btn-primary">자가 진단하기</a>
-          </div>
+            <a href="<c:url value='/dia/dia1'/>" class="btn-primary">자가 진단하기</a>
+            </div>
         </section>
 
         <section class="about-section">
@@ -309,7 +316,7 @@
               IoT 기기 연동으로 실시간 건강 데이터를 수집하고,<br>
               부서와 맞는 정확한 병원 추천을 제공합니다.
             </p>
-            <a href="#hospitals" class="btn-primary">병원 찾아보기</a>
+            <a href="<c:url value='/map/map1'/>" class="btn-primary">병원 찾아보기</a>
           </div>
           <div class="about-image">
             여기엔 화면사진 붙여 넣읍시다2
@@ -355,20 +362,20 @@
   <div class="footer-content">
     <div class="footer-info">
       <h3>AI 기반 의료 매칭 시스템</h3>
-      <p>주소: 서울특별시 강남구, 대한민국 우편번호 06234</p>
-      <p>이메일: contact@medical-ai.kr</p>
-      <p>대표자: 홍길동</p>
+      <p>주소: 주소: 충청남도 아산시 탕정면 선문로221번길 70, 대한민국 우편번호 31460</p>
+      <p>이메일: project@final.com</p>
+      <p>대표자: 몰입형</p>
     </div>
     <div class="footer-contact">
-      <h3>전문 의료상담</h3>
-      <div class="contact-number">1234-5678</div>
-      <p>평일: AM 9:00 - PM 6:00</p>
-      <p>토요일: AM 9:00 - PM 1:00</p>
-      <p>일요일: PM 1:00 - PM 6:00</p>
+      <h3>문의사항</h3>
+      <div class="contact-number">010-1234-5678</div>
+      <p>평일: AM 9:00 - PM 9:00</p>
+      <p>토요일: 휴식</p>
+      <p>일요일: 휴식</p>
     </div>
   </div>
   <div class="footer-bottom">
-    <p>Copyright © 2025 AI 의료 매칭 시스템. All Rights Reserved.</p>
+    <p>© 2025 FINAL-PROJECT AI 의료 매칭 시스템</p>
   </div>
 </footer>
 
@@ -510,6 +517,5 @@
       if(modal) modal.classList.toggle('active');
   }
 </script>
-
 </body>
 </html>
