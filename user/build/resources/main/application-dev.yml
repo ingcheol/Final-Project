@@ -9,6 +9,7 @@ server:
     encoding:
       charset: UTF-8
       force: true
+
 spring:
   messages:
     basename: message
@@ -22,12 +23,6 @@ spring:
       prefix: /views/
       suffix: .jsp
   datasource:
-    #url: jdbc:mysql://127.0.0.1:3306/shopdb?serverTimezone=Asia/Seoul
-    #    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    #    url: jdbc:log4jdbc:mysql://127.0.0.1:3306/shopdb?characterEncoding=utf8
-    #    username: post
-    #    password: ENC(idIWCdznEM3ggslDeTmLJw==)
-    #    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: ENC(idIWCdznEM3ggslDeTmLJw==)
@@ -41,7 +36,28 @@ spring:
         options:
           model: gpt-4o
           temperature: 0.1
-          max_tokens: 1000
+#          max_tokens: 1000
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
+            redirect-uri: "https://127.0.0.1:8444/login/oauth2/code/kakao"
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+            client-name: Kakao
+            scope:
+              - profile_nickname
+              - account_email
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 mybatis:
   type-aliases-package: edu.sm.app.dto
   mapper-locations: classpath:/mapper/*.xml
