@@ -23,6 +23,37 @@
             padding: 20px;
         }
 
+        /* 언어 선택 버튼 */
+        .language-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 8px;
+            background: white;
+            padding: 5px;
+            border-radius: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
         .container {
             background: white;
             border-radius: 20px;
@@ -69,20 +100,31 @@
     </style>
 </head>
 <body>
+<!-- 언어 선택 버튼 -->
+<div class="language-selector">
+    <button class="lang-btn active" data-lang="ko">한국어</button>
+    <button class="lang-btn" data-lang="en">English</button>
+    <button class="lang-btn" data-lang="ja">日本語</button>
+    <button class="lang-btn" data-lang="zh">中文</button>
+</div>
+
 <div class="container">
-    <h1> AI 분석 진행 중</h1>
-    <p class="loading">증상을 분석하고 있습니다...</p>
+    <h1 data-i18n="analyzingTitle"> AI 분석 진행 중</h1>
+    <p class="loading" data-i18n="analyzingMessage">증상을 분석하고 있습니다...</p>
 
     <div class="spinner"></div>
 
     <div class="step">
-        <h3>입력하신 증상:</h3>
+        <h3 data-i18n="inputSymptom">입력하신 증상:</h3>
         <p>${symptomText}</p>
     </div>
 
     <form id="analysisForm" action="${pageContext.request.contextPath}/dia/dia4" method="post" style="display:none;">
     </form>
 </div>
+
+<!-- multilang.js 추가 -->
+<script src="<c:url value='/js/multilang.js'/>"></script>
 
 <script>
     console.log("dia3.jsp 로드됨");
