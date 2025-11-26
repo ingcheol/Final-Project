@@ -370,6 +370,9 @@
         <a href="<c:url value='/dia/reset'/>" style="flex: 1; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; background: white; color: #666; border: 2px solid #e0e0e0; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
             <span data-i18n="btnNewDiagnosis"> 새로 진단하기</span>
         </a>
+        <a href="<c:url value='/appointment/my'/>" style="flex: 1; padding: 16px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; background: white; color: #666; border: 2px solid #e0e0e0; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+            <span data-i18n="예약하러가기"> 예약하러가기</span>
+        </a>
         <a href="<c:url value='/'/>" style="flex: 1; padding: 16px 24px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
             <span data-i18n="btnHome"> 홈으로 돌아가기</span>
         </a>

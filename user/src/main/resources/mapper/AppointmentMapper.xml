@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="edu.sm.app.repository.AppointmentRepository">
+
+    <resultMap id="appointmentMap" type="Appointment">
+        <id property="appointmentId" column="appointment_id"/>
+        <result property="appointmentTime" column="appointment_time"/>
+        <result property="appointmentType" column="appointment_type"/>
+        <result property="status" column="status"/>
+        <result property="notes" column="notes"/>
+        <result property="patientId" column="patient_id"/>
+        <!-- Patient 테이블 조인 필드 -->
+        <result property="name" column="name"/>
+        <result property="email" column="email"/>
+        <result property="phone" column="phone"/>
+    </resultMap>
+
+    <!-- 기본 CRUD -->
+    <insert id="insert" parameterType="Appointment" useGeneratedKeys="true" keyProperty="appointmentId">
+        INSERT INTO appointment (appointment_time, appointment_type, status, notes, patient_id)
+        VALUES (#{appointmentTime}, #{appointmentType}, #{status}, #{notes}, #{patientId})
+    </insert>
+
+    <update id="update" parameterType="Appointment">
+        UPDATE appointment
+        SET appointment_time = #{appointmentTime},
+            appointment_type = #{appointmentType},
+            status = #{status},
+            notes = #{notes}
+        WHERE appointment_id = #{appointmentId}
+    </update>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM appointment WHERE appointment_id = #{appointmentId}
+    </delete>
+
+    <select id="select" parameterType="long" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        WHERE a.appointment_id = #{appointmentId}
+    </select>
+
+    <select id="selectAll" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        ORDER BY a.appointment_time DESC
+    </select>
+
+    <!-- 환자별 예약 조회 -->
+    <select id="findByPatientId" parameterType="long" resultMap="appointmentMap">
+        SELECT * FROM appointment
+        WHERE patient_id = #{patientId}
+        ORDER BY appointment_time DESC
+    </select>
+
+    <!-- 상태별 예약 조회 -->
+    <select id="findByStatus" parameterType="string" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        WHERE a.status = #{status}
+        ORDER BY a.appointment_time ASC
+    </select>
+
+    <!-- 환자별 + 상태별 -->
+    <select id="findByPatientIdAndStatus" resultMap="appointmentMap">
+        SELECT * FROM appointment
+        WHERE patient_id = #{patientId} AND status = #{status}
+        ORDER BY appointment_time DESC
+    </select>
+
+    <!-- 특정 날짜 예약 조회 -->
+    <select id="findByDate" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        WHERE DATE(a.appointment_time) = DATE(#{date})
+        ORDER BY a.appointment_time ASC
+    </select>
+
+    <!-- 상태 변경 -->
+    <update id="updateStatus">
+        UPDATE appointment
+        SET status = #{status}
+        WHERE appointment_id = #{appointmentId}
+    </update>
+
+    <!-- 최근 예약 조회 -->
+    <select id="findRecentAppointments" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        ORDER BY a.appointment_time DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 승인 대기 개수 -->
+    <select id="countPendingAppointments" resultType="int">
+        SELECT COUNT(*) FROM appointment WHERE status = 'pending'
+    </select>
+
+</mapper>
