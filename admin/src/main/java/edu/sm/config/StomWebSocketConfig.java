@@ -27,6 +27,7 @@ public class StomWebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
     }
 
+
     // ❌ registerWebSocketHandlers 메서드 제거
     // WebRTC 시그널링은 Shop 서버(8444)에서만 처리
     // Admin 서버는 UI만 제공하고, WebSocket은 Shop 서버로 연결

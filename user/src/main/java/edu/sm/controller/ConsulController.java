@@ -30,11 +30,11 @@ public class ConsulController {
 
         log.info("Room chat - From: {}, Room: {}, Content: {}", sendId, roomId, content);
 
-        // Patient용 브로드캐스트 (모든 patient가 구독)
+        // Patient용 브로드캐스트 (환자는 /send/...를 구독 중이므로 정상 수신됨)
         messagingTemplate.convertAndSend("/send/chat/" + roomId, message);
 
-//        // Adviser용 브로드캐스트 (모든 adviser가 구독)
-//        messagingTemplate.convertAndSend("/advisersend/chat/" + roomId, message);
+        // ✅ [수정] 아래 줄 주석 해제 (Adviser는 /advisersend/...를 구독 중이므로 이게 필요함)
+        messagingTemplate.convertAndSend("/advisersend/chat/" + roomId, message);
     }
 
     /**

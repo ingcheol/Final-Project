@@ -39,9 +39,9 @@ public class StomWebSocketConfig implements WebSocketMessageBrokerConfigurer, We
         // Patient(로컬)와 Adviser(크로스 오리진, 8443)가 모두 여기에 연결
         registry.addHandler(new WebRTCSignalingHandler(), "/signal")
                 .setAllowedOrigins(
-                        "https://127.0.0.1:8443",    // Admin 서버
-                        "https://localhost:8443",
-                        "https://127.0.0.1:8444",    // Shop 서버 (자기자신)
+                        "https://10.20.39.64:8443",    // Admin 서버
+                        "https://10.20.39.64:8443",
+                        "https://10.20.39.64:8444",    // Shop 서버 (자기자신)
                         "https://localhost:8444"
                 );
     }

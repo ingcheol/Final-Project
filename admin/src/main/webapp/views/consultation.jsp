@@ -198,27 +198,32 @@
             });
         },
 
-        connectChat: function () {
-            const socket = new SockJS('${websocketurl}chat');
-            this.stompClient = Stomp.over(socket);
-            const self = this;
+      connectChat: function () {
+        // 1. [수정] 서버의 addEndpoint("/adviserchat")와 일치시킴
+        // ${websocketurl} 뒤에 슬래시(/)가 포함되어 있다면 'adviserchat'만, 없다면 '/adviserchat'
+        const socket = new SockJS('${websocketurl}adviserchat');
 
-            this.stompClient.connect({}, function (frame) {
-                console.log('Chat Connected: ' + frame);
-                self.setChatConnected(true);
+        this.stompClient = Stomp.over(socket);
+        const self = this;
 
-                self.stompClient.subscribe('/send/chat/' + self.roomId, function (msg) {
-                    const data = JSON.parse(msg.body);
-                    if (data.sendid !== self.id) {
-                        self.addMessage(data.content1, 'received', data.sendid);
-                    }
-                });
+        this.stompClient.connect({}, function (frame) {
+          console.log('Chat Connected: ' + frame);
+          self.setChatConnected(true);
 
-            }, function (error) {
-                console.error('STOMP connection error:', error);
-                self.setChatConnected(false);
-            });
-        },
+          // 2. [수정] 서버의 enableSimpleBroker("/advisersend")와 일치시킴
+          // 기존: '/send/chat/' -> 변경: '/advisersend/chat/'
+          self.stompClient.subscribe('/advisersend/chat/' + self.roomId, function (msg) {
+            const data = JSON.parse(msg.body);
+            if (data.sendid !== self.id) {
+              self.addMessage(data.content1, 'received', data.sendid);
+            }
+          });
+
+        }, function (error) {
+          console.error('STOMP connection error:', error);
+          self.setChatConnected(false);
+        });
+      },
 
         sendMessage: function () {
             const msg = $('#totext').val().trim();

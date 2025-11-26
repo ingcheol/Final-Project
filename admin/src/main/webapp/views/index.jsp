@@ -332,6 +332,10 @@
                 <span class="icon">📱</span>
                 <span>Consultation</span>
             </a>
+            <a href="<c:url value='/admin/appointments'/>" class="nav-item">
+                <span class="icon">📱</span>
+                <span>Appointments</span>
+            </a>
           <a href="<c:url value='/admin/signlanguage'/>" class="nav-item">
             <span class="icon">👌</span>
             <span>수어 번역</span>
@@ -444,6 +448,21 @@
           <c:when test="${center == 'signlanguage'}">
             <jsp:include page="signlanguage.jsp" />
           </c:when>
+
+            <%-- 예약 관리 목록 페이지 --%>
+            <c:when test="${center == 'appointments/list'}">
+                <jsp:include page="appointments/list.jsp" />
+            </c:when>
+
+            <%-- 예약 관리 상세 페이지 --%>
+            <c:when test="${center == 'appointments/detail'}">
+                <jsp:include page="appointments/detail.jsp" />
+            </c:when>
+
+            <%-- 예약 관리 수정 페이지 --%>
+            <c:when test="${center == 'appointments/edit'}">
+                <jsp:include page="appointments/edit.jsp" />
+            </c:when>
 
             <%-- 8. 에러 페이지 --%>
             <c:when test="${center == 'error'}">
