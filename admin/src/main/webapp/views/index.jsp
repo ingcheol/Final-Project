@@ -284,6 +284,29 @@
                 margin-left: 0;
             }
         }
+
+        /* --- 알림 모달 스타일 (기존 모달 스타일 활용 및 확장) --- */
+        #alertModal .modal-content {
+            border-top: 5px solid #6366f1; /* 기본 색상 */
+        }
+        #alertModal.warning .modal-content {
+            border-top-color: #ffc107; /* 경고: 노랑 */
+        }
+        #alertModal.emergency .modal-content {
+            border-top-color: #e74c3c; /* 위험: 빨강 */
+        }
+        .alert-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .alert-message {
+            font-size: 16px;
+            font-weight: bold;
+            margin: 20px 0;
+            white-space: pre-line;
+        }
+
     </style>
 </head>
 <body>
@@ -309,6 +332,10 @@
                 <span class="icon">📱</span>
                 <span>Consultation</span>
             </a>
+          <a href="<c:url value='/admin/signlanguage'/>" class="nav-item">
+            <span class="icon">👌</span>
+            <span>수어 번역</span>
+          </a>
         </div>
 
         <div class="nav-section">
@@ -413,6 +440,11 @@
                 <jsp:include page="consultation.jsp" />
             </c:when>
 
+<%--          수어 번역--%>
+          <c:when test="${center == 'signlanguage'}">
+            <jsp:include page="signlanguage.jsp" />
+          </c:when>
+
             <%-- 8. 에러 페이지 --%>
             <c:when test="${center == 'error'}">
                 <div class="welcome-screen">
@@ -421,7 +453,7 @@
                 </div>
             </c:when>
 
-            <%-- 9. 그 외의 경우 (초기 접속 등) --%>
+          <%-- 9. 그 외의 경우 (초기 접속 등) --%>
             <c:otherwise>
                 <div class="welcome-screen">
                     <h1>OSEN</h1>
@@ -444,11 +476,109 @@
     </div>
 </div>
 
+<!-- 비정상 알림 모달 -->
+<div id="alertModal" class="modal">
+  <div class="modal-content">
+    <span class="close" id="closeAlertBtn">&times;</span>
+    <h2 id="alertTitle">알림</h2>
+    <div id="alertTime" class="alert-time"></div>
+    <div id="alertMessage" class="alert-message"></div>
+    <button class="btn-primary" onclick="closeAlertModal()">확인</button>
+  </div>
+</div>
 <script>
-    // 모달 관련 JavaScript
+    // 로그인 모달 관련 JavaScript
     var modal = document.getElementById("loginModal");
     var btn = document.getElementById("loginBtn");
     var span = document.getElementById("closeModalBtn");
+
+    // --- 알림 모달 및 SSE 관련 스크립트 ---
+    var alertModal = document.getElementById("alertModal");
+    var closeAlertBtn = document.getElementById("closeAlertBtn");
+    var alertTitle = document.getElementById("alertTitle");
+    var alertTime = document.getElementById("alertTime");
+    var alertMessage = document.getElementById("alertMessage");
+
+    // 알림 모달 닫기 함수
+    function closeAlertModal() {
+        alertModal.style.display = "none";
+        // 모달 닫을 때 클래스 초기화
+        alertModal.classList.remove('warning', 'emergency');
+    }
+
+    // X 버튼 클릭 시 닫기
+    closeAlertBtn.onclick = closeAlertModal;
+
+    // 모달 외부 클릭 시 닫기 (로그인 모달과 통합 처리)
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        if (event.target == alertModal) {
+            closeAlertModal();
+        }
+    }
+
+    // --- SSE 연결 및 알림 처리 ---
+    let eventSource = null;
+
+    function connect() {
+        // 실제 운영 서버 주소로 변경 필요할 수 있음
+        eventSource = new EventSource('https://localhost:8444/iot/admin/subscribe');
+
+        eventSource.addEventListener('connect', function(event) {
+            console.log('알림 서버 연결 성공');
+        });
+
+        eventSource.addEventListener('warning', function(event) {
+            showAlert(event.data, 'warning');
+        });
+
+        eventSource.addEventListener('emergency', function(event) {
+            showAlert(event.data, 'emergency');
+            playAlertSound(); // 소리 재생
+        });
+
+        eventSource.onerror = function(error) {
+            console.log('알림 서버 연결 끊김, 재연결 시도...');
+            // EventSource는 기본적으로 자동 재연결을 시도하므로 추가 로직 불필요
+        };
+    }
+
+    function showAlert(message, type) {
+        const now = new Date();
+        const timeStr = now.getHours() + ':' +
+            String(now.getMinutes()).padStart(2, '0') + ':' +
+            String(now.getSeconds()).padStart(2, '0');
+
+        // 내용 채우기
+        alertTime.innerText = timeStr;
+        alertMessage.innerText = message;
+
+        // 타입에 따른 스타일/제목 설정
+        alertModal.className = 'modal'; // 초기화
+        alertModal.classList.add(type); // warning 또는 emergency 클래스 추가
+        alertModal.style.display = "block";
+
+        if (type === 'emergency') {
+            alertTitle.innerText = "🚨 긴급 알림";
+            alertTitle.style.color = "#e74c3c";
+        } else if (type === 'warning') {
+            alertTitle.innerText = "⚠️ 경고 알림";
+            alertTitle.style.color = "#ffc107";
+        }
+    }
+
+    function playAlertSound() {
+        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuAyvLZimwQHTfE7efHdCUFM4fN8t2WQAoTXbPp7KlXFApFoN/yvnsgBSyAy/LaiXwQHDnE7efHdCUFM4fO8t2XQAsUX7To66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvnweBSyBy/PaiwwQIDnB7efHdCUFM4fP8tyXQAsUXrTp66lWFApFoN/yvg==');
+        audio.play().catch(function(e) { console.log('Audio play failed', e); });
+    }
+
+    window.addEventListener('beforeunload', function() {
+        if (eventSource) {
+            eventSource.close();
+        }
+    });
 
     // 👤 버튼 클릭 시 모달 열기 (로그아웃 상태일 때만 존재)
     if (btn) {
@@ -468,6 +598,8 @@
             modal.style.display = "none";
         }
     }
+
+    connect();
 </script>
 </body>
 </html>
