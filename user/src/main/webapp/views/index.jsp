@@ -170,10 +170,10 @@
       <li><a href="<c:url value="/dia/dia1"/>">자가진단</a></li>
       <li><a href="<c:url value="/map/map1"/>">병원찾기</a></li>
       <li><a href="<c:url value='/statview'/>">통계 확인</a></li>
-      <li><a href="<c:url value='/consul'/>">상담하기</a></li>
       <c:choose>
         <c:when test="${loginuser != null}">
           <li><a href="/healthmgr">AI 건강 상담</a></li>
+          <li><a href="/appointment/my">나의 예약</a></li>
           <li><a href="/monitor?patientId=${loginuser.patientId}">IoT 모니터링</a></li>
           <li><a href="<c:url value='/info?userId=${loginuser.patientId}'/>">${loginuser.patientName}님</a></li>
           <li><a href="<c:url value='/logout'/>">로그아웃</a></li>
@@ -382,136 +382,136 @@
 </footer>
 
 <script>
-  const translationManager = {
-    currentLang: 'ko',
-    cache: {}, // { 'en': Promise object, ... }
-
-    // 텍스트 추출 (기존과 동일)
-    extractTextNodes: function() {
-        const textNodes = [];
-        const nodeRefs = [];
-        const walker = document.createTreeWalker(
-            document.body, NodeFilter.SHOW_TEXT,
-            { acceptNode: node => {
-                const t = node.nodeValue.trim();
-                if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
-                return NodeFilter.FILTER_ACCEPT;
-            }}, false
-        );
-        while(node = walker.nextNode()) {
-            textNodes.push(node.nodeValue.trim());
-            nodeRefs.push({ type: 'text', node: node });
-        }
-        document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
-            if (el.placeholder && el.placeholder.trim()) {
-                textNodes.push(el.placeholder);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
-            }
-            if (el.value && (el.type === 'button' || el.type === 'submit')) {
-                textNodes.push(el.value);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
-            }
-        });
-        return { textNodes, nodeRefs };
-    },
-
-    // 공통 요청 함수 (캐싱 로직 통합)
-    fetchTranslation: function(targetLangCode) {
-        // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
-        if (this.cache[targetLangCode]) {
-            return this.cache[targetLangCode];
-        }
-
-        const { textNodes } = this.extractTextNodes();
-        if (textNodes.length === 0) return Promise.resolve([]);
-
-        // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
-        const requestPromise = fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                targetLang: this.getLangName(targetLangCode),
-                texts: textNodes
-            })
-        })
-        .then(res => res.json())
-        .then(data => data.translatedTexts)
-        .catch(err => {
-            console.error(err);
-            delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
-            return null;
-        });
-
-        this.cache[targetLangCode] = requestPromise; // 캐시 저장
-        return requestPromise;
-    },
-
-    getLangName: function(code) {
-        const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
-        return map[code] || code;
-    },
-
-    // 접속 시 자동 실행 (백그라운드)
-    preloadTranslations: function() {
-        console.log("🚀 백그라운드 번역 시작...");
-        ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
-    },
-
-    // 언어 변경 클릭 시
-    translatePage: async function(targetLangCode) {
-        if (targetLangCode === 'ko') {
-            location.reload();
-            return;
-        }
-
-        this.currentLang = targetLangCode;
-        document.body.style.cursor = 'wait';
-        document.body.style.opacity = '0.6';
-
-        try {
-            // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
-            const translatedTexts = await this.fetchTranslation(targetLangCode);
-
-            if (translatedTexts) {
-                const { nodeRefs } = this.extractTextNodes();
-                if (translatedTexts.length === nodeRefs.length) {
-                    nodeRefs.forEach((ref, index) => {
-                        if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
-                        else ref.node[ref.attr] = translatedTexts[index];
-                    });
-
-                    // 캘린더 언어 설정
-                    if (window.calendarManager && window.calendarManager.calendar) {
-                        let calLang = 'en';
-                        if (targetLangCode === 'ja') calLang = 'ja';
-                        if (targetLangCode === 'zh') calLang = 'zh-cn';
-                        window.calendarManager.calendar.setOption('locale', calLang);
-                    }
-                }
-            }
-        } catch (e) {
-            console.error(e);
-            alert("번역 적용 실패");
-        } finally {
-            document.body.style.cursor = 'default';
-            document.body.style.opacity = '1';
-        }
-    }
-  };
-
-  document.addEventListener('DOMContentLoaded', function() {
-      if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
-
-      // 1초 뒤 백그라운드 번역 시작
-      setTimeout(() => translationManager.preloadTranslations(), 1000);
-
-      const langSelect = document.getElementById('language-select');
-      if (langSelect) {
-          langSelect.addEventListener('change', function() {
-              translationManager.translatePage(this.value);
-          });
-      }
-  });
+  // const translationManager = {
+  //   currentLang: 'ko',
+  //   cache: {}, // { 'en': Promise object, ... }
+  //
+  //   // 텍스트 추출 (기존과 동일)
+  //   extractTextNodes: function() {
+  //       const textNodes = [];
+  //       const nodeRefs = [];
+  //       const walker = document.createTreeWalker(
+  //           document.body, NodeFilter.SHOW_TEXT,
+  //           { acceptNode: node => {
+  //               const t = node.nodeValue.trim();
+  //               if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
+  //               return NodeFilter.FILTER_ACCEPT;
+  //           }}, false
+  //       );
+  //       while(node = walker.nextNode()) {
+  //           textNodes.push(node.nodeValue.trim());
+  //           nodeRefs.push({ type: 'text', node: node });
+  //       }
+  //       document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
+  //           if (el.placeholder && el.placeholder.trim()) {
+  //               textNodes.push(el.placeholder);
+  //               nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
+  //           }
+  //           if (el.value && (el.type === 'button' || el.type === 'submit')) {
+  //               textNodes.push(el.value);
+  //               nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
+  //           }
+  //       });
+  //       return { textNodes, nodeRefs };
+  //   },
+  //
+  //   // 공통 요청 함수 (캐싱 로직 통합)
+  //   fetchTranslation: function(targetLangCode) {
+  //       // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
+  //       if (this.cache[targetLangCode]) {
+  //           return this.cache[targetLangCode];
+  //       }
+  //
+  //       const { textNodes } = this.extractTextNodes();
+  //       if (textNodes.length === 0) return Promise.resolve([]);
+  //
+  //       // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
+  //       const requestPromise = fetch('/api/translate', {
+  //           method: 'POST',
+  //           headers: { 'Content-Type': 'application/json' },
+  //           body: JSON.stringify({
+  //               targetLang: this.getLangName(targetLangCode),
+  //               texts: textNodes
+  //           })
+  //       })
+  //       .then(res => res.json())
+  //       .then(data => data.translatedTexts)
+  //       .catch(err => {
+  //           console.error(err);
+  //           delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
+  //           return null;
+  //       });
+  //
+  //       this.cache[targetLangCode] = requestPromise; // 캐시 저장
+  //       return requestPromise;
+  //   },
+  //
+  //   getLangName: function(code) {
+  //       const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
+  //       return map[code] || code;
+  //   },
+  //
+  //   // 접속 시 자동 실행 (백그라운드)
+  //   preloadTranslations: function() {
+  //       console.log("🚀 백그라운드 번역 시작...");
+  //       ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
+  //   },
+  //
+  //   // 언어 변경 클릭 시
+  //   translatePage: async function(targetLangCode) {
+  //       if (targetLangCode === 'ko') {
+  //           location.reload();
+  //           return;
+  //       }
+  //
+  //       this.currentLang = targetLangCode;
+  //       document.body.style.cursor = 'wait';
+  //       document.body.style.opacity = '0.6';
+  //
+  //       try {
+  //           // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
+  //           const translatedTexts = await this.fetchTranslation(targetLangCode);
+  //
+  //           if (translatedTexts) {
+  //               const { nodeRefs } = this.extractTextNodes();
+  //               if (translatedTexts.length === nodeRefs.length) {
+  //                   nodeRefs.forEach((ref, index) => {
+  //                       if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
+  //                       else ref.node[ref.attr] = translatedTexts[index];
+  //                   });
+  //
+  //                   // 캘린더 언어 설정
+  //                   if (window.calendarManager && window.calendarManager.calendar) {
+  //                       let calLang = 'en';
+  //                       if (targetLangCode === 'ja') calLang = 'ja';
+  //                       if (targetLangCode === 'zh') calLang = 'zh-cn';
+  //                       window.calendarManager.calendar.setOption('locale', calLang);
+  //                   }
+  //               }
+  //           }
+  //       } catch (e) {
+  //           console.error(e);
+  //           alert("번역 적용 실패");
+  //       } finally {
+  //           document.body.style.cursor = 'default';
+  //           document.body.style.opacity = '1';
+  //       }
+  //   }
+  // };
+  //
+  // document.addEventListener('DOMContentLoaded', function() {
+  //     if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
+  //
+  //     // 1초 뒤 백그라운드 번역 시작
+  //     setTimeout(() => translationManager.preloadTranslations(), 1000);
+  //
+  //     const langSelect = document.getElementById('language-select');
+  //     if (langSelect) {
+  //         langSelect.addEventListener('change', function() {
+  //             translationManager.translatePage(this.value);
+  //         });
+  //     }
+  // });
 
   // 챗봇 관련 함수 (toggleChatbot, sendMessage 등 필요하다면 여기에 추가)
   function toggleChatbot() {
