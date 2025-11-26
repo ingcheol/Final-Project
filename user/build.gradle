@@ -98,6 +98,8 @@ dependencies {
 
     // OAuth2 Client
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//    http5
+    implementation 'org.apache.httpcomponents.client5:httpclient5'
 
 	// test
 	testImplementation 'org.projectlombok:lombok'
