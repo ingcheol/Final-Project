@@ -114,47 +114,12 @@
     .footer-content { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 60px; margin-bottom: 30px; }
     .footer-bottom { text-align: center; padding-top: 30px; border-top: 1px solid #34495e; color: #95a5a6; }
 
-    /* 챗봇 버튼 및 모달 */
-    .chatbot-button { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 999; border: none; }
-    .chatbot-button:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); }
-    .chatbot-button svg { width: 35px; height: 35px; fill: white; }
-
-    .chatbot-modal { display: none; position: fixed; bottom: 120px; right: 30px; width: 400px; height: 600px; background: white; border-radius: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); z-index: 998; flex-direction: column; overflow: hidden; }
-    .chatbot-modal.active { display: flex; }
-    .chatbot-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-    .chatbot-close { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-    .chatbot-body { flex: 1; padding: 20px; overflow-y: auto; background: #f5f5f5; }
-
-    /* 채팅 메시지 스타일 */
-    .chat-message { margin-bottom: 15px; display: flex; gap: 10px; animation: slideIn 0.3s ease-out; }
-    .chat-message.user { justify-content: flex-end; }
-    .chat-message.bot { justify-content: flex-start; }
-    .message-bubble { max-width: 70%; padding: 12px 16px; word-wrap: break-word; line-height: 1.5; font-size: 15px; position: relative; }
-    .chat-message.user .message-bubble { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 18px 18px 4px 18px; box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3); }
-    .chat-message.bot .message-bubble { background: white; color: #333; border-radius: 18px 18px 18px 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-    @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .chatbot-footer { padding: 15px; background: white; border-top: 1px solid #e0e0e0; display: flex; gap: 10px; }
-    .chatbot-input { flex: 1; padding: 12px 16px; border: 1px solid #e0e0e0; border-radius: 25px; outline: none; font-size: 14px; }
-    .chatbot-send { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .chatbot-send:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .typing-indicator { display: none; padding: 12px 16px; background: white; border-radius: 18px; width: fit-content; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-    .typing-indicator.active { display: block; }
-    .typing-indicator span { display: inline-block; width: 8px; height: 8px; background: #999; border-radius: 50%; margin: 0 2px; animation: typing 1.4s infinite; }
-    .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-    .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
-
     /* 반응형 */
     @media (max-width: 768px) {
       .hero-content { flex-direction: column; text-align: center; }
       .quick-menu { width: 100%; margin-top: 30px; }
       .notice-section, .guide-cards, .about-section, .footer-content { grid-template-columns: 1fr; }
       .hero-text h1 { font-size: 32px; }
-      .chatbot-modal { width: 90%; height: 70%; right: 5%; bottom: 80px; }
-      .chatbot-button { width: 60px; height: 60px; bottom: 20px; right: 20px; }
-      .chatbot-button svg { width: 30px; height: 30px; }
       nav { flex-direction: column; gap: 10px; }
       .nav-menu { width: 100%; justify-content: center; flex-wrap: wrap; }
     }
@@ -326,37 +291,7 @@
     </c:choose>
 </div>
 
-<button class="chatbot-button" onclick="toggleChatbot()">
-  <svg viewBox="0 0 24 24">
-    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
-  </svg>
-</button>
-
-<div class="chatbot-modal" id="chatbotModal">
-  <div class="chatbot-header">
-    <h3>🏥 AI 의료 상담</h3>
-    <button class="chatbot-close" onclick="toggleChatbot()">×</button>
-  </div>
-  <div class="chatbot-body" id="chatBody">
-    <div class="chat-message bot">
-      <div class="message-bubble">
-        안녕하세요! AI 의료 상담 챗봇입니다.<br>
-        궁금하신 내용을 자유롭게 물어보세요.
-      </div>
-    </div>
-    <div class="typing-indicator" id="typingIndicator">
-      <span></span><span></span><span></span>
-    </div>
-  </div>
-  <div class="chatbot-footer">
-    <input type="text" class="chatbot-input" id="chatInput" placeholder="메시지를 입력하세요..." onkeypress="handleKeyPress(event)">
-    <button class="chatbot-send" onclick="sendMessage()" id="sendBtn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-      </svg>
-    </button>
-  </div>
-</div>
+<jsp:include page="chatbot.jsp" />
 
 <footer id="contact">
   <div class="footer-content">
@@ -378,144 +313,137 @@
     <p>© 2025 FINAL-PROJECT AI 의료 매칭 시스템</p>
   </div>
 </footer>
+<%--<script>--%>
+<%--  const translationManager = {--%>
+<%--    currentLang: 'ko',--%>
+<%--    cache: {}, // { 'en': Promise object, ... }--%>
 
-<script>
-  const translationManager = {
-    currentLang: 'ko',
-    cache: {}, // { 'en': Promise object, ... }
+<%--    // 텍스트 추출 (기존과 동일)--%>
+<%--    extractTextNodes: function() {--%>
+<%--      const textNodes = [];--%>
+<%--      const nodeRefs = [];--%>
+<%--      const walker = document.createTreeWalker(--%>
+<%--              document.body, NodeFilter.SHOW_TEXT,--%>
+<%--              { acceptNode: node => {--%>
+<%--                  const t = node.nodeValue.trim();--%>
+<%--                  if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;--%>
+<%--                  return NodeFilter.FILTER_ACCEPT;--%>
+<%--                }}, false--%>
+<%--      );--%>
+<%--      while(node = walker.nextNode()) {--%>
+<%--        textNodes.push(node.nodeValue.trim());--%>
+<%--        nodeRefs.push({ type: 'text', node: node });--%>
+<%--      }--%>
+<%--      document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {--%>
+<%--        if (el.placeholder && el.placeholder.trim()) {--%>
+<%--          textNodes.push(el.placeholder);--%>
+<%--          nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });--%>
+<%--        }--%>
+<%--        if (el.value && (el.type === 'button' || el.type === 'submit')) {--%>
+<%--          textNodes.push(el.value);--%>
+<%--          nodeRefs.push({ type: 'attr', node: el, attr: 'value' });--%>
+<%--        }--%>
+<%--      });--%>
+<%--      return { textNodes, nodeRefs };--%>
+<%--    },--%>
 
-    // 텍스트 추출 (기존과 동일)
-    extractTextNodes: function() {
-        const textNodes = [];
-        const nodeRefs = [];
-        const walker = document.createTreeWalker(
-            document.body, NodeFilter.SHOW_TEXT,
-            { acceptNode: node => {
-                const t = node.nodeValue.trim();
-                if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
-                return NodeFilter.FILTER_ACCEPT;
-            }}, false
-        );
-        while(node = walker.nextNode()) {
-            textNodes.push(node.nodeValue.trim());
-            nodeRefs.push({ type: 'text', node: node });
-        }
-        document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
-            if (el.placeholder && el.placeholder.trim()) {
-                textNodes.push(el.placeholder);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
-            }
-            if (el.value && (el.type === 'button' || el.type === 'submit')) {
-                textNodes.push(el.value);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
-            }
-        });
-        return { textNodes, nodeRefs };
-    },
+<%--    // 공통 요청 함수 (캐싱 로직 통합)--%>
+<%--    fetchTranslation: function(targetLangCode) {--%>
+<%--      // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)--%>
+<%--      if (this.cache[targetLangCode]) {--%>
+<%--        return this.cache[targetLangCode];--%>
+<%--      }--%>
 
-    // 공통 요청 함수 (캐싱 로직 통합)
-    fetchTranslation: function(targetLangCode) {
-        // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
-        if (this.cache[targetLangCode]) {
-            return this.cache[targetLangCode];
-        }
+<%--      const { textNodes } = this.extractTextNodes();--%>
+<%--      if (textNodes.length === 0) return Promise.resolve([]);--%>
 
-        const { textNodes } = this.extractTextNodes();
-        if (textNodes.length === 0) return Promise.resolve([]);
+<%--      // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀--%>
+<%--      const requestPromise = fetch('/api/translate', {--%>
+<%--        method: 'POST',--%>
+<%--        headers: { 'Content-Type': 'application/json' },--%>
+<%--        body: JSON.stringify({--%>
+<%--          targetLang: this.getLangName(targetLangCode),--%>
+<%--          texts: textNodes--%>
+<%--        })--%>
+<%--      })--%>
+<%--              .then(res => res.json())--%>
+<%--              .then(data => data.translatedTexts)--%>
+<%--              .catch(err => {--%>
+<%--                console.error(err);--%>
+<%--                delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함--%>
+<%--                return null;--%>
+<%--              });--%>
 
-        // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
-        const requestPromise = fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                targetLang: this.getLangName(targetLangCode),
-                texts: textNodes
-            })
-        })
-        .then(res => res.json())
-        .then(data => data.translatedTexts)
-        .catch(err => {
-            console.error(err);
-            delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
-            return null;
-        });
+<%--      this.cache[targetLangCode] = requestPromise; // 캐시 저장--%>
+<%--      return requestPromise;--%>
+<%--    },--%>
 
-        this.cache[targetLangCode] = requestPromise; // 캐시 저장
-        return requestPromise;
-    },
+<%--    getLangName: function(code) {--%>
+<%--      const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };--%>
+<%--      return map[code] || code;--%>
+<%--    },--%>
 
-    getLangName: function(code) {
-        const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
-        return map[code] || code;
-    },
+<%--    // 접속 시 자동 실행 (백그라운드)--%>
+<%--    preloadTranslations: function() {--%>
+<%--      console.log("🚀 백그라운드 번역 시작...");--%>
+<%--      ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));--%>
+<%--    },--%>
 
-    // 접속 시 자동 실행 (백그라운드)
-    preloadTranslations: function() {
-        console.log("🚀 백그라운드 번역 시작...");
-        ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
-    },
+<%--    // 언어 변경 클릭 시--%>
+<%--    translatePage: async function(targetLangCode) {--%>
+<%--      if (targetLangCode === 'ko') {--%>
+<%--        location.reload();--%>
+<%--        return;--%>
+<%--      }--%>
 
-    // 언어 변경 클릭 시
-    translatePage: async function(targetLangCode) {
-        if (targetLangCode === 'ko') {
-            location.reload();
-            return;
-        }
+<%--      this.currentLang = targetLangCode;--%>
+<%--      document.body.style.cursor = 'wait';--%>
+<%--      document.body.style.opacity = '0.6';--%>
 
-        this.currentLang = targetLangCode;
-        document.body.style.cursor = 'wait';
-        document.body.style.opacity = '0.6';
+<%--      try {--%>
+<%--        // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함--%>
+<%--        const translatedTexts = await this.fetchTranslation(targetLangCode);--%>
 
-        try {
-            // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
-            const translatedTexts = await this.fetchTranslation(targetLangCode);
+<%--        if (translatedTexts) {--%>
+<%--          const { nodeRefs } = this.extractTextNodes();--%>
+<%--          if (translatedTexts.length === nodeRefs.length) {--%>
+<%--            nodeRefs.forEach((ref, index) => {--%>
+<%--              if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];--%>
+<%--              else ref.node[ref.attr] = translatedTexts[index];--%>
+<%--            });--%>
 
-            if (translatedTexts) {
-                const { nodeRefs } = this.extractTextNodes();
-                if (translatedTexts.length === nodeRefs.length) {
-                    nodeRefs.forEach((ref, index) => {
-                        if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
-                        else ref.node[ref.attr] = translatedTexts[index];
-                    });
+<%--            // 캘린더 언어 설정--%>
+<%--            if (window.calendarManager && window.calendarManager.calendar) {--%>
+<%--              let calLang = 'en';--%>
+<%--              if (targetLangCode === 'ja') calLang = 'ja';--%>
+<%--              if (targetLangCode === 'zh') calLang = 'zh-cn';--%>
+<%--              window.calendarManager.calendar.setOption('locale', calLang);--%>
+<%--            }--%>
+<%--          }--%>
+<%--        }--%>
+<%--      } catch (e) {--%>
+<%--        console.error(e);--%>
+<%--        alert("번역 적용 실패");--%>
+<%--      } finally {--%>
+<%--        document.body.style.cursor = 'default';--%>
+<%--        document.body.style.opacity = '1';--%>
+<%--      }--%>
+<%--    }--%>
+<%--  };--%>
 
-                    // 캘린더 언어 설정
-                    if (window.calendarManager && window.calendarManager.calendar) {
-                        let calLang = 'en';
-                        if (targetLangCode === 'ja') calLang = 'ja';
-                        if (targetLangCode === 'zh') calLang = 'zh-cn';
-                        window.calendarManager.calendar.setOption('locale', calLang);
-                    }
-                }
-            }
-        } catch (e) {
-            console.error(e);
-            alert("번역 적용 실패");
-        } finally {
-            document.body.style.cursor = 'default';
-            document.body.style.opacity = '1';
-        }
-    }
-  };
+<%--  document.addEventListener('DOMContentLoaded', function() {--%>
+<%--    if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();--%>
 
-  document.addEventListener('DOMContentLoaded', function() {
-      if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
+<%--    // 1초 뒤 백그라운드 번역 시작--%>
+<%--    setTimeout(() => translationManager.preloadTranslations(), 1000);--%>
 
-      // 1초 뒤 백그라운드 번역 시작
-      setTimeout(() => translationManager.preloadTranslations(), 1000);
-
-      const langSelect = document.getElementById('language-select');
-      if (langSelect) {
-          langSelect.addEventListener('change', function() {
-              translationManager.translatePage(this.value);
-          });
-      }
-  });
-
-  // 챗봇 관련 함수 (toggleChatbot, sendMessage 등 필요하다면 여기에 추가)
-  function toggleChatbot() {
-      const modal = document.getElementById('chatbotModal');
-      if(modal) modal.classList.toggle('active');
-  }
-</script>
+<%--    const langSelect = document.getElementById('language-select');--%>
+<%--    if (langSelect) {--%>
+<%--      langSelect.addEventListener('change', function() {--%>
+<%--        translationManager.translatePage(this.value);--%>
+<%--      });--%>
+<%--    }--%>
+<%--  });--%>
+<%--</script>--%>
 </body>
 </html>
