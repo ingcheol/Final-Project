@@ -37,4 +37,9 @@ public interface AppointmentRepository extends SmRepository<Appointment, Long> {
 
     // 승인 대기 중인 예약 개수
     int countPendingAppointments() throws Exception;
+
+    // 날짜 범위로 예약 조회 (String 사용)
+    List<Appointment> findByDateRange(
+            @Param("startDate") String startDate,
+            @Param("endDate") String endDate) throws Exception;
 }

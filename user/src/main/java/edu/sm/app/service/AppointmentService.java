@@ -127,4 +127,9 @@ public class AppointmentService implements SmService<Appointment, Long> {
         }
         return true;
     }
+    // 날짜 범위로 예약 조회 메서드 추가
+    public List<Appointment> getAppointmentsByDateRange(String startDate, String endDate) throws Exception {
+        return appointmentRepository.findByDateRange(startDate, endDate);
+    }
+
 }

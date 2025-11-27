@@ -119,4 +119,16 @@
         SELECT COUNT(*) FROM appointment WHERE status = 'pending'
     </select>
 
+    <select id="findByDateRange" resultMap="appointmentMap">
+        SELECT a.*,
+               p.name,
+               p.email,
+               p.phone
+        FROM appointment a
+                 LEFT JOIN patient p ON a.patient_id = p.patient_id
+        WHERE DATE(a.appointment_time) BETWEEN #{startDate} AND #{endDate}
+        ORDER BY a.appointment_time ASC
+    </select>
+
+
 </mapper>
