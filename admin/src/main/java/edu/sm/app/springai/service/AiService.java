@@ -11,9 +11,12 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -66,4 +69,21 @@ public class AiService {
         log.info(fluxString.toString());
         return fluxString;
     }
+
+  public String translate(String text, String targetLang) {
+    // consul에 쓸거, AiChatController
+    String templateMsg = """
+                Translate the following text into {targetLang}.
+                Only return the translated text. Do not add explanations.
+                Text: {text}
+                """;
+    try {
+      PromptTemplate template = new PromptTemplate(templateMsg);
+      Prompt prompt = template.create(Map.of("targetLang", targetLang, "text", text));
+      return chatClient.prompt(prompt).call().content();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return text; // 에러나면 원문 그대로 반환
+    }
+  }
 }

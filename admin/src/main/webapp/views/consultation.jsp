@@ -181,6 +181,10 @@
         websocket: null,
         configuration: { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] },
 
+        chatRecorder: null,
+        chatChunks: [],
+        isChatRecording: false,
+
         init: async function () {
             if (!this.id) this.id = 'adviser_' + Math.floor(Math.random() * 100);
 
@@ -196,6 +200,8 @@
                     this.sendMessage();
                 }
             });
+
+            this.initVoiceInput();
         },
 
         connectChat: function () {
@@ -235,12 +241,123 @@
             $('#totext').val('');
         },
 
-        addMessage:function(content, type, sender){
+        // 음성 인식 및 번역
+        initVoiceInput: function() {
+            const chatMicBtn = document.getElementById('chatMicBtn');
+            if (!chatMicBtn) return;
+
+            const self = this;
+
+            chatMicBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+
+                if (!self.isChatRecording) {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        self.chatRecorder = new MediaRecorder(stream);
+                        self.chatChunks = [];
+
+                        self.chatRecorder.ondataavailable = (e) => self.chatChunks.push(e.data);
+
+                        self.chatRecorder.onstop = async () => {
+                            const audioBlob = new Blob(self.chatChunks, {type: 'audio/webm'});
+                            const formData = new FormData();
+                            formData.append("audio", audioBlob, "recording.webm");
+
+                            chatMicBtn.style.backgroundColor = "#95a5a6";
+                            chatMicBtn.textContent = "⏳";
+
+                            try {
+                                const sttResponse = await fetch('/api/chat-support/stt', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+                                const sttData = await sttResponse.json();
+
+                                if (sttData.status === 'success' && sttData.text) {
+                                    const myLang = $('#myLanguage').val();
+
+                                    const translateResponse = await fetch('/api/chat-support/translate', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({
+                                            text: sttData.text,
+                                            targetLang: myLang
+                                        })
+                                    });
+                                    const translateData = await translateResponse.json();
+
+                                    const finalText = translateData.translatedText || sttData.text;
+                                    $('#totext').val(finalText);
+                                    self.sendMessage();
+                                } else {
+                                    alert("음성 인식 실패");
+                                }
+                            } catch (error) {
+                                console.error("음성 처리 오류:", error);
+                                alert("음성 처리 중 오류가 발생했습니다.");
+                            } finally {
+                                chatMicBtn.style.backgroundColor = "#e74c3c";
+                                chatMicBtn.textContent = "🎙️";
+                                stream.getTracks().forEach(track => track.stop());
+                            }
+                        };
+
+                        self.chatRecorder.start();
+                        self.isChatRecording = true;
+                        chatMicBtn.style.backgroundColor = "#c0392b";
+                        chatMicBtn.textContent = "⏹️";
+
+                    } catch (err) {
+                        console.error("마이크 권한 오류:", err);
+                        alert("마이크 권한을 허용해주세요.");
+                    }
+                } else {
+                    if (self.chatRecorder && self.chatRecorder.state !== 'inactive') {
+                        self.chatRecorder.stop();
+                    }
+                    self.isChatRecording = false;
+                }
+            });
+        },
+
+        addMessage: async function(content, type, sender) {
             const senderDisplay = (type === 'sent' ? '나' : sender);
+            let msgContent = content;
+            let extraHtml = '';
+
+            // 받은 메시지는 번역 시도
+            if (type === 'received') {
+                const myLang = $('#myLanguage').val();
+
+                try {
+                    const response = await fetch('/api/chat-support/translate', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: content, targetLang: myLang})
+                    });
+                    const data = await response.json();
+
+                    if (data.translatedText) {
+                        const safeText = data.translatedText.replace(/'/g, "\\'").replace(/"/g, '\\"');
+                        extraHtml =
+                            '<hr style="margin: 5px 0; border: 0; border-top: 1px dashed rgba(0,0,0,0.2);">' +
+                            '<div style="font-weight:bold; display:flex; align-items:center; gap:5px; color:#2c3e50;">' +
+                            '<span>' + data.translatedText + '</span>' +
+                            '<button onclick="playTTS(\'' + safeText + '\')" style="background:none; border:none; cursor:pointer; font-size:14px;">🔊</button>' +
+                            '</div>';
+                    }
+                } catch (e) {
+                    console.error("번역 실패", e);
+                }
+            }
+
             let messageHtml = '<div class="message ' + type + '">';
             messageHtml += '<div class="message-sender">' + senderDisplay + '</div>';
-            messageHtml += '<div class="message-bubble">' + content + '</div>';
-            messageHtml += '</div>';
+            messageHtml += '<div class="message-bubble">';
+            messageHtml += msgContent;
+            messageHtml += extraHtml;
+            messageHtml += '</div></div>';
 
             $('#chatMessages').append(messageHtml);
             $('#chatMessages').scrollTop($('#chatMessages')[0].scrollHeight);
@@ -470,6 +587,23 @@
     }
 
     $(function () { adviserConsult.init(); });
+
+    function playTTS(text) {
+        if (!text) return;
+        fetch('/api/chat-support/tts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: text})
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.audio) {
+                    const audio = new Audio("data:audio/mp3;base64," + data.audio);
+                    audio.play();
+                }
+            })
+            .catch(err => console.error("TTS 오류:", err));
+    }
 
     window.onbeforeunload = function (e) {
         e.preventDefault();
@@ -738,15 +872,19 @@
   </div>
 
   <div id="chatSection" class="chat-container hidden">
-    <div class="chat-header">
-      환자와의 채팅 (Room: ${adviserConsult.roomId})
-      <span style="float:right;font-size:12px;font-weight:normal">
-        Chat Status: <span id="status">Disconnected</span>
-      </span>
+    <div class="chat-header" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>환자와의 채팅 (Room: ${adviserConsult.roomId})</span>
+      <select id="myLanguage" style="font-size:12px;padding:2px;border-radius:4px;border:none;color:#333;">
+        <option value="Korean" selected>전송할 언어: 한국어</option>
+        <option value="English">전송할 언어: English</option>
+        <option value="Japanese">전송할 언어: 日本語</option>
+        <option value="Chinese">전송할 언어: 中文</option>
+      </select>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
       <input type="hidden" id="target" value="${adviserConsult.roomId}">
+      <button id="chatMicBtn" style="margin-right:8px; background:#e74c3c; width:40px; padding:0;" title="음성 입력">🎙️</button>
       <input type="text" id="totext" placeholder="메시지를 입력하세요..." autocomplete="off">
       <button id="sendto" type="button">전송</button>
     </div>

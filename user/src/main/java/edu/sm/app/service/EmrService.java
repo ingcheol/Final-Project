@@ -276,7 +276,8 @@ public class EmrService {
   /**
    * EMR 조회
    */
-  public Emr getEmr(Long emrId) throws Exception {
-    return emrRepository.select(emrId);
+  public Emr getRecentEmr(Long patientId) throws Exception {
+    return emrRepository.findTopByPatientIdOrderByCreatedAtDesc(patientId)
+        .orElse(null); // 데이터가 없으면 null 반환하여 스케줄러에서 처리
   }
 }

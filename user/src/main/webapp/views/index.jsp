@@ -146,6 +146,35 @@
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
 
+    /*URL 음성 이동 AI*/
+    .voice-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 105px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        transition: transform 0.2s;
+    }
+    .voice-btn:active { transform: scale(0.9); }
+    .voice-btn.recording { animation: pulse-red 1.5s infinite; background-color: #c0392b; }
+
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
     /* 반응형 */
     @media (max-width: 768px) {
       .hero-content { flex-direction: column; text-align: center; }
@@ -157,7 +186,15 @@
       .chatbot-button svg { width: 30px; height: 30px; }
       nav { flex-direction: column; gap: 10px; }
       .nav-menu { width: 100%; justify-content: center; flex-wrap: wrap; }
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            bottom: 20px;
+            right: 90px;
+        }
     }
+
   </style>
 </head>
 <body>
@@ -328,6 +365,10 @@
     </c:choose>
 </div>
 
+<button id="voiceBtn" class="voice-btn" title="누르고 말하면 이동합니다">
+  🎙️
+</button>
+
 <button class="chatbot-button" onclick="toggleChatbot()">
   <svg viewBox="0 0 24 24">
     <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1zm0-3H7c-.55 0-1-.45-1-1s.45-1 1-1h10c.55 0 1 .45 1 1s-.45 1-1 1z"/>
@@ -382,142 +423,240 @@
 </footer>
 
 <script>
-  const translationManager = {
-    currentLang: 'ko',
-    cache: {}, // { 'en': Promise object, ... }
-
-    // 텍스트 추출 (기존과 동일)
-    extractTextNodes: function() {
-        const textNodes = [];
-        const nodeRefs = [];
-        const walker = document.createTreeWalker(
-            document.body, NodeFilter.SHOW_TEXT,
-            { acceptNode: node => {
-                const t = node.nodeValue.trim();
-                if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
-                return NodeFilter.FILTER_ACCEPT;
-            }}, false
-        );
-        while(node = walker.nextNode()) {
-            textNodes.push(node.nodeValue.trim());
-            nodeRefs.push({ type: 'text', node: node });
-        }
-        document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
-            if (el.placeholder && el.placeholder.trim()) {
-                textNodes.push(el.placeholder);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
-            }
-            if (el.value && (el.type === 'button' || el.type === 'submit')) {
-                textNodes.push(el.value);
-                nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
-            }
-        });
-        return { textNodes, nodeRefs };
-    },
-
-    // 공통 요청 함수 (캐싱 로직 통합)
-    fetchTranslation: function(targetLangCode) {
-        // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
-        if (this.cache[targetLangCode]) {
-            return this.cache[targetLangCode];
-        }
-
-        const { textNodes } = this.extractTextNodes();
-        if (textNodes.length === 0) return Promise.resolve([]);
-
-        // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
-        const requestPromise = fetch('/api/translate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                targetLang: this.getLangName(targetLangCode),
-                texts: textNodes
-            })
-        })
-        .then(res => res.json())
-        .then(data => data.translatedTexts)
-        .catch(err => {
-            console.error(err);
-            delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
-            return null;
-        });
-
-        this.cache[targetLangCode] = requestPromise; // 캐시 저장
-        return requestPromise;
-    },
-
-    getLangName: function(code) {
-        const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
-        return map[code] || code;
-    },
-
-    // 접속 시 자동 실행 (백그라운드)
-    preloadTranslations: function() {
-        console.log("🚀 백그라운드 번역 시작...");
-        ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
-    },
-
-    // 언어 변경 클릭 시
-    translatePage: async function(targetLangCode) {
-        if (targetLangCode === 'ko') {
-            location.reload();
-            return;
-        }
-
-        this.currentLang = targetLangCode;
-        document.body.style.cursor = 'wait';
-        document.body.style.opacity = '0.6';
-
-        try {
-            // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
-            const translatedTexts = await this.fetchTranslation(targetLangCode);
-
-            if (translatedTexts) {
-                const { nodeRefs } = this.extractTextNodes();
-                if (translatedTexts.length === nodeRefs.length) {
-                    nodeRefs.forEach((ref, index) => {
-                        if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
-                        else ref.node[ref.attr] = translatedTexts[index];
-                    });
-
-                    // 캘린더 언어 설정
-                    if (window.calendarManager && window.calendarManager.calendar) {
-                        let calLang = 'en';
-                        if (targetLangCode === 'ja') calLang = 'ja';
-                        if (targetLangCode === 'zh') calLang = 'zh-cn';
-                        window.calendarManager.calendar.setOption('locale', calLang);
-                    }
-                }
-            }
-        } catch (e) {
-            console.error(e);
-            alert("번역 적용 실패");
-        } finally {
-            document.body.style.cursor = 'default';
-            document.body.style.opacity = '1';
-        }
-    }
-  };
-
-  document.addEventListener('DOMContentLoaded', function() {
-      if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
-
-      // 1초 뒤 백그라운드 번역 시작
-      setTimeout(() => translationManager.preloadTranslations(), 1000);
-
-      const langSelect = document.getElementById('language-select');
-      if (langSelect) {
-          langSelect.addEventListener('change', function() {
-              translationManager.translatePage(this.value);
-          });
-      }
-  });
+  // const translationManager = {
+  //   currentLang: 'ko',
+  //   cache: {}, // { 'en': Promise object, ... }
+  //
+  //   // 텍스트 추출 (기존과 동일)
+  //   extractTextNodes: function() {
+  //       const textNodes = [];
+  //       const nodeRefs = [];
+  //       const walker = document.createTreeWalker(
+  //           document.body, NodeFilter.SHOW_TEXT,
+  //           { acceptNode: node => {
+  //               const t = node.nodeValue.trim();
+  //               if(!t || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
+  //               return NodeFilter.FILTER_ACCEPT;
+  //           }}, false
+  //       );
+  //       while(node = walker.nextNode()) {
+  //           textNodes.push(node.nodeValue.trim());
+  //           nodeRefs.push({ type: 'text', node: node });
+  //       }
+  //       document.querySelectorAll('[placeholder], input[type="button"], input[type="submit"]').forEach(el => {
+  //           if (el.placeholder && el.placeholder.trim()) {
+  //               textNodes.push(el.placeholder);
+  //               nodeRefs.push({ type: 'attr', node: el, attr: 'placeholder' });
+  //           }
+  //           if (el.value && (el.type === 'button' || el.type === 'submit')) {
+  //               textNodes.push(el.value);
+  //               nodeRefs.push({ type: 'attr', node: el, attr: 'value' });
+  //           }
+  //       });
+  //       return { textNodes, nodeRefs };
+  //   },
+  //
+  //   // 공통 요청 함수 (캐싱 로직 통합)
+  //   fetchTranslation: function(targetLangCode) {
+  //       // 이미 요청 중이거나 완료된 캐시가 있으면 그것을 반환 (중복 요청 방지)
+  //       if (this.cache[targetLangCode]) {
+  //           return this.cache[targetLangCode];
+  //       }
+  //
+  //       const { textNodes } = this.extractTextNodes();
+  //       if (textNodes.length === 0) return Promise.resolve([]);
+  //
+  //       // [수정됨] 요청 자체(Promise)를 캐시에 넣어버림 -> 이후 같은 요청은 이 Promise 결과를 씀
+  //       const requestPromise = fetch('/api/translate', {
+  //           method: 'POST',
+  //           headers: { 'Content-Type': 'application/json' },
+  //           body: JSON.stringify({
+  //               targetLang: this.getLangName(targetLangCode),
+  //               texts: textNodes
+  //           })
+  //       })
+  //       .then(res => res.json())
+  //       .then(data => data.translatedTexts)
+  //       .catch(err => {
+  //           console.error(err);
+  //           delete this.cache[targetLangCode]; // 에러나면 캐시 삭제해서 다시 시도하게 함
+  //           return null;
+  //       });
+  //
+  //       this.cache[targetLangCode] = requestPromise; // 캐시 저장
+  //       return requestPromise;
+  //   },
+  //
+  //   getLangName: function(code) {
+  //       const map = { 'en': 'English', 'ja': 'Japanese', 'zh': 'Chinese', 'ko': 'Korean' };
+  //       return map[code] || code;
+  //   },
+  //
+  //   // 접속 시 자동 실행 (백그라운드)
+  //   preloadTranslations: function() {
+  //       console.log("🚀 백그라운드 번역 시작...");
+  //       ['en', 'ja', 'zh'].forEach(lang => this.fetchTranslation(lang));
+  //   },
+  //
+  //   // 언어 변경 클릭 시
+  //   translatePage: async function(targetLangCode) {
+  //       if (targetLangCode === 'ko') {
+  //           location.reload();
+  //           return;
+  //       }
+  //
+  //       this.currentLang = targetLangCode;
+  //       document.body.style.cursor = 'wait';
+  //       document.body.style.opacity = '0.6';
+  //
+  //       try {
+  //           // fetchTranslation이 캐시가 있으면 캐시를, 없으면 새 요청을 리턴함
+  //           const translatedTexts = await this.fetchTranslation(targetLangCode);
+  //
+  //           if (translatedTexts) {
+  //               const { nodeRefs } = this.extractTextNodes();
+  //               if (translatedTexts.length === nodeRefs.length) {
+  //                   nodeRefs.forEach((ref, index) => {
+  //                       if (ref.type === 'text') ref.node.nodeValue = translatedTexts[index];
+  //                       else ref.node[ref.attr] = translatedTexts[index];
+  //                   });
+  //
+  //                   // 캘린더 언어 설정
+  //                   if (window.calendarManager && window.calendarManager.calendar) {
+  //                       let calLang = 'en';
+  //                       if (targetLangCode === 'ja') calLang = 'ja';
+  //                       if (targetLangCode === 'zh') calLang = 'zh-cn';
+  //                       window.calendarManager.calendar.setOption('locale', calLang);
+  //                   }
+  //               }
+  //           }
+  //       } catch (e) {
+  //           console.error(e);
+  //           alert("번역 적용 실패");
+  //       } finally {
+  //           document.body.style.cursor = 'default';
+  //           document.body.style.opacity = '1';
+  //       }
+  //   }
+  // };
+  //
+  // document.addEventListener('DOMContentLoaded', function() {
+  //     if (typeof window.calendarManager !== 'undefined') window.calendarManager.init();
+  //
+  //     // 1초 뒤 백그라운드 번역 시작
+  //     setTimeout(() => translationManager.preloadTranslations(), 1000);
+  //
+  //     const langSelect = document.getElementById('language-select');
+  //     if (langSelect) {
+  //         langSelect.addEventListener('change', function() {
+  //             translationManager.translatePage(this.value);
+  //         });
+  //     }
+  // });
 
   // 챗봇 관련 함수 (toggleChatbot, sendMessage 등 필요하다면 여기에 추가)
   function toggleChatbot() {
       const modal = document.getElementById('chatbotModal');
       if(modal) modal.classList.toggle('active');
   }
+
+  // 음성 녹음 및 네비게이션 로직
+  const voiceBtn = document.getElementById('voiceBtn');
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false; // 현재 녹음 중인지 상태 체크
+
+  // 버튼 클릭 시 녹음 시작/종료 토글
+  voiceBtn.addEventListener('click', toggleRecording);
+
+  async function toggleRecording(e) {
+      e.preventDefault();
+
+      if (!isRecording) {
+          await startRecording();
+      } else {
+          stopAndSend();
+      }
+  }
+
+  async function startRecording() {
+      try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+              audioChunks.push(event.data);
+          };
+
+          // 녹음이 멈췄을 때 실행될 전송 로직을 미리 정의
+          mediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+              const formData = new FormData();
+              formData.append("audio", audioBlob);
+
+              // 처리 중 표시 (노란색)
+              voiceBtn.style.backgroundColor = "#f1c40f";
+
+              try {
+                  const response = await fetch('/voice/navigate', {
+                      method: 'POST',
+                      body: formData
+                  });
+                  const data = await response.json();
+
+                  // 버튼 색상 복구 (빨간색)
+                  voiceBtn.style.backgroundColor = "#e74c3c";
+
+                  if (data.status === 'success') {
+                      if (data.url === 'unknown') {
+                          alert("죄송합니다. 갈 곳을 찾지 못했어요. 😅\n인식된 말: " + data.text);
+                      } else {
+                          // 안내 메시지 표시
+                          let msgDiv = document.createElement('div');
+                          msgDiv.style.cssText = "position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.8); color:white; padding:15px 30px; border-radius:30px; z-index:9999; font-size:18px; animation: fadeOut 2s forwards; animation-delay: 1s;";
+                          msgDiv.innerText = "🤖 " + data.message;
+                          document.body.appendChild(msgDiv);
+
+                          // 1초 뒤 이동
+                          setTimeout(() => {
+                              window.location.href = data.url;
+                          }, 1200);
+                      }
+                  } else {
+                      alert("오류: " + data.message);
+                  }
+              } catch (error) {
+                  console.error("서버 통신 오류:", error);
+                  voiceBtn.style.backgroundColor = "#e74c3c";
+                  alert("서버와 연결할 수 없습니다.");
+              }
+
+              if (stream) {
+                  stream.getTracks().forEach(track => track.stop());
+              }
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          voiceBtn.classList.add('recording');
+          console.log("녹음 시작...");
+
+      } catch (err) {
+          console.error("마이크 접근 권한 실패:", err);
+          alert("마이크 사용 권한을 허용해주세요.");
+      }
+  }
+
+  function stopAndSend() {
+      if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+
+      mediaRecorder.stop();
+      isRecording = false;
+      voiceBtn.classList.remove('recording');
+      console.log("녹음 종료 요청됨...");
+  }
+
 </script>
 </body>
 </html>

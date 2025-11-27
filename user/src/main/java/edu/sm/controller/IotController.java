@@ -88,16 +88,21 @@ public class IotController {
   @RequestMapping(value = "/data", method = {RequestMethod.GET, RequestMethod.POST})
   public String saveData(
       @RequestParam("patientId") Long patientId,
+      @RequestParam(value = "userId", required = false) Long userId,
       @RequestParam("deviceType") String deviceType,
       @RequestParam("vitalType") String vitalType,
       @RequestParam("value") Double value) {
 
-    log.info("IoT Data Received: {}, {}, {}, {}", patientId, deviceType, vitalType, value);
+    Long targetId = (patientId != null) ? patientId : userId;
+    if (targetId == null) {
+      log.error("Missing ID");
+      return "fail";
+    }
 
     try {
-      List<Iot> recentData = iotService.getRecentByPatientId(patientId, 10);
+      List<Iot> recentData = iotService.getRecentByPatientId(targetId, 10);
 
-      String prompt = buildAiPrompt(patientId, vitalType, value, recentData);
+      String prompt = buildAiPrompt(targetId, vitalType, value, recentData);
       String aiResponse = chatClient.prompt()
           .user(prompt)
           .call()
@@ -108,7 +113,7 @@ public class IotController {
       AiAnalysis analysis = parseAiResponse(aiResponse);
 
       Iot iot = Iot.builder()
-          .patientId(patientId)
+          .patientId(targetId)
           .deviceType(deviceType)
           .vitalType(vitalType)
           .value(value)
@@ -119,7 +124,7 @@ public class IotController {
 
       // ✅ 비정상이면 관리자에게만 알림
       if (analysis.isAbnormal || analysis.isEmergency) {
-        sendAdminAlert(patientId, vitalType, value, analysis);
+        sendAdminAlert(targetId, vitalType, value, analysis);
       }
 
       return "ok";
@@ -161,23 +166,31 @@ public class IotController {
     }
   }
 
-  /**
-   * ✅ 차트 데이터 조회 - 일반 REST API (누구나 접근 가능)
-   */
+  /* 차트 데이터 조회 */
   @GetMapping("/chart")
   public List<Iot> getChartData(
-      @RequestParam("patientId") Long patientId,
+      @RequestParam(value = "patientId", required = false) Long patientId,
+      @RequestParam(value = "userId", required = false) Long userId,
       @RequestParam(value = "days", defaultValue = "1") int days) throws Exception {
-    log.info("차트 데이터 요청: patientId={}, days={}", patientId, days);
-    return iotService.getByDateRange(patientId, days);
+
+    Long targetId = (patientId != null) ? patientId : userId;
+    if (targetId == null) throw new IllegalArgumentException("ID Missing");
+
+    log.info("차트 데이터 요청: patientId={}, days={}", targetId, days);
+    return iotService.getByDateRange(targetId, days);
   }
 
-  /**
-   * ✅ 실시간 데이터 조회 - 일반 REST API (누구나 접근 가능)
-   */
+  /* 실시간 데이터 조회  */
   @GetMapping("/getlive")
-  public List<Iot> getLive(@RequestParam("patientId") Long patientId) throws Exception {
-    return iotService.getRecentByPatientId(patientId, 10);
+  public List<Iot> getLive(
+      @RequestParam(value = "patientId", required = false) Long patientId,
+      @RequestParam(value = "userId", required = false) Long userId
+  ) throws Exception {
+
+    Long targetId = (patientId != null) ? patientId : userId;
+    if (targetId == null) throw new IllegalArgumentException("ID Missing");
+
+    return iotService.getRecentByPatientId(targetId, 10);
   }
 
   private String getVitalName(String vitalType) {
