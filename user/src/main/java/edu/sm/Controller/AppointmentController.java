@@ -11,6 +11,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -105,34 +111,56 @@ public class AppointmentController {
     }
 
     /**
-     * 예약 상세 조회
+     * 예약 상세 조회 (JSON / View 모두 처리)
      */
     @GetMapping("/{id}")
-    public String appointmentDetail(@PathVariable Long id, Model model, HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<?> appointmentDetail(
+            @PathVariable Long id,
+            HttpSession session,
+            @RequestHeader(value = "Accept", defaultValue = "") String accept) {
+
         try {
             Patient patient = (Patient) session.getAttribute("loginuser");
             if (patient == null) {
-                return "redirect:/login";
+                if (accept.contains("application/json")) {
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error", "로그인이 필요합니다.");
+                    return ResponseEntity.status(401).body(error);
+                }
+                return ResponseEntity.status(302).header("Location", "/login").build();
             }
 
             Appointment appointment = appointmentService.get(id);
 
             // 본인 예약만 조회 가능
             if (!appointment.getPatientId().equals(patient.getPatientId())) {
-                model.addAttribute("error", "권한이 없습니다.");
-                model.addAttribute("center", "error");
-                return "index";
+                if (accept.contains("application/json")) {
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error", "권한이 없습니다.");
+                    return ResponseEntity.status(403).body(error);
+                }
+                return ResponseEntity.status(403).build();
             }
 
-            model.addAttribute("appointment", appointment);
-            model.addAttribute("center", "appointment/detail");
-            return "index";
+            // AJAX 요청인 경우 JSON 반환
+            if (accept.contains("application/json")) {
+                return ResponseEntity.ok(appointment);
+            }
+
+            // 일반 요청인 경우는 처리하지 않음 (다른 메서드에서 처리)
+            return ResponseEntity.status(404).build();
 
         } catch (Exception e) {
             log.error("예약 상세 조회 실패", e);
-            model.addAttribute("error", "예약 정보를 불러오는데 실패했습니다.");
-            model.addAttribute("center", "error");
-            return "index";
+
+            if (accept.contains("application/json")) {
+                Map<String, String> error = new HashMap<>();
+                error.put("error", "예약 정보를 불러오는데 실패했습니다.");
+                return ResponseEntity.status(500).body(error);
+            }
+
+            return ResponseEntity.status(500).build();
         }
     }
 
@@ -176,5 +204,76 @@ public class AppointmentController {
             redirectAttributes.addFlashAttribute("error", "예약 취소 중 오류가 발생했습니다.");
             return "redirect:/appointment/my";
         }
+    }
+
+    /**
+     * 캘린더용 예약 목록 조회 (AJAX)
+     */
+    @GetMapping("/calendar/events")
+    @ResponseBody
+    public List<Map<String, Object>> getCalendarEvents(
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end,
+            HttpSession session) {
+
+        try {
+            Patient patient = (Patient) session.getAttribute("loginuser");
+            if (patient == null) {
+                return new ArrayList<>();
+            }
+
+            // 해당 환자의 예약만 조회
+            List<Appointment> appointments = appointmentService.getByPatientId(patient.getPatientId());
+
+            // FullCalendar 형식으로 변환
+            List<Map<String, Object>> events = new ArrayList<>();
+            for (Appointment apt : appointments) {
+                Map<String, Object> event = new HashMap<>();
+                event.put("id", apt.getAppointmentId());
+                event.put("title", "🏥 " + apt.getAppointmentTypeKr());
+                event.put("start", apt.getFormattedDate() + "T" + apt.getFormattedTime());
+
+                // 상태에 따른 색상
+                String color = getColorByStatus(apt.getStatus());
+                event.put("backgroundColor", color);
+                event.put("borderColor", color);
+
+                // 추가 정보
+                Map<String, Object> extendedProps = new HashMap<>();
+                extendedProps.put("status", apt.getStatus());
+                extendedProps.put("statusKr", apt.getStatusKr());
+                extendedProps.put("type", "appointment");
+                extendedProps.put("time", apt.getFormattedTime());
+                extendedProps.put("desc", apt.getNotes() != null ? apt.getNotes() : "");
+                extendedProps.put("appointmentId", apt.getAppointmentId());
+                extendedProps.put("dbRecord", true);
+                extendedProps.put("appointmentType", apt.getAppointmentType());
+                event.put("extendedProps", extendedProps);
+
+                events.add(event);
+            }
+
+            return events;
+
+        } catch (Exception e) {
+            log.error("캘린더 이벤트 조회 실패", e);
+            return new ArrayList<>();
+        }
+    }
+
+    private String getColorByStatus(String status) {
+        switch (status) {
+            case "confirmed":
+                return "#70ad47"; // 녹색
+            case "pending":
+                return "#ffc000";   // 노란색
+            case "cancelled":
+                return "#c0c0c0"; // 회색
+            case "completed":
+                return "#5b9bd5"; // 파란색
+            default:
+                return "#808080";
+        }
+
     }
 }
