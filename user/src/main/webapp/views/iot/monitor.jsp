@@ -7,6 +7,9 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -91,6 +94,73 @@
           padding: 20px;
           box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
+
+      /* AI 일일 미션 알림 스타일(어르신의 가독성을 위한 폰트 크기) */
+      .mission-notification {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: linear-gradient(135deg, #00695c 0%, yellowgreen 100%);
+          color: white;
+          padding: 0;
+          border-radius: 12px;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+          width: 80%;
+          max-width: 500px;
+          z-index: 9999;
+          animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .notification-header {
+          background: rgba(0,0,0,0.2);
+          padding: 15px 20px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-radius: 12px 12px 0 0;
+          font-weight: bold;
+      }
+
+      .notification-header button {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 28px;
+          cursor: pointer;
+          padding: 0;
+          width: 30px;
+          height: 30px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          transition: background 0.2s;
+      }
+
+      .notification-header button:hover {
+          background: rgba(255,255,255,0.2);
+      }
+
+      .notification-body {
+          padding: 40px;
+          font-size: 24px;        /* 본문 글자 크기 확대 */
+          line-height: 1.6;       /* 줄 간격 넓게 */
+          font-weight: 500;       /* 글자 두께 약간 두껍게 */
+          word-break: keep-all;   /* 단어 중간에 끊기지 않게 */
+      }
+
+      @keyframes slideIn {
+          from {
+              transform: translateX(400px);
+              opacity: 0;
+          }
+          to {
+              transform: translateX(0);
+              opacity: 1;
+          }
+      }
+
   </style>
 </head>
 <body>
@@ -113,8 +183,8 @@
   <div class="chart-section">
     <div class="chart-controls">
       <span style="font-weight: bold;">기간 선택:</span>
-      <button onclick="loadHistoryChart(1)" id="btn1">최근 1일</button>
-      <button onclick="loadHistoryChart(7)" class="active" id="btn7">최근 7일</button>
+      <button onclick="loadHistoryChart(1)" class="active" id="btn1">최근 1일</button>
+      <button onclick="loadHistoryChart(7)" id="btn7">최근 7일</button>
       <button onclick="loadHistoryChart(30)" id="btn30">최근 30일</button>
     </div>
     <div class="chart-container" id="historyChartContainer"></div>
@@ -128,12 +198,84 @@
     let currentPeriod = 7;
     let liveUpdateInterval = null;
 
+    function speakMessage(message) {
+        // Web Speech API 지원 확인
+        if ('speechSynthesis' in window) {
+            // 기존 음성이 재생 중이면 중지
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(message);
+
+            // 한국어 음성 설정
+            utterance.lang = 'ko-KR';
+            utterance.rate = 0.8;  // 속도 (0.1 ~ 10, 기본 1)
+            utterance.pitch = 1;   // 음높이 (0 ~ 2, 기본 1)
+            utterance.volume = 1;  // 볼륨 (0 ~ 1, 기본 1)
+
+            // 한국어 음성 선택 (사용 가능한 경우)
+            const voices = window.speechSynthesis.getVoices();
+            const koreanVoice = voices.find(voice => voice.lang.includes('ko'));
+            if (koreanVoice) {
+                utterance.voice = koreanVoice;
+            }
+
+            // 음성 재생
+            window.speechSynthesis.speak(utterance);
+
+            console.log("음성 출력 시작:", message);
+        } else {
+            console.warn("⚠️ 브라우저가 음성 출력을 지원하지 않습니다.");
+            alert(message); // 대체: alert 표시
+        }
+    }
+
+    // 웹소켓 연결
+    const socket = new SockJS('/chat');
+    const stompClient = Stomp.over(socket);
+
+    stompClient.connect({}, function(frame) {
+        console.log('일일미션 웹소켓 연결 성공:', frame);
+
+        // 환자 미션 메시지 구독
+        stompClient.subscribe('/send/mission/' + patientId, function(message) {
+            console.log("AI 메시지 도착:", message.body);
+
+            showMissionNotification(message.body);
+            speakMessage(message.body);
+        });
+    }, function(error) {
+        console.error("🔥 웹소켓 연결 실패:", error);
+    });
+
+    // 모달 알림
+    function showMissionNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'mission-notification';
+        notification.innerHTML =
+            '<div class="notification-header">' +
+            '<span>AI 건강 일일 미션</span>' +
+            '<button onclick="this.parentElement.parentElement.remove()">✖</button>' +
+            '</div>' +
+            '<div class="notification-body">' + message + '</div>';
+
+        document.body.appendChild(notification);
+
+        // 10초 후 자동 제거
+        setTimeout(() => notification.remove(), 10000);
+    }
+
+    // 페이지 로드 시 음성 목록 초기화 (일부 브라우저 필요)
+    window.speechSynthesis.onvoiceschanged = function() {
+        const voices = window.speechSynthesis.getVoices();
+        console.log("사용 가능한 음성:", voices.filter(v => v.lang.includes('ko')));
+    };
+
     // ✅ 실시간 차트 로드 (최근 1분)
     function loadLiveChart() {
         fetch('https://localhost:8444/iot/getlive?patientId=' + patientId)
             .then(response => response.json())
             .then(data => {
-                console.log('실시간 데이터:', data);
+                // console.log('실시간 데이터:', data);
                 renderLiveChart(data);
             })
             .catch(error => {

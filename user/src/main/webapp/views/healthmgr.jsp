@@ -499,11 +499,11 @@
 <div class="main-container">
   <!-- 헤더 -->
   <div class="header">
+    <a href="<c:url value='/'/>" class="btn-secondary" style="text-decoration: none;">홈</a>
     <h1>AI 건강 상담</h1>
     <div class="header-actions">
       <button class="btn-primary" onclick="predictDisease()">질환 예측</button>
       <button class="btn-secondary" onclick="clearChat()">대화 초기화</button>
-      <a href="<c:url value='/'/>" class="btn-secondary" style="text-decoration: none;">홈</a>
     </div>
   </div>
 

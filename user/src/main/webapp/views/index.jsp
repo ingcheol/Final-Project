@@ -146,6 +146,35 @@
     .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes typing { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
 
+    /*URL 음성 이동 AI*/
+    .voice-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 105px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        cursor: pointer;
+        z-index: 1000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        transition: transform 0.2s;
+    }
+    .voice-btn:active { transform: scale(0.9); }
+    .voice-btn.recording { animation: pulse-red 1.5s infinite; background-color: #c0392b; }
+
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+    }
+
     /* 반응형 */
     @media (max-width: 768px) {
       .hero-content { flex-direction: column; text-align: center; }
@@ -157,7 +186,15 @@
       .chatbot-button svg { width: 30px; height: 30px; }
       nav { flex-direction: column; gap: 10px; }
       .nav-menu { width: 100%; justify-content: center; flex-wrap: wrap; }
+        .voice-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            bottom: 20px;
+            right: 90px;
+        }
     }
+
   </style>
 </head>
 <body>
@@ -327,6 +364,10 @@
       </c:otherwise>
     </c:choose>
 </div>
+
+<button id="voiceBtn" class="voice-btn" title="누르고 말하면 이동합니다">
+  🎙️
+</button>
 
 <button class="chatbot-button" onclick="toggleChatbot()">
   <svg viewBox="0 0 24 24">
@@ -518,6 +559,104 @@
       const modal = document.getElementById('chatbotModal');
       if(modal) modal.classList.toggle('active');
   }
+
+  // 음성 녹음 및 네비게이션 로직
+  const voiceBtn = document.getElementById('voiceBtn');
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let isRecording = false; // 현재 녹음 중인지 상태 체크
+
+  // 버튼 클릭 시 녹음 시작/종료 토글
+  voiceBtn.addEventListener('click', toggleRecording);
+
+  async function toggleRecording(e) {
+      e.preventDefault();
+
+      if (!isRecording) {
+          await startRecording();
+      } else {
+          stopAndSend();
+      }
+  }
+
+  async function startRecording() {
+      try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+
+          mediaRecorder.ondataavailable = (event) => {
+              audioChunks.push(event.data);
+          };
+
+          // 녹음이 멈췄을 때 실행될 전송 로직을 미리 정의
+          mediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+              const formData = new FormData();
+              formData.append("audio", audioBlob);
+
+              // 처리 중 표시 (노란색)
+              voiceBtn.style.backgroundColor = "#f1c40f";
+
+              try {
+                  const response = await fetch('/voice/navigate', {
+                      method: 'POST',
+                      body: formData
+                  });
+                  const data = await response.json();
+
+                  // 버튼 색상 복구 (빨간색)
+                  voiceBtn.style.backgroundColor = "#e74c3c";
+
+                  if (data.status === 'success') {
+                      if (data.url === 'unknown') {
+                          alert("죄송합니다. 갈 곳을 찾지 못했어요. 😅\n인식된 말: " + data.text);
+                      } else {
+                          // 안내 메시지 표시
+                          let msgDiv = document.createElement('div');
+                          msgDiv.style.cssText = "position:fixed; top:20%; left:50%; transform:translate(-50%, -50%); background:rgba(0,0,0,0.8); color:white; padding:15px 30px; border-radius:30px; z-index:9999; font-size:18px; animation: fadeOut 2s forwards; animation-delay: 1s;";
+                          msgDiv.innerText = "🤖 " + data.message;
+                          document.body.appendChild(msgDiv);
+
+                          // 1초 뒤 이동
+                          setTimeout(() => {
+                              window.location.href = data.url;
+                          }, 1200);
+                      }
+                  } else {
+                      alert("오류: " + data.message);
+                  }
+              } catch (error) {
+                  console.error("서버 통신 오류:", error);
+                  voiceBtn.style.backgroundColor = "#e74c3c";
+                  alert("서버와 연결할 수 없습니다.");
+              }
+
+              if (stream) {
+                  stream.getTracks().forEach(track => track.stop());
+              }
+          };
+
+          mediaRecorder.start();
+          isRecording = true;
+          voiceBtn.classList.add('recording');
+          console.log("녹음 시작...");
+
+      } catch (err) {
+          console.error("마이크 접근 권한 실패:", err);
+          alert("마이크 사용 권한을 허용해주세요.");
+      }
+  }
+
+  function stopAndSend() {
+      if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+
+      mediaRecorder.stop();
+      isRecording = false;
+      voiceBtn.classList.remove('recording');
+      console.log("녹음 종료 요청됨...");
+  }
+
 </script>
 </body>
 </html>

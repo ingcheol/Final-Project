@@ -125,7 +125,10 @@ public class LoginController {
   }
 
   @RequestMapping("/info")
-  public String info(Model model, @RequestParam("patientId") Long patientId, HttpSession session) throws Exception {
+  public String info(Model model,
+                     @RequestParam(value = "patientId", required = false) Long patientId,
+                     @RequestParam(value = "userId", required = false) Long userId,
+                     HttpSession session) throws Exception {
     Patient loginPatient = (Patient) session.getAttribute("loginuser");
 
     // 로그인 체크
@@ -133,12 +136,20 @@ public class LoginController {
       return "redirect:/login";
     }
 
-    // 본인 확인
-    if (!loginPatient.getPatientId().equals(patientId)) {
+    // patientId, userId 중 전달된 값 사용
+    Long targetId = (patientId != null) ? patientId : userId;
+
+    // 전달된 값이 없으면 홈으로
+    if (targetId == null) {
       return "redirect:/";
     }
 
-    Patient patient = patientService.get(patientId);
+    // 본인 확인
+    if (!loginPatient.getPatientId().equals(targetId)) {
+      return "redirect:/";
+    }
+
+    Patient patient = patientService.get(targetId);
 
     // 주소 복호화
     if (patient.getPatientAddr() != null && !patient.getPatientAddr().isEmpty()) {
@@ -146,6 +157,7 @@ public class LoginController {
     }
 
     model.addAttribute("patient", patient);
+    model.addAttribute("user", patient);
     model.addAttribute("center", "info");
     return "index";
   }
