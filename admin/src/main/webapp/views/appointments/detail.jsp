@@ -347,11 +347,6 @@
         </form>
       </c:if>
 
-      <!-- 공통 버튼 -->
-      <a href="<c:url value='/admin/appointments/${appointment.appointmentId}/edit'/>" class="btn btn-outline">
-        ✏️ 정보 수정
-      </a>
-
       <c:if test="${sessionScope.admin != null}">
         <form method="post"
               action="<c:url value='/admin/appointments/${appointment.appointmentId}/delete'/>"
