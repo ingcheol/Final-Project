@@ -18,7 +18,7 @@ import java.util.List;
 @RequestMapping("/iot")
 @Slf4j
 @CrossOrigin(
-    origins = "https://localhost:8443",
+    origins = "https://127.0.0.1:8443",
     allowedHeaders = "*",
     methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS}
 )

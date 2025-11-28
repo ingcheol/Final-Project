@@ -27,7 +27,7 @@ public class VoiceController {
   public Map<String, String> handleVoiceCommand(@RequestParam("audio") MultipartFile audioFile, HttpSession session) {
     try {
       // 1. STT: 음성을 텍스트로 변환
-      String userCommand = aiSttService.stt(audioFile);
+      String userCommand = aiSttService.sttWithExtension(audioFile,"webm");
       log.info("음성 명령: {}", userCommand);
 
       if (userCommand == null || userCommand.trim().isEmpty()) {
@@ -65,18 +65,15 @@ public class VoiceController {
     // 사이트 맵 정의 (AI가 판단할 기준)
     String siteMap = """
             1. [메인 홈]: / (키워드: 홈, 메인, 처음)
-            2. [IoT 모니터링]: /monitor?patientId=%d (키워드: 내 차트, 혈압, 혈당, 모니터링, 건강 상태)
+            2. [IoT 모니터링]: /monitor?patientId=%d (키워드: 내 차트, 혈압, 혈당, 모니터링, 건강 상태, 바이탈 확인)
             3. [예약 신청]: /appointment/new (키워드: 예약 하기, 진료 예약, 병원 가고 싶어)
             4. [내 예약 확인]: /appointment/my (키워드: 내 예약, 언제 예약했지, 예약 조회)
             5. [병원 지도]: /map/map1 (키워드: 병원 위치, 지도, 찾아가는 길)
             6. [화상 진료]: /consul (키워드: 화상 상담, 비대면 진료, 의사 선생님 보기)
-            7. [수어 번역]: /signlanguage (키워드: 수어, 수화, 번역)
-            8. [건강 매니저]: /healthmgr (키워드: 건강 관리, 식단, 챗봇, 문서 업로드)
-            9. [진료 기록(EMR)]: /emr (키워드: 진료 기록, 처방전, 기록 보기)
-            10. [AI 자가 진단]: /dia/dia1 (키워드: 아파, 증상, 진단, 무슨 병이지)
-            11. [질병 통계]: /statview?year=%d&sickCd=J20 (키워드: 감기 통계, 질병 정보) -> '감기'면 J20, '당뇨'면 E11 등 질병명에 맞춰 코드 변경 필요.
-            12. [로그인]: /login (키워드: 로그인)
-            13. [로그아웃]: /logout (키워드: 로그아웃)
+            7. [건강 매니저]: /healthmgr (키워드: 건강 관리, 식단, 챗봇, 문서 업로드)
+            8. [AI 자가 진단]: /dia/dia1 (키워드: 아파, 증상, 진단, 무슨 병이지)
+            9. [질병 통계]: /statview?year=%d&sickCd=J20 (키워드: 감기 통계, 질병 정보) -> '감기'면 J20, '당뇨'면 E11 등 질병명에 맞춰 코드 변경 필요.
+            10. [로그인]: /login (키워드: 로그인)
             """.formatted(patientId, year);
 
     String prompt = String.format("""

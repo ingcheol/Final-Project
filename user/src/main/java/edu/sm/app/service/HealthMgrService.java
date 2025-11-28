@@ -166,7 +166,6 @@ public class HealthMgrService {
     predictionPrompt.append("⚠️ 업로드된 진단서/처방전이 있다면 반드시 해당 내용을 인용하고 분석에 포함하세요.\n");
     predictionPrompt.append("반드시 한국어로 답변하고, 의학적으로 정확하게 작성해주세요.");
 
-    // ✅ QuestionAnswerAdvisor 제거 (이미 검색 결과를 프롬프트에 포함)
     ChatClient chatClient = chatClientBuilder.build();
 
     String prediction = chatClient.prompt()
@@ -182,6 +181,12 @@ public class HealthMgrService {
   private String buildSystemPrompt(Patient patient, Long patientId) throws Exception {
     StringBuilder prompt = new StringBuilder();
     prompt.append("당신은 전문적이고 친절한 AI 건강 상담사입니다.\n\n");
+    prompt.append("당신의 목표는 사용자의 건강 상태를 분석하여 실질적인 식단, 운동, 생활 습관을 '적극적으로' 추천하는 것입니다.\n\n");
+    prompt.append("1. 절대 \"의료 전문가가 아니므로 조언해 줄 수 없다\"는 식의 회피성 답변을 하지 마세요.\n");
+    prompt.append("2. 대신 \"현재 증상 완화에 도움이 되는 일반적인 방법은...\" 또는 \"영양학적 관점에서 추천드리는 식단은...\" 같은 화법을 사용하세요.\n");
+    prompt.append("3. 사용자의 질문에 대해 구체적인 운동 루틴, 음식 메뉴, 영양소 등을 상세히 나열하세요.\n");
+    prompt.append("4. 답변의 톤앤매너는 친절하고 전문적이며, 동기부여를 주는 말투를 사용하세요.\n");
+    prompt.append("5. 모든 답변의 끝에는 \"※ 정확한 진단과 치료는 반드시 전문의와 상담하시기 바랍니다.\" 문구를 한 줄 덧붙이세요.\n\n");
     prompt.append("=== 환자 기본 정보 ===\n");
 
     prompt.append(String.format("- 이름: %s\n",
@@ -239,12 +244,30 @@ public class HealthMgrService {
         .findByPatientIdAndMeasuredAtAfterOrderByMeasuredAtDesc(patientId, weekAgo);
 
     if (!recentVitals.isEmpty()) {
-      String vitalsString = recentVitals.stream()
-          .map(iot -> String.format("%s: %.2f", iot.getVitalType(), iot.getValue()))
-          .collect(Collectors.joining(", "));
-      prompt.append(String.format("최근 7일 바이탈: %s\n", vitalsString));
+      Map<String, List<Iot>> vitalsByType = recentVitals.stream()
+          .collect(Collectors.groupingBy(Iot::getVitalType));
+
+      prompt.append(String.format("총 %d회 측정됨 (최근 7일)\n\n", recentVitals.size()));
+
+      for (Map.Entry<String, List<Iot>> entry : vitalsByType.entrySet()) {
+        String vitalType = entry.getKey();
+        List<Iot> vitals = entry.getValue();
+
+        double avg = vitals.stream().mapToDouble(Iot::getValue).average().orElse(0.0);
+        double max = vitals.stream().mapToDouble(Iot::getValue).max().orElse(0.0);
+        double min = vitals.stream().mapToDouble(Iot::getValue).min().orElse(0.0);
+        long abnormalCount = vitals.stream().filter(Iot::getIsAbnormal).count();
+        double latestValue = vitals.get(0).getValue();
+
+        prompt.append(String.format("%s:\n", vitalType));
+        prompt.append(String.format("  - 최신: %.2f\n", latestValue));
+        prompt.append(String.format("  - 평균: %.2f (최대 %.2f, 최소 %.2f)\n", avg, max, min));
+        prompt.append(String.format("  - 측정 횟수: %d회\n", vitals.size()));
+        prompt.append(String.format("  - 비정상 측정: %d회 (%.1f%%)\n\n",
+            abnormalCount, (abnormalCount * 100.0 / vitals.size())));
+      }
     } else {
-      prompt.append("최근 바이탈 데이터가 없습니다.\n");
+      prompt.append("최근 7일간 측정된 바이탈 데이터가 없습니다.\n");
     }
 
     prompt.append("\n=== 상담 가이드라인 ===\n");
@@ -273,10 +296,6 @@ public class HealthMgrService {
         return "일본어 (日本語)";
       case "zh":
         return "중국어 (中文)";
-      case "es":
-        return "스페인어 (Español)";
-      case "fr":
-        return "프랑스어 (Français)";
       default:
         return languageCode;
     }

@@ -12,6 +12,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest;
 import org.springframework.ai.openai.api.OpenAiAudioApi.SpeechRequest.AudioResponseFormat;
 import org.springframework.ai.openai.audio.speech.SpeechPrompt;
 import org.springframework.ai.openai.audio.speech.SpeechResponse;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -124,6 +125,29 @@ public class AiSttService {
     response.put("audio", base64Audio);
 
     return response;
+  }
+
+//  voice컨트롤러에서 확장자 고정
+  public String sttWithExtension(MultipartFile multipartFile, String extension) throws IOException {
+    Resource audioResource = new ByteArrayResource(multipartFile.getBytes()) {
+      @Override
+      public String getFilename() {
+        // 전달받은 확장자를 붙여서 리턴 (예: "audio.webm")
+        return "audio." + extension;
+      }
+    };
+
+    OpenAiAudioTranscriptionOptions options = OpenAiAudioTranscriptionOptions.builder()
+        .model("whisper-1")
+        .language("ko")
+        .build();
+
+    AudioTranscriptionPrompt prompt = new AudioTranscriptionPrompt(audioResource, options);
+    AudioTranscriptionResponse response = openAiAudioTranscriptionModel.call(prompt);
+
+    String text = response.getResult().getOutput();
+    log.info("STT Result (Extension: {}): {}", extension, text);
+    return text;
   }
 
 }

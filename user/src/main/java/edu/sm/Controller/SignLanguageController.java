@@ -25,7 +25,7 @@ public class SignLanguageController {
   private final SignLanguageService signLanguageService;
   private final RestTemplate restTemplate;
 
-  @Value("${app.url.adminserver:https://localhost:8443}")
+  @Value("${app.url.adminserver:https://127.0.0.1:8443}")
   private String adminServerUrl;
 
   @GetMapping("")

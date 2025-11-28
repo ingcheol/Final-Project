@@ -543,7 +543,7 @@
 
     function connect() {
         // 실제 운영 서버 주소로 변경 필요할 수 있음
-        eventSource = new EventSource('https://localhost:8444/iot/admin/subscribe');
+        eventSource = new EventSource('https://127.0.0.1:8444/iot/admin/subscribe');
 
         eventSource.addEventListener('connect', function(event) {
             console.log('알림 서버 연결 성공');
