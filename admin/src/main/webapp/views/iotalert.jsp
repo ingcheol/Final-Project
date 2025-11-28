@@ -45,7 +45,7 @@
     const alertsEl = document.getElementById('alerts');
 
     function connect() {
-        eventSource = new EventSource('https://localhost:8444/iot/admin/subscribe');
+        eventSource = new EventSource('https://127.0.0.1:8444/iot/admin/subscribe');
 
         eventSource.addEventListener('connect', function(event) {
             statusEl.textContent = '● 알림 구독 중';

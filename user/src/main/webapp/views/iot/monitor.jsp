@@ -272,7 +272,7 @@
 
     // ✅ 실시간 차트 로드 (최근 1분)
     function loadLiveChart() {
-        fetch('https://localhost:8444/iot/getlive?patientId=' + patientId)
+        fetch('/iot/getlive?patientId=' + patientId)
             .then(response => response.json())
             .then(data => {
                 // console.log('실시간 데이터:', data);
@@ -374,7 +374,7 @@
         });
         document.getElementById('btn' + days).classList.add('active');
 
-        fetch('https://localhost:8444/iot/chart?patientId=' + patientId + '&days=' + days)
+        fetch('/iot/chart?patientId=' + patientId + '&days=' + days)
             .then(response => response.json())
             .then(data => {
                 console.log('기간별 데이터:', data);
