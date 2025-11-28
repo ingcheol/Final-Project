@@ -1,6 +1,6 @@
 package edu.sm.controller;
 
-import edu.sm.app.springai.service.AiService;
+import edu.sm.app.springai.service.AiServiceByChatClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -10,24 +10,47 @@ import java.util.Map;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*") // CORS 설정 추가
+@CrossOrigin(origins = "*")
 public class AiChatController {
 
-    private final AiService aiService;
+    private final AiServiceByChatClient aiService;
 
     @PostMapping("/chat")
-    public Map<String, String> chat(@RequestBody Map<String, String> request) {
+    public Map<String, Object> chat(@RequestBody Map<String, String> request) {
         String question = request.get("question");
+        String language = request.getOrDefault("language", "ko");
+        
         log.info("=== 챗봇 질문 수신 ===");
         log.info("질문: {}", question);
+        log.info("언어: {}", language);
 
         try {
-            String answer = aiService.generateText(question);
+            String rawAnswer = aiService.generateText(question, language);
             log.info("=== 챗봇 응답 생성 완료 ===");
-            log.info("응답: {}", answer);
+            log.info("응답: {}", rawAnswer);
+
+            String answer = "";
+            String page = null;
+            
+            String[] lines = rawAnswer.split("\n");
+            for (String line : lines) {
+                if (line.startsWith("ANSWER:")) {
+                    answer = line.substring(7).trim();
+                } else if (line.startsWith("PAGE:")) {
+                    String pagePath = line.substring(5).trim();
+                    if (!pagePath.equals("NONE")) {
+                        page = pagePath;
+                    }
+                }
+            }
+            
+            if (answer.isEmpty()) {
+                answer = rawAnswer;
+            }
 
             return Map.of(
                     "answer", answer,
+                    "page", page != null ? page : "",
                     "status", "success"
             );
         } catch (Exception e) {
@@ -36,13 +59,13 @@ public class AiChatController {
 
             return Map.of(
                     "answer", "죄송합니다. 일시적인 오류가 발생했습니다. 다시 시도해주세요.",
+                    "page", "",
                     "status", "error",
                     "errorMessage", e.getMessage()
             );
         }
     }
 
-    // 테스트용 GET 엔드포인트 추가
     @GetMapping("/chat/test")
     public Map<String, String> testChat() {
         log.info("=== 챗봇 테스트 호출 ===");
