@@ -4,6 +4,8 @@ import edu.sm.app.springai.service.AiServiceByChatClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.Map;
 
 @RestController
@@ -65,6 +67,39 @@ public class AiChatController {
             );
         }
     }
+  }
+
+  // 테스트용 GET 엔드포인트 추가
+  @GetMapping("/chat/test")
+  public Map<String, String> testChat() {
+    log.info("=== 챗봇 테스트 호출 ===");
+    return Map.of(
+        "message", "챗봇 API가 정상 작동 중입니다.",
+        "status", "success"
+    );
+  }
+
+  // 번역 요청
+  @PostMapping("/chat-support/translate")
+  public Map<String, String> translateMessage(@RequestBody Map<String, String> payload) {
+    String text = payload.get("text");
+    String targetLang = payload.get("targetLang");
+
+    log.info("번역 요청: {} -> {}", text, targetLang);
+
+    // AiService에 translate 메서드가 추가되어 있어야 합니다!
+    String translatedText = aiService.translate(text, targetLang);
+
+    return Map.of("translatedText", translatedText);
+  }
+
+  // 읽어주기 (TTS)
+  @PostMapping("/chat-support/tts")
+  public Map<String, String> textToSpeech(@RequestBody Map<String, String> payload) {
+    String text = payload.get("text");
+    log.info("TTS 요청: {}", text);
+    return sttService.tts2(text);
+  }
 
     @GetMapping("/chat/test")
     public Map<String, String> testChat() {

@@ -4,9 +4,12 @@ import edu.sm.app.dto.NewsDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -108,4 +111,21 @@ public class AiService {
         log.info(fluxString.toString());
         return fluxString;
     }
+
+  public String translate(String text, String targetLang) {
+    // consul에 쓸거, AiChatController
+    String templateMsg = """
+                Translate the following text into {targetLang}.
+                Only return the translated text. Do not add explanations.
+                Text: {text}
+                """;
+    try {
+      PromptTemplate template = new PromptTemplate(templateMsg);
+      Prompt prompt = template.create(Map.of("targetLang", targetLang, "text", text));
+      return chatClient.prompt(prompt).call().content();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return text; // 에러나면 원문 그대로 반환
+    }
+  }
 }

@@ -126,3 +126,15 @@ CREATE TABLE diagnosis_history (
                                    urgency_level VARCHAR(50), -- 시급성 (응급/비응급)
                                    created_at TIMESTAMP DEFAULT NOW() -- 진단 일시
 );
+
+
+-- 상담
+
+CREATE TABLE appointment (
+                             appointment_id	BIGSERIAL	NOT NULL,
+                             appointment_time	TIMESTAMP	NOT NULL,
+                             appointment_type	VARCHAR(50)	NULL,
+                             status	VARCHAR(20)	NULL	DEFAULT 'pending',
+                             notes	TEXT	NULL,
+                             patient_id	BIGSERIAL	NOT NULL
+);

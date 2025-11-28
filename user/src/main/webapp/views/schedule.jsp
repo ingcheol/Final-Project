@@ -11,20 +11,24 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js'></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
 
+        /* Layout & Calendar Section */
         .calendar-section { max-width: 1200px; margin: 40px auto; padding: 0 15px; }
         #header-title { font-size: 28px; margin-bottom: 10px; color: #333; }
         #header-desc { color: #666; margin-bottom: 20px; }
 
+        /* Controls */
         .calendar-controls { margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         #header-controls { display: flex; gap: 8px; flex-wrap: wrap; }
         #header-controls button { padding: 10px 15px; border: 1px solid #ccc; cursor: pointer; border-radius: 4px; font-size: 14px; font-weight: 600; transition: all 0.3s ease; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); min-width: 80px; background: #fff; color: #333; }
         #header-controls button:hover { background: #f0f0f0; transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
 
+        /* Buttons Colors */
         #add-manual-event { background-color: #ffc000 !important; color: #333 !important; border-color: #ffc000 !important; }
         #add-manual-event:hover { background-color: #e5a700 !important; }
         #scan-med-btn { background-color: #5b9bd5 !important; color: white !important; border-color: #5b9bd5 !important; }
@@ -32,8 +36,10 @@
         #speech-input-btn { background-color: #70ad47 !important; color: white !important; border-color: #70ad47 !important; }
         #speech-input-btn:hover { background-color: #5d9337 !important; }
 
+        /* Calendar Container */
         #calendar { border: 1px solid #ddd; padding: 15px; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
+        /* Right Side Panel */
         .today-schedule-panel { position: fixed; right: -450px; top: 50%; transform: translateY(-50%); width: 420px; max-height: 85vh; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; z-index: 999; overflow-y: auto; border-radius: 12px 0 0 12px; }
         .today-schedule-panel.open { right: 0; }
         .panel-header { padding: 20px; background: linear-gradient(135deg, #5b9bd5 0%, #4a8ac1 100%); color: white; position: sticky; top: 0; z-index: 10; }
@@ -43,24 +49,36 @@
         .panel-close:hover { background: rgba(255,255,255,0.5); transform: rotate(90deg); }
         .panel-content { padding: 20px; }
 
+        /* Schedule Items */
         .schedule-item { background: #f8f9fa; border-left: 4px solid #5b9bd5; padding: 15px; margin-bottom: 12px; border-radius: 6px; transition: all 0.2s; cursor: pointer; }
         .schedule-item:hover { transform: translateX(-5px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #e8f4ff; }
         .schedule-item.medication { border-left-color: #ff7f50; }
+        .schedule-item.appointment { border-left-color: #70ad47; }
         .schedule-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .schedule-item-title { font-weight: 600; font-size: 15px; color: #333; }
         .schedule-item-time { font-size: 13px; color: #666; background: white; padding: 2px 8px; border-radius: 4px; }
         .schedule-item-desc { font-size: 13px; color: #666; line-height: 1.5; }
 
+        /* Status Badges */
+        .schedule-item-status { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .status-completed { background: #d1ecf1; color: #0c5460; }
+
+        /* Empty State & Notification */
         .no-schedule { text-align: center; padding: 40px 20px; color: #999; }
         .no-schedule-icon { font-size: 48px; margin-bottom: 10px; }
         .notification-badge { position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; font-size: 11px; padding: 2px 6px; border-radius: 10px; font-weight: 600; }
 
+        /* FullCalendar Customization */
         .fc-daygrid-day-frame { position: relative; cursor: pointer; }
         .fc-daygrid-day-top { display: flex; justify-content: space-between; align-items: center; }
         .add-event-btn { width: 18px; height: 18px; border-radius: 50%; background: #5b9bd5; color: white; border: none; cursor: pointer; font-size: 14px; line-height: 16px; opacity: 0; transition: all 0.2s; z-index: 10; display: flex; align-items: center; justify-content: center; margin-right: 4px; }
         .fc-daygrid-day:hover .add-event-btn { opacity: 1; }
         .add-event-btn:hover { background: #4a8ac1; transform: scale(1.15); }
 
+        /* Modals */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal-content { background-color: #fff; margin: 5% auto; padding: 30px; border: none; width: 90%; max-width: 500px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); animation: slideDown 0.3s; }
@@ -69,12 +87,14 @@
         .close { color: #aaa; float: right; font-size: 28px; font-weight: bold; line-height: 20px; cursor: pointer; transition: color 0.2s; }
         .close:hover, .close:focus { color: #000; }
 
+        /* Form Elements */
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #555; }
-        .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="time"], .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #5b9bd5; box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.1); }
+        .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="time"], .form-group input[type="datetime-local"], .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #5b9bd5; box-shadow: 0 0 0 3px rgba(91, 155, 213, 0.1); }
         .form-group textarea { resize: vertical; min-height: 80px; font-family: inherit; }
 
+        /* Modal Buttons */
         .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
         .modal-buttons button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
         .btn-primary { background-color: #5b9bd5; color: white; }
@@ -82,24 +102,33 @@
         .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
         .btn-secondary { background-color: #e0e0e0; color: #333; }
         .btn-secondary:hover { background-color: #d0d0d0; }
+        .btn-danger { background-color: #d9534f; color: white; }
+        .btn-danger:hover { background-color: #c9302c; }
 
+        /* Toasts & Badges */
         .toast { position: fixed; bottom: 30px; right: 30px; background: #333; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 2000; animation: slideInRight 0.3s, fadeOut 0.3s 2.7s; max-width: 300px; }
         @keyframes slideInRight { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; } }
         .toast.success { background: #70ad47; }
         .toast.error { background: #d9534f; }
         .toast.info { background: #5b9bd5; }
-
         .ai-badge { display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-left: 8px; }
 
+        /* File Upload */
         .file-upload-wrapper { position: relative; display: inline-block; width: 100%; }
         .file-upload-wrapper input[type="file"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; z-index: 2; }
         .file-upload-label { display: flex; align-items: center; justify-content: center; padding: 30px; border: 2px dashed #ddd; border-radius: 8px; background: #f9f9f9; cursor: pointer; transition: all 0.3s; font-size: 15px; color: #666; }
         .file-upload-label:hover { border-color: #5b9bd5; background: #f0f7ff; }
         .file-upload-label.has-file { border-color: #70ad47; background: #f0f9f0; color: #70ad47; }
-
         #image-preview { margin-top: 15px; text-align: center; }
         #preview-img { max-width: 100%; max-height: 300px; border-radius: 8px; border: 2px solid #ddd; }
+
+        /* Appointment Selector */
+        .appointment-type-selector { display: flex; gap: 10px; margin-top: 10px; }
+        .appointment-type-option { flex: 1; padding: 15px; border: 2px solid #ddd; border-radius: 8px; text-align: center; cursor: pointer; transition: all 0.3s; }
+        .appointment-type-option:hover { border-color: #5b9bd5; background: #f0f7ff; }
+        .appointment-type-option.selected { border-color: #5b9bd5; background: #e8f4ff; }
+        .appointment-type-icon { font-size: 24px; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -115,7 +144,9 @@
                 <span class="notification-badge" id="today-count" style="display: none;">0</span>
             </button>
             <button onclick="calendarManager.goToToday()" data-key="today">오늘로 이동</button>
-            <button onclick="calendarManager.clearEvents()" data-key="clearEvents">일정 초기화</button>
+            <button onclick="calendarManager.openAppointmentModal()" data-key="addAppointment">
+                🏥 상담 예약
+            </button>
             <button id="add-manual-event" onclick="calendarManager.openQuickAddModal()" data-key="addManualEvent">
                 ✍️ 일정 추가 <span class="ai-badge">AI</span>
             </button>
@@ -131,7 +162,6 @@
     <div id="calendar"></div>
 </section>
 
-<!-- 오늘 일정 패널 -->
 <div id="todaySchedulePanel" class="today-schedule-panel">
     <div class="panel-header">
         <button class="panel-close" onclick="calendarManager.closeTodayPanel()">✕</button>
@@ -146,7 +176,46 @@
     </div>
 </div>
 
-<!-- 빠른 일정 추가 모달 -->
+<div id="appointmentModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="calendarManager.closeAppointmentModal()">&times;</span>
+        <h3>🏥 상담 예약</h3>
+
+        <div class="form-group">
+            <label>상담 유형 선택</label>
+            <div class="appointment-type-selector">
+                <div class="appointment-type-option" data-type="video" onclick="calendarManager.selectAppointmentType('video')">
+                    <div class="appointment-type-icon">📹</div>
+                    <div>화상 상담</div>
+                </div>
+                <div class="appointment-type-option" data-type="chat" onclick="calendarManager.selectAppointmentType('chat')">
+                    <div class="appointment-type-icon">💬</div>
+                    <div>채팅 상담</div>
+                </div>
+                <div class="appointment-type-option" data-type="phone" onclick="calendarManager.selectAppointmentType('phone')">
+                    <div class="appointment-type-icon">📞</div>
+                    <div>전화 상담</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="appointment-datetime">예약 일시</label>
+            <input type="datetime-local" id="appointment-datetime" required>
+        </div>
+
+        <div class="form-group">
+            <label for="appointment-notes">상담 내용 (선택)</label>
+            <textarea id="appointment-notes" rows="4" placeholder="상담받고 싶은 내용을 입력해주세요"></textarea>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-secondary" onclick="calendarManager.closeAppointmentModal()">취소</button>
+            <button class="btn-primary" onclick="calendarManager.saveAppointment()">예약 신청</button>
+        </div>
+    </div>
+</div>
+
 <div id="quickAddModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="calendarManager.closeQuickAddModal()">&times;</span>
@@ -167,7 +236,6 @@
     </div>
 </div>
 
-<!-- 날짜별 일정 추가 모달 -->
 <div id="dateEventModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="calendarManager.closeDateEventModal()">&times;</span>
@@ -195,7 +263,6 @@
     </div>
 </div>
 
-<!-- 약물 정보 입력 모달 -->
 <div id="medicationModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="calendarManager.closeMedicationModal()">&times;</span>
@@ -226,6 +293,19 @@
     </div>
 </div>
 
+<div id="appointmentDetailModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="calendarManager.closeAppointmentDetailModal()">&times;</span>
+        <h3>🏥 예약 상세</h3>
+
+        <div id="appointment-detail-content">
+        </div>
+
+        <div class="modal-buttons" id="appointment-detail-buttons">
+        </div>
+    </div>
+</div>
+
 <script>
     // Toast 알림
     function showToast(message, type) {
@@ -234,7 +314,9 @@
         toast.className = 'toast ' + type;
         toast.textContent = message;
         document.body.appendChild(toast);
-        setTimeout(function() { toast.remove(); }, 3000);
+        setTimeout(function() {
+            toast.remove();
+        }, 3000);
     }
 
     // Calendar Manager
@@ -245,23 +327,18 @@
         recognition: null,
         imageData: null,
         speechSynthesis: window.speechSynthesis,
+        selectedAppointmentType: 'video',
+        currentAppointmentId: null,
 
         // 음성 출력 함수
         speak: function(text) {
-            if (!this.speechSynthesis) {
-                console.log('음성 합성을 지원하지 않는 브라우저입니다.');
-                return;
-            }
-
-            // 이전 음성 중지
+            if (!this.speechSynthesis) return;
             this.speechSynthesis.cancel();
-
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'ko-KR';
-            utterance.rate = 0.9; // 속도 (0.1 ~ 10)
-            utterance.pitch = 1; // 음높이 (0 ~ 2)
-            utterance.volume = 1; // 볼륨 (0 ~ 1)
-
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 1;
             this.speechSynthesis.speak(utterance);
         },
 
@@ -279,6 +356,18 @@
                     center: 'title',
                     right: 'dayGridMonth,dayGridWeek'
                 },
+                // ⭐ 이미 여기서 데이터를 로드하고 있습니다
+                events: function(info, successCallback, failureCallback) {
+                    fetch('/appointment/calendar/events?start=' + info.startStr + '&end=' + info.endStr)
+                        .then(response => response.json())
+                        .then(data => {
+                            successCallback(data);
+                        })
+                        .catch(error => {
+                            console.error('예약 데이터 로드 실패:', error);
+                            failureCallback(error);
+                        });
+                },
                 eventClick: (info) => {
                     this.showEventDetail(info.event);
                 },
@@ -293,10 +382,164 @@
 
             this.calendar.render();
             this.addPlusButtons();
+            // ❌ 이 줄 삭제 - loadAppointments() 호출 제거
+            // this.loadAppointments();
             this.updateTodaySchedule();
             this.setupNotificationCheck();
             this.initSpeechRecognition();
             this.setupDragAndDrop();
+        },
+
+        // DB에서 예약 데이터 로드
+        loadAppointments: function() {
+            fetch('/appointment/calendar/events')
+                .then(response => response.json())
+                .then(events => {
+                    if (events && events.length > 0) {
+                        this.calendar.addEventSource(events);
+                        this.updateTodaySchedule();
+                    }
+                })
+                .catch(error => {
+                    console.error('예약 데이터 로드 실패:', error);
+                });
+        },
+
+        // 상태에 따른 색상
+        getAppointmentColor: function(status) {
+            switch (status) {
+                case 'pending': return '#ffc107';
+                case 'confirmed': return '#70ad47';
+                case 'cancelled': return '#d9534f';
+                case 'completed': return '#5b9bd5';
+                default: return '#6c757d';
+            }
+        },
+
+        // 상담 예약 모달 열기
+        openAppointmentModal: function() {
+            document.getElementById('appointmentModal').style.display = 'block';
+            this.selectedAppointmentType = 'video';
+            document.querySelectorAll('.appointment-type-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector('[data-type="video"]').classList.add('selected');
+
+            // 기본값: 내일 오전 10시
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(10, 0, 0, 0);
+            const datetimeStr = tomorrow.toISOString().slice(0, 16);
+            document.getElementById('appointment-datetime').value = datetimeStr;
+        },
+
+        closeAppointmentModal: function() {
+            document.getElementById('appointmentModal').style.display = 'none';
+            document.getElementById('appointment-notes').value = '';
+        },
+
+        selectAppointmentType: function(type) {
+            this.selectedAppointmentType = type;
+            document.querySelectorAll('.appointment-type-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.querySelector('[data-type="' + type + '"]').classList.add('selected');
+        },
+
+        // 예약 저장
+        saveAppointment: function() {
+            const datetime = document.getElementById('appointment-datetime').value;
+            const notes = document.getElementById('appointment-notes').value;
+
+            if (!datetime) {
+                showToast('예약 일시를 선택해주세요', 'error');
+                return;
+            }
+
+            const appointmentData = {
+                appointmentTime: datetime,
+                appointmentType: this.selectedAppointmentType,
+                notes: notes,
+                status: 'pending'
+            };
+
+            $.ajax({
+                url: '/appointment/create',
+                type: 'POST',
+                data: appointmentData,
+                success: (response) => {
+                    showToast('예약 신청이 완료되었습니다. 승인 후 알림을 보내드립니다.', 'success');
+                    this.closeAppointmentModal();
+                    // 페이지 새로고침하여 예약 데이터 다시 로드
+                    location.reload();
+                },
+                error: (xhr, status, error) => {
+                    console.error('예약 실패:', error);
+                    const errorMsg = xhr.responseJSON?.message || '예약 신청 중 오류가 발생했습니다.';
+                    showToast(errorMsg, 'error');
+                }
+            });
+        },
+
+        // 예약 상세 모달
+        openAppointmentDetailModal: function(appointment) {
+            this.currentAppointmentId = appointment.appointmentId;
+
+            let html = '<div style="padding: 10px 0;">';
+            html += '<div style="margin-bottom: 15px;">';
+            html += '<strong>상담 유형:</strong> ' + appointment.appointmentTypeKr;
+            html += '<span class="schedule-item-status status-' + appointment.status + '">' + appointment.statusKr + '</span>';
+            html += '</div>';
+            html += '<div style="margin-bottom: 15px;"><strong>예약 일시:</strong> ' + appointment.formattedDateTime + '</div>';
+            if (appointment.notes) {
+                html += '<div style="margin-bottom: 15px;"><strong>상담 내용:</strong><br>' + appointment.notes + '</div>';
+            }
+            html += '</div>';
+
+            document.getElementById('appointment-detail-content').innerHTML = html;
+
+            // 버튼 생성
+            let buttons = '';
+            buttons += '<button class="btn-secondary" onclick="calendarManager.closeAppointmentDetailModal()">닫기</button>';
+
+            // 승인 대기 또는 확정 상태일 때만 취소 가능
+            if (appointment.status === 'pending' || appointment.status === 'confirmed') {
+                buttons += '<button class="btn-danger" onclick="calendarManager.cancelAppointment(' + appointment.appointmentId + ')">예약 취소</button>';
+            }
+
+            document.getElementById('appointment-detail-buttons').innerHTML = buttons;
+            document.getElementById('appointmentDetailModal').style.display = 'block';
+        },
+
+        closeAppointmentDetailModal: function() {
+            document.getElementById('appointmentDetailModal').style.display = 'none';
+            this.currentAppointmentId = null;
+        },
+
+        // 예약 취소
+        cancelAppointment: function(appointmentId) {
+            if (!confirm('정말 이 예약을 취소하시겠습니까?')) {
+                return;
+            }
+
+            const reason = prompt('취소 사유를 입력해주세요 (선택사항):');
+
+            $.ajax({
+                url: '/appointment/cancel/' + appointmentId,
+                type: 'POST',
+                data: {
+                    reason: reason || '환자 요청'
+                },
+                success: (response) => {
+                    showToast('예약이 취소되었습니다.', 'success');
+                    this.closeAppointmentDetailModal();
+                    location.reload();
+                },
+                error: (xhr, status, error) => {
+                    console.error('예약 취소 실패:', error);
+                    showToast('예약 취소 중 오류가 발생했습니다.', 'error');
+                }
+            });
         },
 
         // 드래그앤드롭 설정
@@ -375,7 +618,7 @@
 
             try {
                 this.recognition.start();
-            } catch(e) {
+            } catch (e) {
                 console.error('음성 인식 시작 오류:', e);
                 btn.textContent = '🎙️ 음성 입력';
             }
@@ -395,14 +638,15 @@
                 extendedProps: {
                     time: parsed.time || '',
                     desc: '음성 입력 일정',
-                    type: 'voice'
+                    type: 'voice',
+                    dbRecord: false
                 }
             }]);
 
             showToast('일정이 추가되었습니다', 'success');
         },
 
-        // AI 자연어 파싱 (개선 버전)
+        // AI 자연어 파싱
         parseNaturalLanguage: function(text) {
             let date = new Date();
             let title = text;
@@ -438,11 +682,10 @@
                 date.setDate(parseInt(datePattern2[2]));
             }
 
-            // 시간 파싱 (오전/오후, 24시간제)
+            // 시간 파싱
             let hour = null;
             let minute = 0;
 
-            // "오후 3시", "오전 9시" 형태
             const ampmMatch = text.match(/(오전|오후)\s*(\d{1,2})시/);
             if (ampmMatch) {
                 hour = parseInt(ampmMatch[2]);
@@ -450,13 +693,11 @@
                 if (ampmMatch[1] === '오전' && hour === 12) hour = 0;
             }
 
-            // "15시", "9시" 형태
             const hourMatch = text.match(/(\d{1,2})시/);
             if (hourMatch && !ampmMatch) {
                 hour = parseInt(hourMatch[1]);
             }
 
-            // "30분", "반" 형태
             const minuteMatch = text.match(/(\d{1,2})분/);
             if (minuteMatch) {
                 minute = parseInt(minuteMatch[1]);
@@ -468,7 +709,7 @@
                 time = String(hour).padStart(2, '0') + ':' + String(minute).padStart(2, '0');
             }
 
-            // 제목 정리 (날짜/시간 표현 제거)
+            // 제목 정리
             title = text
                 .replace(/오늘|내일|모레|다음주/g, '')
                 .replace(/월요일|화요일|수요일|목요일|금요일|토요일|일요일/g, '')
@@ -480,7 +721,6 @@
                 .replace(/반/g, '')
                 .trim();
 
-            // 제목이 비어있으면 원본 사용
             if (!title) title = text;
 
             return {
@@ -536,7 +776,8 @@
                 extendedProps: {
                     time: parsed.time || '',
                     desc: '사용자 추가 일정',
-                    type: 'user'
+                    type: 'user',
+                    dbRecord: false
                 }
             }]);
 
@@ -579,7 +820,8 @@
                 extendedProps: {
                     time: time,
                     desc: desc,
-                    type: 'appointment'
+                    type: 'appointment',
+                    dbRecord: false
                 }
             }]);
 
@@ -613,7 +855,6 @@
                 label.textContent = '✅ ' + file.name;
                 label.classList.add('has-file');
 
-                // 이미지 미리보기
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     this.imageData = e.target.result;
@@ -644,7 +885,6 @@
             btn.textContent = 'AI 분석 중...';
             btn.disabled = true;
 
-            // AI 분석 시뮬레이션
             setTimeout(() => {
                 let medicationData;
 
@@ -663,21 +903,39 @@
                 btn.disabled = false;
                 showToast('약물 일정이 캘린더에 등록되었습니다', 'success');
 
-                // 알림 설정
                 this.setupMedicationNotifications(medicationData);
             }, 2000);
         },
 
         // 이미지에서 약물 정보 추출 (Mock)
         extractMedicationFromImage: function(imageData) {
-            // 실제로는 OCR API나 Claude Vision API 사용
             return {
                 startDate: new Date().toISOString().split('T')[0],
                 duration: 5,
-                medications: [
-                    { name: '톡스엔정 50mg', dose: 1, daily: 1, times: ['저녁'], totalDays: 2, color: '#ff7f50' },
-                    { name: '펠루스정', dose: 1, daily: 3, times: ['아침', '점심', '저녁'], totalDays: 5, color: '#4682b4' },
-                    { name: '덱스부프로펜정 150mg', dose: 1, daily: 3, times: ['아침', '점심', '저녁'], totalDays: 5, color: '#9370db' }
+                medications: [{
+                    name: '톡스엔정 50mg',
+                    dose: 1,
+                    daily: 1,
+                    times: ['저녁'],
+                    totalDays: 2,
+                    color: '#ff7f50'
+                },
+                    {
+                        name: '펠루스정',
+                        dose: 1,
+                        daily: 3,
+                        times: ['아침', '점심', '저녁'],
+                        totalDays: 5,
+                        color: '#4682b4'
+                    },
+                    {
+                        name: '덱스부프로펜정 150mg',
+                        dose: 1,
+                        daily: 3,
+                        times: ['아침', '점심', '저녁'],
+                        totalDays: 5,
+                        color: '#9370db'
+                    }
                 ]
             };
         },
@@ -713,9 +971,14 @@
             return {
                 startDate: new Date().toISOString().split('T')[0],
                 duration: medications.length > 0 ? Math.max(...medications.map(m => m.totalDays)) : 5,
-                medications: medications.length > 0 ? medications : [
-                    { name: '약물', dose: 1, daily: 3, times: ['아침', '점심', '저녁'], totalDays: 5, color: '#4682b4' }
-                ]
+                medications: medications.length > 0 ? medications : [{
+                    name: '약물',
+                    dose: 1,
+                    daily: 3,
+                    times: ['아침', '점심', '저녁'],
+                    totalDays: 5,
+                    color: '#4682b4'
+                }]
             };
         },
 
@@ -738,7 +1001,8 @@
                             extendedProps: {
                                 time: time + ' 식후 30분',
                                 desc: '복용량: ' + med.dose + '정',
-                                type: 'medication'
+                                type: 'medication',
+                                dbRecord: false
                             }
                         });
                     });
@@ -759,20 +1023,18 @@
             }
         },
 
-        // 알림 체크 설정 (시간별 알림만)
+        // 알림 체크 설정
         setupNotificationCheck: function() {
-            // 알림 권한 요청
             if (Notification.permission === 'default') {
                 Notification.requestPermission();
             }
 
-            // 1분마다 오늘 일정의 시간 체크
             setInterval(() => {
                 this.checkTodayEventTimes();
-            }, 60000); // 1분마다
+            }, 60000);
         },
 
-        // 오늘 일정 시간 체크 (시간이 설정된 일정만)
+        // 오늘 일정 시간 체크
         checkTodayEventTimes: function() {
             if (Notification.permission !== 'granted') return;
 
@@ -788,12 +1050,10 @@
             events.forEach(event => {
                 const eventTime = event.extendedProps.time;
                 if (eventTime) {
-                    // 시간만 추출 (예: "09:00", "15:30")
                     const timeMatch = eventTime.match(/^(\d{2}):(\d{2})/);
                     if (timeMatch) {
                         const eventTimeStr = timeMatch[1] + ':' + timeMatch[2];
 
-                        // 정확히 그 시간이면 알림
                         if (eventTimeStr === currentTime) {
                             new Notification('⏰ ' + event.title, {
                                 body: '일정 시간입니다!',
@@ -809,7 +1069,7 @@
         },
 
         checkUpcomingNotifications: function(event) {
-            // 이 함수는 제거 (1일 전 알림 기능 제거)
+            // 빈 함수 (1일 전 알림 제거)
         },
 
         // 일정 상세 보기
@@ -821,23 +1081,26 @@
             if (event.extendedProps.desc) {
                 message += event.extendedProps.desc + '\n';
             }
-            message += '\n이 일정을 삭제하시겠습니까?';
 
+            // ⭐ 예약 일정인 경우 상세 모달 표시
+            if (event.extendedProps.type === 'appointment' && event.extendedProps.dbRecord) {
+                // DB 예약 데이터면 상세 모달 표시
+                this.showAppointmentDetail(event.extendedProps.appointmentId);
+                return;
+            }
+
+            message += '\n이 일정을 삭제하시겠습니까?';
             if (confirm(message)) {
                 event.remove();
                 showToast('일정이 삭제되었습니다', 'success');
                 this.updateTodaySchedule();
             }
-        },
-
-        // 오늘 일정 패널
-        toggleTodayPanel: function() {
+        },  // ⭐ 이 부분이 빠져있었습니다!
+        toggleTodayPanel: function() { // 중복된 함수 선언을 하나로 합치고, 누락된 괄호 문제를 해결했습니다.
             const panel = document.getElementById('todaySchedulePanel');
-            this.todayPanelOpen = !this.todayPanelOpen;
             if (this.todayPanelOpen) {
                 panel.classList.add('open');
 
-                // 음성 안내
                 const today = new Date();
                 const events = this.calendar.getEvents().filter(e => {
                     const eventDate = new Date(e.start);
@@ -867,16 +1130,15 @@
         closeTodayPanel: function() {
             document.getElementById('todaySchedulePanel').classList.remove('open');
             this.todayPanelOpen = false;
-            this.speechSynthesis.cancel(); // 음성 중지
+            this.speechSynthesis.cancel();
         },
 
-        // 오늘 일정 업데이트 (날짜 필터링)
+        // 오늘 일정 업데이트
         updateTodaySchedule: function() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const todayStr = today.toISOString().split('T')[0];
 
-            // 오늘 날짜의 일정만 필터링
             const events = this.calendar.getEvents().filter(e => {
                 const eventDate = new Date(e.start);
                 eventDate.setHours(0, 0, 0, 0);
@@ -893,7 +1155,6 @@
                 listEl.innerHTML = '<div class="no-schedule"><div class="no-schedule-icon">📭</div><p>오늘은 일정이 없습니다</p></div>';
                 document.getElementById('today-count').style.display = 'none';
             } else {
-                // 시간순 정렬
                 events.sort((a, b) => {
                     const timeA = a.extendedProps.time || '99:99';
                     const timeB = b.extendedProps.time || '99:99';
@@ -902,10 +1163,24 @@
 
                 let html = '';
                 events.forEach((event, index) => {
-                    const className = event.extendedProps.type === 'medication' ? 'schedule-item medication' : 'schedule-item';
-                    html += '<div class="' + className + '" onclick="calendarManager.speakEventDetail(event, ' + index + ')" style="cursor: pointer;">';
+                    let className = 'schedule-item';
+                    if (event.extendedProps.type === 'medication') {
+                        className += ' medication';
+                    } else if (event.extendedProps.type === 'appointment') {
+                        className += ' appointment';
+                    }
+
+                    html += '<div class="' + className + '" onclick="calendarManager.handleScheduleItemClick(' + index + ')">';
                     html += '<div class="schedule-item-header">';
-                    html += '<span class="schedule-item-title">' + event.title + '</span>';
+                    html += '<span class="schedule-item-title">' + event.title;
+
+                    // 예약 상태 표시
+                    if (event.extendedProps.type === 'appointment') {
+                        const statusClass = 'status-' + event.extendedProps.status;
+                        html += '<span class="schedule-item-status ' + statusClass + '">' + event.extendedProps.statusKr + '</span>';
+                    }
+
+                    html += '</span>';
                     if (event.extendedProps.time) {
                         html += '<span class="schedule-item-time">' + event.extendedProps.time + '</span>';
                     }
@@ -917,57 +1192,146 @@
                 });
                 listEl.innerHTML = html;
 
-                // 이벤트 리스너 추가 (클릭 시 음성 안내)
-                const items = listEl.querySelectorAll('.schedule-item');
-                items.forEach((item, index) => {
-                    item.addEventListener('click', () => {
-                        const event = events[index];
-                        let message = event.title;
-                        if (event.extendedProps.time) {
-                            message += ', ' + event.extendedProps.time;
-                        }
-                        if (event.extendedProps.desc) {
-                            message += ', ' + event.extendedProps.desc;
-                        }
-                        this.speak(message);
-                    });
-                });
-
                 const badge = document.getElementById('today-count');
                 badge.textContent = events.length;
                 badge.style.display = 'inline-block';
             }
         },
 
-        // 일정 추가 시 음성 안내
+        // 일정 아이템 클릭 처리
+        handleScheduleItemClick: function(index) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+
+            const events = this.calendar.getEvents().filter(e => {
+                const eventDate = new Date(e.start);
+                eventDate.setHours(0, 0, 0, 0);
+                return eventDate.toISOString().split('T')[0] === todayStr;
+            });
+
+            // 시간순 정렬
+            events.sort((a, b) => {
+                const timeA = a.extendedProps.time || '99:99';
+                const timeB = b.extendedProps.time || '99:99';
+                return timeA.localeCompare(timeB);
+            });
+
+            const event = events[index];
+
+            // 음성 안내
+            let message = event.title;
+            if (event.extendedProps.time) {
+                message += ', ' + event.extendedProps.time;
+            }
+            if (event.extendedProps.desc) {
+                message += ', ' + event.extendedProps.desc;
+            }
+            this.speak(message);
+
+            // 예약 상세 보기
+            if (event.extendedProps.type === 'appointment' && event.extendedProps.appointmentId) {
+                this.showAppointmentDetail(event.extendedProps.appointmentId);
+            }
+        },
+
+        // 예약 상세 보기
+        showAppointmentDetail: function(appointmentId) {
+            fetch('/appointment/' + appointmentId, {
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('예약 정보를 불러올 수 없습니다');
+                    }
+                    return response.json();
+                })
+                .then(apt => {
+                    const content = document.getElementById('appointment-detail-content');
+
+                    let html = '<div style="line-height: 1.8;">';
+                    html += '<p><strong>상담 유형:</strong> ' + (apt.appointmentTypeKr || '정보 없음') + '</p>';
+                    html += '<p><strong>예약 일시:</strong> ' + (apt.formattedDateTimeWithDay || apt.formattedDateTime || '정보 없음') + '</p>';
+                    html += '<p><strong>상태:</strong> <span class="schedule-item-status status-' + apt.status + '">' + (apt.statusKr || apt.status) + '</span></p>';
+                    if (apt.notes) {
+                        html += '<p><strong>메모:</strong><br>' + apt.notes.replace(/\n/g, '<br>') + '</p>';
+                    }
+                    html += '</div>';
+
+                    content.innerHTML = html;
+
+                    // 버튼 생성 - 닫기만 표시
+                    const buttons = document.getElementById('appointment-detail-buttons');
+                    let buttonHtml = '<button class="btn-secondary" onclick="calendarManager.closeAppointmentDetailModal()">닫기</button>';
+
+                    // 취소 기능은 예약 관리 페이지에서만 가능하도록 제거
+                    // 필요시 아래 주석 해제
+                    /*
+                    if (apt.status === 'pending' || apt.status === 'confirmed') {
+                        buttonHtml += '<button class="btn-danger" onclick="calendarManager.cancelAppointment(' + appointmentId + ')">예약 취소</button>';
+                    }
+                    */
+
+                    buttons.innerHTML = buttonHtml;
+                    this.currentAppointmentId = appointmentId;
+                    document.getElementById('appointmentDetailModal').style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('예약 상세 조회 실패:', error);
+                    showToast('예약 정보를 불러올 수 없습니다', 'error');
+                });
+        },
+
+        closeAppointmentDetailModal: function() {
+            document.getElementById('appointmentDetailModal').style.display = 'none';
+            this.currentAppointmentId = null;
+        },
+
+        // 예약 취소
+        cancelAppointment: function(appointmentId) {
+            const reason = prompt('취소 사유를 입력해주세요 (선택사항):');
+            if (reason === null) return; // 취소
+
+            $.ajax({
+                url: '/appointment/cancel/' + appointmentId,
+                type: 'POST',
+                data: {
+                    reason: reason || '환자 요청'
+                },
+                success: () => {
+                    showToast('예약이 취소되었습니다', 'success');
+                    this.closeAppointmentDetailModal();
+                    this.calendar.removeAllEvents();
+                    this.loadAppointments();
+                    this.updateTodaySchedule();
+                    this.speak('예약이 취소되었습니다');
+                },
+                error: (xhr, status, error) => {
+                    console.error('예약 취소 실패:', error);
+                    showToast('예약 취소 중 오류가 발생했습니다', 'error');
+                }
+            });
+        },
+
         addEvents: function(eventsArray) {
             this.calendar.addEventSource(eventsArray);
             this.updateTodaySchedule();
 
-            // 추가된 일정 음성 안내
             if (eventsArray.length > 0) {
                 const firstEvent = eventsArray[0];
                 this.speak(eventsArray.length + '개의 일정이 추가되었습니다. ' + firstEvent.title);
             }
         },
 
-        // 일정 초기화
-        clearEvents: function() {
-            if (confirm('모든 일정을 삭제하시겠습니까?')) {
-                this.calendar.removeAllEvents();
-                showToast('일정이 초기화되었습니다', 'info');
-                this.speak('모든 일정이 삭제되었습니다.');
-                this.updateTodaySchedule();
-            }
-        },
-
-        // 오늘로 이동
         goToToday: function() {
             this.calendar.today();
             showToast('오늘 날짜로 이동했습니다', 'info');
             this.speak('오늘 날짜로 이동했습니다.');
         }
     };
+
 
     // 모달 외부 클릭시 닫기
     window.onclick = function(event) {

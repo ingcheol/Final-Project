@@ -46,6 +46,12 @@
             text-decoration: none;
         }
 
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
         .nav-menu {
             display: flex;
             gap: 40px;
@@ -63,6 +69,37 @@
             color: #5B6FB5;
         }
 
+        /* 언어 선택 버튼 스타일 */
+        .language-selector {
+            display: flex;
+            gap: 8px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 20px;
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .lang-btn:hover {
+            background: rgba(91, 111, 181, 0.1);
+            color: #5B6FB5;
+        }
+
+        .lang-btn.active {
+            background: #5B6FB5;
+            color: white;
+        }
+
         .main-container {
             margin-top: 100px;
             padding: 40px 30px;
@@ -71,7 +108,6 @@
             margin-right: auto;
         }
 
-        /* Progress Bar */
         .progress-bar {
             display: flex;
             justify-content: space-between;
@@ -120,12 +156,6 @@
             transform: scale(1.1);
         }
 
-        .progress-step.completed .circle {
-            background: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-
         .progress-step span {
             font-size: 13px;
             color: #666;
@@ -137,7 +167,6 @@
             font-weight: 700;
         }
 
-        /* Card */
         .diagnosis-card {
             background: white;
             border-radius: 20px;
@@ -162,7 +191,6 @@
             color: #7f8c8d;
         }
 
-        /* Input Section */
         .input-section {
             margin-bottom: 30px;
         }
@@ -233,34 +261,6 @@
             50% { opacity: 0.7; }
         }
 
-        /* Image Upload */
-        .image-upload-area {
-            margin-top: 30px;
-            border: 3px dashed #e0e0e0;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #fafafa;
-        }
-
-        .image-upload-area:hover {
-            border-color: #5B6FB5;
-            background: #f0f4ff;
-        }
-
-        .image-upload-area.dragover {
-            border-color: #5B6FB5;
-            background: #e8f0fe;
-            transform: scale(1.02);
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
         .image-preview {
             display: none;
             margin-top: 20px;
@@ -310,7 +310,6 @@
             transform: scale(1.1);
         }
 
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -354,7 +353,6 @@
             color: #5B6FB5;
         }
 
-        /* Info Box */
         .info-box {
             background: linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%);
             border: 2px solid #C7D2FE;
@@ -419,14 +417,22 @@
 <body>
 <header>
     <nav>
-        <a href="<c:url value="/"/>" class="logo">🏥 AI 의료 매칭 시스템</a>
-        <ul class="nav-menu">
-            <li><a href="<c:url value="/"/>">홈</a></li>
-            <li><a href="<c:url value="/#services"/>">서비스 소개</a></li>
-            <li><a href="<c:url value="/#diagnosis"/>">자가진단</a></li>
-            <li><a href="<c:url value="/map/map1"/>" style="color: #5B6FB5;">병원찾기</a></li>
-            <li><a href="<c:url value="/#contact"/>">문의하기</a></li>
-        </ul>
+        <a href="<c:url value="/"/>" class="logo" data-i18n="logo">🏥 AI 의료 매칭 시스템</a>
+        <div class="nav-right">
+            <ul class="nav-menu">
+                <li><a href="<c:url value="/"/>" data-i18n="navHome">홈</a></li>
+                <li><a href="<c:url value="/#services"/>" data-i18n="navServices">서비스 소개</a></li>
+                <li><a href="<c:url value="/#diagnosis"/>" data-i18n="navDiagnosis">자가진단</a></li>
+                <li><a href="<c:url value="/map/map1"/>" data-i18n="navHospital" style="color: #5B6FB5;">병원찾기</a></li>
+                <li><a href="<c:url value="/#contact"/>" data-i18n="navContact">문의하기</a></li>
+            </ul>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="ko">한국어</button>
+                <button class="lang-btn" data-lang="en">English</button>
+                <button class="lang-btn" data-lang="ja">日本語</button>
+                <button class="lang-btn" data-lang="zh">中文</button>
+            </div>
+        </div>
     </nav>
 </header>
 
@@ -435,56 +441,55 @@
     <div class="progress-bar">
         <div class="progress-step active">
             <div class="circle">1</div>
-            <span>증상 입력</span>
+            <span data-i18n="step1">증상 입력</span>
         </div>
         <div class="progress-step">
             <div class="circle">2</div>
-            <span>설문조사</span>
+            <span data-i18n="step2">설문조사</span>
         </div>
         <div class="progress-step">
             <div class="circle">3</div>
-            <span>AI 분석</span>
+            <span data-i18n="step3">AI 분석</span>
         </div>
         <div class="progress-step">
             <div class="circle">4</div>
-            <span>결과 확인</span>
+            <span data-i18n="step4">결과 확인</span>
         </div>
     </div>
 
     <!-- Diagnosis Card -->
     <div class="diagnosis-card">
         <div class="card-header">
-            <h2>증상을 입력해주세요</h2>
-            <p>현재 불편하신 증상을 자세히 설명해주시면 AI가 분석해드립니다</p>
+            <h2 data-i18n="pageTitle">증상을 입력해주세요</h2>
+            <p data-i18n="pageSubtitle">현재 불편하신 증상을 자세히 설명해주시면 AI가 분석해드립니다</p>
         </div>
 
-        <form id="diagnosisForm" action="<c:url value="/dia/dia2"/>" method="post" enctype="multipart/form-data">
+        <form id="diagnosisForm" action="<c:url value='/dia/dia2'/>" method="post" enctype="multipart/form-data">
+            <!-- 언어 정보 전송 -->
+            <input type="hidden" id="languageInput" name="language" value="ko">
+
             <!-- 텍스트 입력 -->
             <div class="input-section">
-                <label for="symptomText">증상 설명 *</label>
+                <label for="symptomText" data-i18n="symptomLabel">증상 설명 *</label>
                 <textarea
                         id="symptomText"
                         name="symptomText"
+                        data-i18n="symptomPlaceholder"
                         placeholder="예: 3일 전부터 머리가 지끈지끈 아프고 열이 38도 정도 나요. 목도 따끔거리고 기침도 조금 나옵니다."
                         required
                 ></textarea>
+
+                <!-- 음성 입력 & 사진 추가 버튼 -->
                 <div class="input-buttons">
-                    <button type="button" class="btn-voice" id="voiceBtn">
-                         음성으로 입력
+                    <button type="button" class="btn-voice" id="voiceBtn" data-i18n="voiceBtn">
+                        🎤 음성으로 입력
                     </button>
-                    <button type="button" class="btn-camera" onclick="document.getElementById('imageInput').click()">
-                         사진 추가 (선택)
+                    <button type="button" class="btn-camera" data-i18n="cameraBtn" onclick="document.getElementById('imageInput').click()">
+                        📷 사진 추가 (선택)
                     </button>
                 </div>
-            </div>
 
-            <!-- 이미지 업로드 -->
-            <div class="image-upload-area" id="uploadArea">
-                <div class="upload-icon">📸</div>
-                <h4 style="margin: 10px 0;">증상 사진 업로드 (선택사항)</h4>
-                <p style="color: #7f8c8d; font-size: 14px; margin-top: 8px;">
-                    피부 발진, 상처 등의 사진을 업로드하면 더 정확한 분석이 가능합니다
-                </p>
+                <!-- 숨겨진 파일 입력 -->
                 <input
                         type="file"
                         id="imageInput"
@@ -500,28 +505,31 @@
 
             <!-- 안내사항 -->
             <div class="info-box">
-                <h4>💡 입력 팁</h4>
+                <h4 data-i18n="infoTitle">💡 입력 팁</h4>
                 <ul>
-                    <li>증상이 시작된 시기를 알려주세요 (예: 3일 전부터)</li>
-                    <li>통증의 정도나 빈도를 구체적으로 설명해주세요</li>
-                    <li>동반되는 다른 증상도 함께 말씀해주세요</li>
-                    <li>사진은 최대 5장까지 업로드 가능합니다</li>
-                    <li>약 복용 중이라면 함께 알려주세요</li>
+                    <li data-i18n="infoTip1">증상이 시작된 시기를 알려주세요 (예: 3일 전부터)</li>
+                    <li data-i18n="infoTip2">통증의 정도나 빈도를 구체적으로 설명해주세요</li>
+                    <li data-i18n="infoTip3">동반되는 다른 증상도 함께 말씀해주세요</li>
+                    <li data-i18n="infoTip4">사진은 최대 5장까지 업로드 가능합니다</li>
+                    <li data-i18n="infoTip5">약 복용 중이라면 함께 알려주세요</li>
                 </ul>
             </div>
 
             <!-- 액션 버튼 -->
             <div class="action-buttons">
-                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <button type="button" class="btn btn-secondary" data-i18n="btnPrev" onclick="history.back()">
                     ← 이전으로
                 </button>
-                <button type="submit" class="btn btn-primary" id="submitBtn">
+                <button type="submit" class="btn btn-primary" id="submitBtn" data-i18n="btnNext">
                     다음 단계 (설문조사) →
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<!-- multilang.js 추가 -->
+<script src="<c:url value='/js/multilang.js'/>"></script>
 
 <script>
     // 음성 입력 기능
@@ -540,14 +548,22 @@
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            recognition.lang = 'ko-KR';
+
+            // 언어에 따라 음성 인식 언어 설정
+            const langCode = {
+                'ko': 'ko-KR',
+                'en': 'en-US',
+                'ja': 'ja-JP',
+                'zh': 'zh-CN'
+            };
+            recognition.lang = langCode[currentLang] || 'ko-KR';
             recognition.continuous = true;
             recognition.interimResults = true;
 
             recognition.onstart = function() {
                 isRecording = true;
                 document.getElementById('voiceBtn').classList.add('recording');
-                document.getElementById('voiceBtn').innerHTML = '⏹️ 녹음 중지';
+                document.getElementById('voiceBtn').textContent = t('voiceStopBtn');
             };
 
             recognition.onresult = function(event) {
@@ -560,13 +576,13 @@
 
             recognition.onerror = function(event) {
                 console.error('음성 인식 오류:', event.error);
-                alert('음성 인식 중 오류가 발생했습니다: ' + event.error);
+                alert(t('alertVoiceNotSupported'));
                 stopVoiceRecording();
             };
 
             recognition.start();
         } else {
-            alert('이 브라우저는 음성 인식을 지원하지 않습니다.\n크롬 브라우저를 사용해주세요.');
+            alert(t('alertVoiceNotSupported'));
         }
     }
 
@@ -575,73 +591,97 @@
             recognition.stop();
             isRecording = false;
             document.getElementById('voiceBtn').classList.remove('recording');
-            document.getElementById('voiceBtn').innerHTML = '🎤 음성으로 입력';
+            document.getElementById('voiceBtn').textContent = t('voiceBtn');
         }
     }
 
-    // 이미지 업로드 기능
-    const uploadArea = document.getElementById('uploadArea');
+    // 이미지 업로드 및 미리보기
     const imageInput = document.getElementById('imageInput');
     const imagePreview = document.getElementById('imagePreview');
     let uploadedFiles = [];
-
-    uploadArea.addEventListener('click', () => imageInput.click());
-
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        handleFiles(e.dataTransfer.files);
-    });
+    const dataTransfer = new DataTransfer();
 
     imageInput.addEventListener('change', (e) => {
-        handleFiles(e.target.files);
+        const files = Array.from(e.target.files);
+        console.log('📸 선택된 파일:', files.length + '개');
+        handleFiles(files);
     });
 
     function handleFiles(files) {
         if (uploadedFiles.length + files.length > 5) {
-            alert('이미지는 최대 5장까지 업로드 가능합니다.');
+            alert(t('alertMaxImages'));
             return;
         }
 
-        Array.from(files).forEach(file => {
+        files.forEach(file => {
             if (file.type.startsWith('image/')) {
+                console.log('✅ 이미지 추가:', file.name, file.type, file.size + ' bytes');
                 uploadedFiles.push(file);
+                dataTransfer.items.add(file);
                 displayImage(file);
+            } else {
+                console.warn('⚠️ 이미지 파일이 아님:', file.type);
             }
         });
+
+        imageInput.files = dataTransfer.files;
+        console.log('📦 현재 업로드된 파일 수:', uploadedFiles.length);
     }
 
     function displayImage(file) {
         const reader = new FileReader();
+
         reader.onload = (e) => {
+            console.log('🖼️ 이미지 로드 완료:', file.name);
+
             const div = document.createElement('div');
             div.className = 'preview-item';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="preview">
-                <button type="button" class="remove-btn" onclick="removeImage(this, '${file.name}')">×</button>
-            `;
+            div.setAttribute('data-filename', file.name);
+
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.alt = 'preview';
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-btn';
+            removeBtn.textContent = '×';
+            removeBtn.onclick = function() {
+                removeImage(div, file.name);
+            };
+
+            div.appendChild(img);
+            div.appendChild(removeBtn);
             imagePreview.appendChild(div);
             imagePreview.classList.add('show');
+
+            console.log('✅ 미리보기 표시 완료:', file.name);
         };
+
+        reader.onerror = (error) => {
+            console.error('❌ 이미지 로드 실패:', error);
+            alert(t('alertImageLoadError') + file.name);
+        };
+
         reader.readAsDataURL(file);
     }
 
-    function removeImage(btn, fileName) {
+    function removeImage(previewDiv, fileName) {
+        console.log('🗑️ 이미지 삭제:', fileName);
+
         uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
-        btn.parentElement.remove();
+
+        const newDataTransfer = new DataTransfer();
+        uploadedFiles.forEach(file => newDataTransfer.items.add(file));
+        imageInput.files = newDataTransfer.files;
+
+        previewDiv.remove();
 
         if (uploadedFiles.length === 0) {
             imagePreview.classList.remove('show');
         }
+
+        console.log('📦 남은 파일 수:', uploadedFiles.length);
     }
 
     // 폼 제출 검증
@@ -650,19 +690,33 @@
 
         if (!symptomText) {
             e.preventDefault();
-            alert('증상을 입력해주세요.');
+            alert(t('alertNoSymptom'));
             return;
         }
 
         if (symptomText.length < 10) {
             e.preventDefault();
-            alert('증상을 좀 더 자세히 입력해주세요. (최소 10자 이상)');
+            alert(t('alertShortSymptom'));
             return;
         }
 
-        // 제출 버튼 비활성화
+        // 현재 언어 전송
+        document.getElementById('languageInput').value = currentLang;
+
+        const fileInput = document.getElementById('imageInput');
+        console.log('=== 폼 제출 직전 확인 ===');
+        console.log('📤 제출할 파일 수:', fileInput.files.length);
+
+        if (fileInput.files.length > 0) {
+            for (let i = 0; i < fileInput.files.length; i++) {
+                console.log('파일 ' + (i+1) + ':', fileInput.files[i].name, fileInput.files[i].size + ' bytes');
+            }
+        } else {
+            console.warn('⚠️ 제출할 이미지 파일이 없습니다');
+        }
+
         document.getElementById('submitBtn').disabled = true;
-        document.getElementById('submitBtn').innerHTML = '처리 중...';
+        document.getElementById('submitBtn').textContent = t('processing');
     });
 </script>
 </body>
