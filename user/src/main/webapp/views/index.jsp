@@ -345,6 +345,7 @@
             </div>
         </section>
 
+
         <section class="about-section">
           <div class="about-content">
             <h2>🏥 MAP API를 이용한 병원 찾기 시스템</h2>
@@ -364,6 +365,8 @@
       </c:otherwise>
     </c:choose>
 </div>
+
+<jsp:include page="chatbot.jsp" />
 
 <button id="voiceBtn" class="voice-btn" title="누르고 말하면 이동합니다">
   🎙️
