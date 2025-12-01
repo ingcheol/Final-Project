@@ -51,7 +51,7 @@
         border-radius: 4px;
         border: none;
         cursor: pointer;
-        font-size: 16px
+        font-size: 18px
     }
 
     .start-call {
@@ -66,7 +66,7 @@
 
     .connection-status {
         text-align: center;
-        font-size: 14px
+        font-size: 24px
     }
 
     /* 채팅 스타일 */
@@ -108,7 +108,8 @@
 
     .message-bubble {
         max-width: 60%;
-        padding: 10px 15px;
+        padding: 12px 18px;
+        font-size: 24px;
         border-radius: 18px;
         word-wrap: break-word;
         position: relative;
@@ -126,7 +127,7 @@
     }
 
     .message-sender {
-        font-size: 11px;
+        font-size: 18px;
         color: #64748b;
         margin-bottom: 3px;
         padding: 0 5px
@@ -153,7 +154,7 @@
         border: 1px solid #e2e8f0;
         border-radius: 20px;
         outline: none;
-        font-size: 14px
+        font-size: 24px
     }
 
     .chat-input-area button {
@@ -271,7 +272,6 @@
                                     alert("음성 인식 실패");
                                 }
                             } catch (error) {
-                                console.error("음성 처리 오류:", error);
                                 alert("음성 처리 중 오류가 발생했습니다.");
                             } finally {
                                 // UI 원상복구
@@ -287,7 +287,6 @@
                         chatMicBtn.textContent = "⏹️";
 
                     } catch (err) {
-                        console.error("마이크 권한 오류:", err);
                         alert("마이크 권한을 허용해주세요.");
                     }
                 } else {
@@ -368,7 +367,7 @@
                             '<hr style="margin: 5px 0; border: 0; border-top: 1px dashed rgba(0,0,0,0.2);">' +
                             '<div style="font-weight:bold; display:flex; align-items:center; gap:5px; color:#2c3e50;">' +
                             '<span>' + data.translatedText + '</span>' +
-                            '<button onclick="playTTS(\'' + safeText + '\')" style="background:none; border:none; cursor:pointer; font-size:14px;">🔊</button>' +
+                            '<button onclick="playTTS(\'' + safeText + '\')" style="background:none; border:none; cursor:pointer; font-size:18px;">🔊</button>' +
                             '</div>';
                     }
                 } catch (e) {
@@ -456,7 +455,6 @@
                 $('#adviserArea').show();
                 $('#user').html("통화 시도 중");
             } catch (error) {
-                console.error('통화 시작 오류:', error);
                 this.updateConnectionStatus('Error: ' + error.message);
             }
         },
@@ -559,7 +557,6 @@
             };
 
             this.websocket.onerror = (error) => {
-                console.error('WebSocket 오류:', error);
                 this.updateConnectionStatus('WebSocket Error');
             };
         },
@@ -638,8 +635,8 @@
 </script>
 
 <div class="col-sm-10">
-  <h2>Patient Chat & Video Consultation</h2>
-  <h4 id="user">상담사 연결 대기 중...</h4>
+  <h2 class="connection-status">상담사와 실시간 화상통화 및 다국어 채팅 번역 AI</h2>
+  <h4 id="user" class="connection-status">상담사 연결 대기 중...</h4>
 
   <!-- 영상통화 영역 -->
   <div class="webrtc-container">
@@ -663,8 +660,8 @@
   <!-- 채팅 영역 -->
   <div class="chat-container">
     <div class="chat-header" style="display:flex; justify-content:space-between; align-items:center;">
-      <span>💬 상담사와의 채팅 (Room: ${patientConsult.roomId})</span>
-      <select id="myLanguage" style="font-size:12px; padding:2px; border-radius:4px; border:none; color:#333;">
+      <span>💬 상담사와의 채팅</span>
+      <select id="myLanguage" style="font-size:18px; padding:2px; border-radius:4px; border:none; color:#333;">
         <option value="Korean" selected>전송할 언어: 한국어</option>
         <option value="English">전송할 언어: English</option>
         <option value="Japanese">전송할 언어: 日本語</option>
@@ -674,7 +671,7 @@
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
       <input type="hidden" id="target" value="${patientConsult.roomId}">
-      <button id="chatMicBtn" style="margin-right:8px; background:#e74c3c; width:40px; padding:0;" title="음성 입력">🎤
+      <button id="chatMicBtn" style="margin-right:8px; background:#e74c3c; width:60px; padding:0;" title="음성 입력">🎙️
       </button>
       <input type="text" id="totext" placeholder="메시지를 입력하세요..." autocomplete="off">
       <button id="sendto">전송</button>

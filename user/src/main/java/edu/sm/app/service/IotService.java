@@ -20,17 +20,17 @@ public class IotService implements SmService<Iot,Long> {
     return iotRepository.findByPatientId(patientId);
   }
 
-  // 🆕 최근 N개 데이터 조회 (AI 분석용)
+  // 최근 N개 데이터 조회 (AI 분석용)
   public List<Iot> getRecentByPatientId(Long patientId, int limit) throws Exception {
     return iotRepository.findRecentByPatientId(patientId, limit);
   }
 
-  // 🆕 특정 바이탈의 최근 데이터 조회 (추세 분석용)
+  // 특정 바이탈의 최근 데이터 조회 (추세 분석용)
   public List<Iot> getRecentByVitalType(Long patientId, String vitalType, int limit) throws Exception {
     return iotRepository.findRecentByPatientIdAndVitalType(patientId, vitalType, limit);
   }
 
-  // 🆕 7일/30일/90일 데이터 조회 (그래프용)
+  // 기간별 데이터 조회 (그래프용)
   public List<Iot> getByDateRange(Long patientId, int days) throws Exception {
     LocalDateTime startDate = LocalDateTime.now().minusDays(days);
     return iotRepository.findByPatientIdAndMeasuredAtAfterOrderByMeasuredAtDesc(patientId, startDate);

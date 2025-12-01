@@ -46,7 +46,7 @@
       }
 
       .header h1 {
-          font-size: 20px;
+          font-size: 24px;
           color: #1a202c;
       }
 
@@ -60,7 +60,7 @@
           border: 1px solid #e2e8f0;
           background: white;
           border-radius: 6px;
-          font-size: 14px;
+          font-size: 18px;
           cursor: pointer;
           transition: all 0.2s;
       }
@@ -122,7 +122,7 @@
           color: white;
           border-radius: 6px;
           cursor: pointer;
-          font-size: 14px;
+          font-size: 18px;
           text-align: center;
           display: block;
           transition: background 0.2s;
@@ -283,7 +283,7 @@
           padding: 12px 16px;
           border-radius: 12px;
           line-height: 1.6;
-          font-size: 14px;
+          font-size: 18px;
           white-space: pre-wrap;
       }
 
@@ -350,7 +350,7 @@
           border: 1px solid #e2e8f0;
           background: white;
           border-radius: 20px;
-          font-size: 13px;
+          font-size: 18px;
           white-space: nowrap;
           cursor: pointer;
           transition: all 0.2s;
@@ -373,7 +373,7 @@
           border: 1px solid #cbd5e0;
           border-radius: 12px;
           padding: 12px;
-          font-size: 14px;
+          font-size: 18px;
           resize: none;
           min-height: 48px;
           max-height: 120px;
@@ -391,7 +391,7 @@
           color: white;
           border: none;
           border-radius: 12px;
-          font-size: 14px;
+          font-size: 18px;
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s;
@@ -501,6 +501,7 @@
   <div class="header">
     <a href="<c:url value='/'/>" class="btn-secondary" style="text-decoration: none;">홈</a>
     <h1>AI 건강 상담</h1>
+    <h4>DB에서 환자의 기본 정보, 최근 진료 기록, IOT 데이터를 AI가 확인하여 분석 및 상담에 도움을 줍니다.</h4>
     <div class="header-actions">
       <button class="btn-primary" onclick="predictDisease()">질환 예측</button>
       <button class="btn-secondary" onclick="clearChat()">대화 초기화</button>
@@ -544,8 +545,9 @@
         <div class="chat-messages" id="chatMessages">
           <div class="empty-state" id="emptyState">
             <h3>AI 건강 상담을 시작하세요</h3>
-            <p>증상이나 건강 고민을 자유롭게 말씀해주세요</p>
-            <p style="font-size: 13px; margin-top: 10px;">
+            <h1>환자의 기본 정보, 최근 진료 기록, IOT 데이터를 종합하여<br>AI가 분석 및 상담에 도움을 줍니다.</h1>
+            <h3>증상이나 건강 고민을 자유롭게 말씀해주세요</h3>
+            <p style="font-size: 18px; margin-top: 10px;">
               왼쪽에 진단서나 처방전 이미지를 업로드하면<br>더 정확한 분석이 가능합니다
             </p>
           </div>
@@ -709,7 +711,6 @@
                 alert(data.message);
             }
         } catch (error) {
-            console.error('삭제 오류:', error);
             alert('삭제 중 오류가 발생했습니다.');
         }
     }
@@ -793,7 +794,6 @@
                 addMessage('예측 중 오류가 발생했습니다: ' + data.message, 'ai');
             }
         } catch (error) {
-            console.error('예측 오류:', error);
             document.getElementById('typingIndicator').style.display = 'none';
             addMessage('네트워크 오류가 발생했습니다.', 'ai');
         }
@@ -870,7 +870,6 @@
             }
 
         } catch (error) {
-            console.error('채팅 오류:', error);
             document.getElementById('typingIndicator').style.display = 'none';
             addMessage('네트워크 오류가 발생했습니다.', 'ai');
         } finally {
@@ -954,7 +953,6 @@
             console.error('대화 내역 로드 실패:', error);
         }
 
-        // 업로드된 이미지 불러오기
         loadUploadedImages();
     });
 </script>

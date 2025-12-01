@@ -40,38 +40,56 @@ public class HealthMgrService {
       return "환자 정보를 찾을 수 없습니다.";
     }
 
-    String systemPrompt = buildSystemPrompt(patient, patientId);
+    // 벡터 DB에서 문서 직접 검색
+    SearchRequest searchRequest = SearchRequest.builder()
+        .query(userMessage)
+        .topK(3)
+        .similarityThreshold(0.5)
+        .filterExpression(
+            "type == 'patient_" + patientId + "_diagnosis' || type == 'patient_" + patientId + "_prescription'"
+        )
+        .build();
+
+    List<org.springframework.ai.document.Document> relatedDocs = vectorStore.similaritySearch(searchRequest);
+
+    // 검색된 문서 내용을 문자열로 변환
+    StringBuilder docContext = new StringBuilder();
+    if (!relatedDocs.isEmpty()) {
+      docContext.append("\n\n=== [참고] 환자의 업로드된 문서 내용 (진단서/처방전) ===\n");
+      for (org.springframework.ai.document.Document doc : relatedDocs) {
+        docContext.append(doc.getFormattedContent()).append("\n---\n");
+      }
+      docContext.append("=====================================================\n");
+      docContext.append("위 문서를 바탕으로 사용자의 질문에 구체적으로 답변하세요.\n\n");
+    }
+
+    // 시스템 프롬프트 구성 (기본 정보 + 문서 정보 추가)
+    String baseSystemPrompt = buildSystemPrompt(patient, patientId);
+    // 문서 내용을 시스템 프롬프트 끝에 추가하여 AI가 "지식"으로 인지하게 함
+    String finalSystemPrompt = baseSystemPrompt + docContext.toString();
+
     ChatClient chatClient = chatClientBuilder.build();
 
+    // 대화 내역 구성
     StringBuilder conversationContext = new StringBuilder();
     for (Map<String, String> msg : chatHistory) {
       String role = msg.get("role");
       String content = msg.get("content");
-      if ("user".equals(role)) {
-        conversationContext.append("사용자: ").append(content).append("\n");
-      } else if ("assistant".equals(role)) {
-        conversationContext.append("AI: ").append(content).append("\n");
+      // null 체크 추가
+      if (content != null) {
+        if ("user".equals(role)) {
+          conversationContext.append("사용자: ").append(content).append("\n");
+        } else if ("assistant".equals(role)) {
+          conversationContext.append("AI: ").append(content).append("\n");
+        }
       }
     }
-
     conversationContext.append("사용자: ").append(userMessage).append("\n");
     conversationContext.append("AI: ");
 
-    SearchRequest searchRequest = SearchRequest.builder()
-        .query(conversationContext.toString())
-        .topK(5)
-        .similarityThreshold(0.5)
-        .filterExpression("type == 'patient_" + patientId + "_diagnosis' OR type == 'patient_" + patientId + "_prescription'")
-        .build();
-
-    QuestionAnswerAdvisor ragAdvisor = QuestionAnswerAdvisor.builder(vectorStore)
-        .searchRequest(searchRequest)
-        .build();
-
     String aiResponse = chatClient.prompt()
-        .system(systemPrompt)
+        .system(finalSystemPrompt)
         .user(conversationContext.toString())
-        .advisors(ragAdvisor)
         .call()
         .content();
 
