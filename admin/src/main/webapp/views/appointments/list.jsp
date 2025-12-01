@@ -338,14 +338,12 @@
                 <td><strong>#${apt.appointmentId}</strong></td>
                 <td>${apt.name != null ? apt.name : '정보 없음'}</td>
                 <td>${apt.phone != null ? apt.phone : '-'}</td>
-                <td>
-                  <fmt:formatDate value="${apt.appointmentTime}" pattern="yyyy-MM-dd HH:mm"/>
-                </td>
+                <td>${apt.formattedDateTime != null ? apt.formattedDateTime : '-'}</td>
                 <td>${apt.appointmentTypeKr}</td>
                 <td>
-                    <span class="status-badge badge-${apt.status}">
-                        ${apt.statusKr}
-                    </span>
+        <span class="status-badge badge-${apt.status}">
+            ${apt.statusKr}
+        </span>
                 </td>
                 <td>
                   <div class="action-buttons">
