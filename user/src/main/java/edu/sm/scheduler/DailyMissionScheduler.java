@@ -27,8 +27,8 @@ public class DailyMissionScheduler {
   private final AiService aiService;
   private final SimpMessagingTemplate messagingTemplate;
 
-  // 시간 설정 해야함 (테스트로 10초)
-  @Scheduled(cron = "0/10 * * * * *")
+  // 시간 설정 해야함 (테스트로 15초)
+  @Scheduled(cron = "0/15 * * * * *")
   public void aiSelectAndSendMission() {
     log.info("=== AI 기반 환자 선별 및 미션 생성 시작 ===");
     try {

@@ -13,48 +13,12 @@
     .confidence-level { height: 100%; background: #22c55e; width: 0%; transition: width 0.2s ease-out; }
     .word-builder-container { background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; }
     .word-display { background: white; border: 2px solid #cbd5e1; border-radius: 8px; padding: 15px; font-size: 24px; font-weight: bold; color: #1e293b; min-height: 60px; margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; }
-    .control-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .btn { padding: 10px 20px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
-    .btn-space { background: #64748b; color: white; }
-    .btn-del { background: #ef4444; color: white; }
-    .btn-reset { background: #94a3b8; color: white; }
-    .guide-text { margin-top: 20px; font-size: 14px; color: #1e293b; text-align: center; background: #e0f2fe; padding: 10px; border-radius: 8px; border: 1px solid #bae6fd; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1646424915/hands.js" crossorigin="anonymous"></script>
-
-<div class="sign-container">
-  <h2 class="text-center" style="margin-bottom: 20px;">한국수어 지문자 자음 인식</h2>
-
-  <div class="video-wrapper">
-    <video id="signVideo" playsinline></video>
-    <canvas id="outputCanvas"></canvas>
-  </div>
-
-  <div class="result-panel">
-    <div class="detected-char-box">
-      <div class="detected-char-label">현재 인식된 자음</div>
-      <div id="textContent" class="detected-char">...</div>
-      <div class="confidence-bar-bg">
-        <div id="confidenceLevel" class="confidence-level"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="word-builder-container">
-    <h4 style="margin-top: 0; margin-bottom: 10px; color: #334155;">조합된 문자열</h4>
-    <div id="currentWord" class="word-display"></div>
-<%--    <div class="control-btns">--%>
-<%--      <button class="btn btn-space" onclick="addSpace()">␣ 띄어쓰기</button>--%>
-<%--      <button class="btn btn-del" onclick="deleteLastChar()">⌫ 한 글자 삭제</button>--%>
-<%--      <button class="btn btn-reset" onclick="clearWord()">↺ 전체 초기화</button>--%>
-<%--    </div>--%>
-  </div>
-
-</div>
 
 <script>
     const videoElement = document.getElementById('signVideo');
@@ -197,3 +161,33 @@
 
     window.addEventListener('load', startCamera);
 </script>
+
+<div class="sign-container">
+  <h2 class="text-center" style="margin-bottom: 20px;">한국수어 번역</h2>
+
+  <div class="video-wrapper">
+    <video id="signVideo" playsinline></video>
+    <canvas id="outputCanvas"></canvas>
+  </div>
+
+  <div class="result-panel">
+    <div class="detected-char-box">
+      <div class="detected-char-label">현재 인식된 단어</div>
+      <div id="textContent" class="detected-char">...</div>
+      <div class="confidence-bar-bg">
+        <div id="confidenceLevel" class="confidence-level"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="word-builder-container">
+    <h4 style="margin-top: 0; margin-bottom: 10px; color: #334155;">전송한 단어</h4>
+    <div id="currentWord" class="word-display"></div>
+<%--    <div class="control-btns">--%>
+<%--      <button class="btn btn-space" onclick="addSpace()">␣ 띄어쓰기</button>--%>
+<%--      <button class="btn btn-del" onclick="deleteLastChar()">⌫ 한 글자 삭제</button>--%>
+<%--      <button class="btn btn-reset" onclick="clearWord()">↺ 전체 초기화</button>--%>
+<%--    </div>--%>
+  </div>
+
+</div>

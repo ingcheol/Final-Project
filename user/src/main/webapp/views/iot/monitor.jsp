@@ -15,7 +15,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>환자 모니터링</title>
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -31,7 +30,7 @@
           background: white;
           padding: 15px;
           border-radius: 8px 8px 0 0;
-          font-size: 18px;
+          font-size: 24px;
           font-weight: bold;
           color: #2c3e50;
           display: flex;
@@ -43,7 +42,7 @@
           display: inline-flex;
           align-items: center;
           gap: 8px;
-          font-size: 14px;
+          font-size: 18px;
           color: #27ae60;
       }
 
@@ -165,9 +164,10 @@
 </head>
 <body>
 <div class="container">
-  <h1>${patientName} 환자 모니터링 (환자 ID: ${patientId})</h1>
+  <h1>${patientName} IoT 모니터링 (ID: ${patientId})
+    <br>AI가 IoT값을 참고하여 선별 및 건강 일일미션, 복약 알림을 제공합니다.</h1>
 
-  <!-- ✅ 실시간 차트 (최근 1분) -->
+  <!-- 실시간 차트 (최근 1분) -->
   <div class="chart-section">
     <div class="chart-title">
       실시간 모니터링
@@ -179,7 +179,7 @@
     <div class="chart-container" id="liveChartContainer"></div>
   </div>
 
-  <!-- ✅ 기간별 차트 (1일/7일/30일) -->
+  <!-- 기간별 차트-->
   <div class="chart-section">
     <div class="chart-controls">
       <span style="font-weight: bold;">기간 선택:</span>
@@ -221,11 +221,9 @@
 
             // 음성 재생
             window.speechSynthesis.speak(utterance);
-
-            console.log("음성 출력 시작:", message);
         } else {
             console.warn("⚠️ 브라우저가 음성 출력을 지원하지 않습니다.");
-            alert(message); // 대체: alert 표시
+            alert(message);
         }
     }
 
@@ -234,8 +232,6 @@
     const stompClient = Stomp.over(socket);
 
     stompClient.connect({}, function(frame) {
-        console.log('일일미션 웹소켓 연결 성공:', frame);
-
         // 환자 미션 메시지 구독
         stompClient.subscribe('/send/mission/' + patientId, function(message) {
             console.log("AI 메시지 도착:", message.body);
@@ -260,22 +256,20 @@
 
         document.body.appendChild(notification);
 
-        // 10초 후 자동 제거
-        setTimeout(() => notification.remove(), 10000);
+        // 15초 후 자동 제거
+        setTimeout(() => notification.remove(), 15000);
     }
 
     // 페이지 로드 시 음성 목록 초기화 (일부 브라우저 필요)
     window.speechSynthesis.onvoiceschanged = function() {
         const voices = window.speechSynthesis.getVoices();
-        console.log("사용 가능한 음성:", voices.filter(v => v.lang.includes('ko')));
     };
 
-    // ✅ 실시간 차트 로드 (최근 1분)
+    // 실시간 차트 로드 (최근 1분)
     function loadLiveChart() {
         fetch('/iot/getlive?patientId=' + patientId)
             .then(response => response.json())
             .then(data => {
-                // console.log('실시간 데이터:', data);
                 renderLiveChart(data);
             })
             .catch(error => {
@@ -283,7 +277,7 @@
             });
     }
 
-    // ✅ 실시간 차트 렌더링
+    // 실시간 차트 렌더링
     function renderLiveChart(data) {
         const seriesData = {
             'HEART_RATE': [],
@@ -365,7 +359,7 @@
         }
     }
 
-    // ✅ 기간별 차트 로드
+    // 기간별 차트 로드
     function loadHistoryChart(days) {
         currentPeriod = days;
 
@@ -377,16 +371,14 @@
         fetch('/iot/chart?patientId=' + patientId + '&days=' + days)
             .then(response => response.json())
             .then(data => {
-                console.log('기간별 데이터:', data);
                 renderHistoryChart(data);
             })
             .catch(error => {
-                console.error('기간별 데이터 조회 실패:', error);
                 alert('차트 데이터를 불러올 수 없습니다.');
             });
     }
 
-    // ✅ 기간별 차트 렌더링
+    // 기간별 차트 렌더링
     function renderHistoryChart(data) {
         const seriesData = {
             'HEART_RATE': [],
@@ -449,24 +441,24 @@
         });
     }
 
-    // ✅ 3초마다 실시간 차트 자동 업데이트
+    // 3초마다 실시간 차트 자동 업데이트
     function startLiveUpdate() {
-        loadLiveChart(); // 즉시 로드
+        loadLiveChart();
         liveUpdateInterval = setInterval(function() {
             loadLiveChart();
-        }, 3000); // 3초마다 업데이트
+        }, 3000);
     }
 
-    // ✅ 페이지 종료 시 자동 업데이트 중지
+    // 페이지 종료 시 자동 업데이트 중지
     window.addEventListener('beforeunload', function() {
         if (liveUpdateInterval) {
             clearInterval(liveUpdateInterval);
         }
     });
 
-    // ✅ 초기 실행
+    // 초기 실행
     startLiveUpdate();        // 실시간 차트 (3초마다 자동 업데이트)
-    loadHistoryChart(7);      // 기간별 차트 (7일)
+    loadHistoryChart(1);      // 기간별 차트
 </script>
 </body>
 </html>
