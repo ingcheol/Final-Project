@@ -33,6 +33,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.175em;
             background-color: #f5f6fa;
             color: #333;
         }
@@ -74,7 +75,7 @@
 
         .nav-title {
             padding: 10px 20px;
-            font-size: 11px;
+            font-size: 14px; /* 기존 11px에서 14px로 증가 */
             text-transform: uppercase;
             color: #94a3b8;
             letter-spacing: 1px;
