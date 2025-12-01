@@ -55,13 +55,32 @@
             max-height: 200px; overflow-y: auto; background: white; border: 1px solid #eee; border-radius: 6px;
         }
         .er-item {
-            padding: 10px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
         }
-        .er-item:hover { background-color: #f8f9fa; }
-        .er-name { font-weight: bold; font-size: 14px; }
-        .er-status { font-size: 12px; }
+        .er-item:hover {
+            background-color: #f8f9fa;
+        }
+        .er-name {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .er-status {
+            font-size: 16px; /* 12px → 16px로 증가 */
+            font-weight: 600; /* 굵게 */
+        }
         .er-badge {
-            display: inline-block; padding: 2px 6px; border-radius: 4px; color: white; font-size: 11px; font-weight: bold; margin-left: 5px;
+            display: inline-block;
+            padding: 5px 12px; /* 2px 6px → 5px 12px로 증가 */
+            border-radius: 6px; /* 4px → 6px */
+            color: white;
+            font-size: 14px; /* 11px → 14px로 증가 */
+            font-weight: bold;
+            margin-left: 8px; /* 5px → 8px */
         }
         .bg-green { background-color: #28a745; }
         .bg-red { background-color: #dc3545; }
@@ -139,8 +158,73 @@
 <div class="main-container">
     <div class="page-header">
         <h1>🏥 병원 찾기</h1>
-        <p>현재 위치 주변의 병원을 찾거나, 실시간 응급실 병상을 조회해보세요.</p>
     </div>
+
+    <!-- AI 검색 시스템 작동 방식 설명 추가 -->
+    <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%); border-radius: 15px; padding: 30px; margin-top: 25px; border-left: 5px solid #5B6FB5; box-shadow: 0 2px 10px rgba(91, 111, 181, 0.1);">
+        <h4 style="color: #2c3e50; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <span data-i18n="mapHowItWorks">AI 병원 검색 시스템 작동 방식</span>
+        </h4>
+
+        <div style="display: grid; gap: 15px;">
+            <!-- 1단계: 증상 분석 -->
+            <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #667eea;">
+                <div style="display: flex; align-items: start; gap: 15px;">
+                    <div style="background: #667eea; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">1</div>
+                    <div style="flex: 1;">
+                        <h5 style="color: #667eea; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="mapStep1Title">증상 입력 및 AI 분석</h5>
+                        <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="mapStep1Desc">
+                            채팅창에 증상이나 필요한 진료과를 입력하면 AI가 자연어 처리(NLP)로 의도를 파악합니다.
+                            예: "머리가 아파요" → AI가 "신경과" 또는 "내과" 키워드 추출
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2단계: 키워드 변환 -->
+            <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #764ba2;">
+                <div style="display: flex; align-items: start; gap: 15px;">
+                    <div style="background: #764ba2; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">2</div>
+                    <div style="flex: 1;">
+                        <h5 style="color: #764ba2; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="mapStep2Title">검색 키워드 자동 생성</h5>
+                        <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="mapStep2Desc">
+                            추출된 정보를 바탕으로 카카오맵 검색에 최적화된 한글 키워드를 자동 생성합니다.
+                            예: "headache" 입력 → "가까운 내과" 키워드로 변환
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3단계: 지도 검색 -->
+            <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #5B6FB5;">
+                <div style="display: flex; align-items: start; gap: 15px;">
+                    <div style="background: #5B6FB5; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">3</div>
+                    <div style="flex: 1;">
+                        <h5 style="color: #5B6FB5; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="mapStep3Title">실시간 병원 검색 및 표시</h5>
+                        <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="mapStep3Desc">
+                            생성된 키워드로 카카오맵 API를 통해 현재 위치 기준 반경 5-10km 내 병원을 실시간 검색합니다.
+                            거리순으로 정렬하여 지도에 마커로 표시하고 상세 정보를 제공합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4단계: 응급실 연동 -->
+            <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #dc3545;">
+                <div style="display: flex; align-items: start; gap: 15px;">
+                    <div style="background: #dc3545; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">4</div>
+                    <div style="flex: 1;">
+                        <h5 style="color: #dc3545; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="mapStep4Title">실시간 응급실 병상 조회</h5>
+                        <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="mapStep4Desc">
+                            응급 상황 키워드 감지 시 국립중앙의료원 공공데이터 API를 호출하여
+                            실시간 응급실 병상 가용 현황(여유/혼잡/만실)을 확인하고 지도에 표시합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <div style="text-align: right; margin-bottom: 10px;">
         <button onclick="changeLanguage('ko')" class="btn btn-sm btn-outline-primary">🇰🇷 한국어</button>
@@ -152,11 +236,11 @@
     <div class="control-panel">
         <div class="control-row">
             <div class="control-buttons">
-                <button id="btn-my-location" class="btn btn-primary">📍 현재 위치</button>
-                <button id="btn-find-nearby" class="btn btn-success">🏥 가까운 병원</button>
-                <button id="btn-emergency" class="btn btn-danger">🚑 응급실 찾기 (지도)</button>
-                <button id="btn-toggle-er" class="btn btn-danger" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);">📊 실시간 응급병상 조회</button>
-                <button id="btn-refresh" class="btn btn-secondary">🔄 새로고침</button>
+                <button id="btn-my-location" class="btn btn-primary"> 현재 위치</button>
+                <button id="btn-find-nearby" class="btn btn-success"> 가까운 병원</button>
+                <button id="btn-emergency" class="btn btn-danger"> 응급실 찾기 (지도)</button>
+                <button id="btn-toggle-er" class="btn btn-danger" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5253 100%);"> 실시간 응급병상 조회</button>
+                <button id="btn-refresh" class="btn btn-secondary"> 새로고침</button>
             </div>
         </div>
 
@@ -224,62 +308,127 @@
         'ko': {
             'title': '🏥 병원 찾기',
             'desc': '현재 위치 주변의 병원을 찾거나, 실시간 응급실 병상을 조회해보세요.',
-            'btn_loc': '📍 현재 위치',
-            'btn_near': '🏥 가까운 병원',
-            'btn_emer': '🚑 응급실 찾기',
-            'btn_er_real': '📊 실시간 응급병상',
-            'btn_refresh': '🔄 새로고침',
+            'btn_loc': ' 현재 위치',
+            'btn_near': ' 가까운 병원',
+            'btn_emer': ' 응급실 찾기 (지도)',
+            'btn_er_real': ' 실시간 응급병상 조회',
+            'btn_refresh': ' 새로고침',
             'chat_welcome': '안녕하세요! AI 의료 상담 챗봇입니다.<br>궁금하신 점을 물어보세요.',
-            'placeholder': '메시지를 입력하세요...'
+            'placeholder': '메시지를 입력하세요...',
+
+            // AI 작동 방식 설명
+            'mapTitle': '🏥 병원 찾기',
+            'mapDesc': '현재 위치 주변의 병원을 찾거나, 실시간 응급실 병상을 조회해보세요.',
+            'mapHowItWorks': 'AI 병원 검색 시스템 작동 방식',
+            'mapStep1Title': '증상 입력 및 AI 분석',
+            'mapStep1Desc': '채팅창에 증상이나 필요한 진료과를 입력하면 AI가 자연어 처리(NLP)로 의도를 파악합니다. 예: "머리가 아파요" → AI가 "신경과" 또는 "내과" 키워드 추출',
+            'mapStep2Title': '검색 키워드 자동 생성',
+            'mapStep2Desc': '추출된 정보를 바탕으로 카카오맵 검색에 최적화된 한글 키워드를 자동 생성합니다. 예: "headache" 입력 → "가까운 내과" 키워드로 변환',
+            'mapStep3Title': '실시간 병원 검색 및 표시',
+            'mapStep3Desc': '생성된 키워드로 카카오맵 API를 통해 현재 위치 기준 반경 5-10km 내 병원을 실시간 검색합니다. 거리순으로 정렬하여 지도에 마커로 표시하고 상세 정보를 제공합니다.',
+            'mapStep4Title': '실시간 응급실 병상 조회',
+            'mapStep4Desc': '응급 상황 키워드 감지 시 국립중앙의료원 공공데이터 API를 호출하여 실시간 응급실 병상 가용 현황(여유/혼잡/만실)을 확인하고 지도에 표시합니다.',
+            'mapTip': '채팅창에 "강남 정형외과", "응급실", "근처 소아과" 등 자유롭게 입력하면 AI가 자동으로 최적의 병원을 찾아드립니다!'
         },
         'en': {
             'title': '🏥 Hospital Finder',
             'desc': 'Find nearby hospitals or check real-time ER beds.',
-            'btn_loc': '📍 My Location',
-            'btn_near': '🏥 Nearby',
-            'btn_emer': '🚑 Emergency Map',
-            'btn_er_real': '📊 Real-time ER',
-            'btn_refresh': '🔄 Refresh',
+            'btn_loc': ' My Location',
+            'btn_near': ' Nearby Hospitals',
+            'btn_emer': ' Emergency Room (Map)',
+            'btn_er_real': ' Real-time ER Beds',
+            'btn_refresh': ' Refresh',
             'chat_welcome': 'Hello! I am your AI Medical Assistant.',
-            'placeholder': 'Type a message...'
+            'placeholder': 'Type a message...',
+
+            'mapTitle': '🏥 Hospital Finder',
+            'mapDesc': 'Find nearby hospitals or check real-time ER beds.',
+            'mapHowItWorks': 'How AI Hospital Search Works',
+            'mapStep1Title': 'Symptom Input & AI Analysis',
+            'mapStep1Desc': 'Enter symptoms or required department in chat, AI analyzes intent using NLP. Ex: "I have a headache" → AI extracts "Neurology" or "Internal Medicine" keyword',
+            'mapStep2Title': 'Auto Keyword Generation',
+            'mapStep2Desc': 'Generates Korean keywords optimized for Kakao Map search. Ex: "headache" input → converts to "nearby internal medicine"',
+            'mapStep3Title': 'Real-time Hospital Search & Display',
+            'mapStep3Desc': 'Searches hospitals within 5-10km radius using Kakao Map API. Sorts by distance and displays markers with detailed information.',
+            'mapStep4Title': 'Real-time ER Bed Check',
+            'mapStep4Desc': 'When emergency keywords detected, calls National Medical Center API to check real-time ER bed availability (Available/Busy/Full) and displays on map.',
+            'mapTip': 'Type freely like "Gangnam Orthopedics", "Emergency Room", "Nearby Pediatrics" - AI will find the best hospitals automatically!'
         },
         'jp': {
             'title': '🏥 病院検索',
             'desc': '近くの病院やリアルタイムの救急病床を検索します。',
-            'btn_loc': '📍 現在地',
-            'btn_near': '🏥 近くの病院',
-            'btn_emer': '🚑 救急室(地図)',
-            'btn_er_real': '📊 救急病床状況',
-            'btn_refresh': '🔄 更新',
+            'btn_loc': ' 現在地',
+            'btn_near': ' 近くの病院',
+            'btn_emer': ' 救急室 (地図)',
+            'btn_er_real': ' リアルタイム救急病床',
+            'btn_refresh': ' 更新',
             'chat_welcome': 'こんにちは！AI医療相談チャットボットです。',
-            'placeholder': 'メッセージを入力...'
+            'placeholder': 'メッセージを入力...',
+
+            'mapTitle': '🏥 病院検索',
+            'mapDesc': '近くの病院やリアルタイムの救急病床を検索します。',
+            'mapHowItWorks': 'AI病院検索システムの動作方式',
+            'mapStep1Title': '症状入力・AI分析',
+            'mapStep1Desc': 'チャットに症状や必要な診療科を入力すると、AIが自然言語処理(NLP)で意図を把握します。例：「頭が痛い」→ AIが「神経科」または「内科」キーワード抽出',
+            'mapStep2Title': '検索キーワード自動生成',
+            'mapStep2Desc': '抽出された情報を基にカカオマップ検索に最適化された韓国語キーワードを自動生成します。例：「headache」入力 → 「近くの内科」キーワードに変換',
+            'mapStep3Title': 'リアルタイム病院検索・表示',
+            'mapStep3Desc': '生成されたキーワードでカカオマップAPIを通じて現在地から半径5-10km以内の病院をリアルタイム検索します。距離順にソートして地図にマーカーで表示し、詳細情報を提供します。',
+            'mapStep4Title': 'リアルタイム救急病床照会',
+            'mapStep4Desc': '緊急状況キーワード検出時、国立中央医療院公共データAPIを呼び出してリアルタイム救急病床利用状況（余裕/混雑/満室）を確認し地図に表示します。',
+            'mapTip': 'チャットに「江南整形外科」「救急室」「近くの小児科」など自由に入力すれば、AIが自動的に最適な病院を探します！'
         },
         'cn': {
             'title': '🏥 寻找医院',
             'desc': '查找附近的医院或实时急诊床位。',
-            'btn_loc': '📍 当前位置',
-            'btn_near': '🏥 附近的医院',
-            'btn_emer': '🚑 急诊室(地图)',
-            'btn_er_real': '📊 实时急诊床位',
-            'btn_refresh': '🔄 刷新',
+            'btn_loc': ' 当前位置',
+            'btn_near': ' 附近医院',
+            'btn_emer': ' 急诊室 (地图)',
+            'btn_er_real': ' 实时急诊床位',
+            'btn_refresh': ' 刷新',
             'chat_welcome': '你好！我是AI医疗咨询助手。',
-            'placeholder': '输入消息...'
+            'placeholder': '输入消息...',
+
+            'mapTitle': '🏥 寻找医院',
+            'mapDesc': '查找附近的医院或实时急诊床位。',
+            'mapHowItWorks': 'AI医院搜索系统运作方式',
+            'mapStep1Title': '症状输入与AI分析',
+            'mapStep1Desc': '在聊天框输入症状或所需科室，AI通过自然语言处理(NLP)识别意图。例："头痛" → AI提取"神经科"或"内科"关键词',
+            'mapStep2Title': '自动生成搜索关键词',
+            'mapStep2Desc': '基于提取的信息自动生成适合Kakao地图搜索的韩语关键词。例："headache"输入 → 转换为"附近内科"关键词',
+            'mapStep3Title': '实时医院搜索与显示',
+            'mapStep3Desc': '通过Kakao地图API使用生成的关键词实时搜索当前位置半径5-10km内的医院。按距离排序并在地图上显示标记和详细信息。',
+            'mapStep4Title': '实时急诊床位查询',
+            'mapStep4Desc': '检测到紧急关键词时，调用国立中央医疗院公共数据API查询实时急诊床位可用状态（充裕/繁忙/满床）并在地图上显示。',
+            'mapTip': '在聊天框自由输入如"江南骨科"、"急诊室"、"附近儿科"等，AI会自动找到最佳医院！'
         }
     };
 
     function changeLanguage(lang) {
         currentLang = lang;
         var t = translations[lang];
+
+        // 페이지 제목/설명
         $('.page-header h1').text(t.title);
         $('.page-header p').text(t.desc);
-        $('#btn-my-location').text(t.btn_loc);
-        $('#btn-find-nearby').text(t.btn_near);
-        $('#btn-emergency').text(t.btn_emer);
-        $('#btn-toggle-er').text(t.btn_er_real);
-        $('#btn-refresh').text(t.btn_refresh);
+
+        //  버튼 텍스트 변경
+        $('#btn-my-location').html(t.btn_loc);
+        $('#btn-find-nearby').html(t.btn_near);
+        $('#btn-emergency').html(t.btn_emer);
+        $('#btn-toggle-er').html(t.btn_er_real);
+        $('#btn-refresh').html(t.btn_refresh);
+
+        // 입력창
         $('#chatInput').attr('placeholder', t.placeholder);
 
-        // 채팅 초기화는 사용자가 대화중일 수 있으므로 생략하거나 필요시 추가
+        // 🆕 data-i18n 속성 기반 번역 적용
+        $('[data-i18n]').each(function() {
+            var key = $(this).attr('data-i18n');
+            if (t[key]) {
+                $(this).text(t[key]);
+            }
+        });
     }
 
     // ==========================================
@@ -414,7 +563,8 @@
                         listHtml += '    <div style="font-size:12px; color:#666;">📞 ' + dutyTel3 + '</div>';
                         listHtml += '  </div>';
                         listHtml += '  <div style="text-align:right;">';
-                        listHtml += '    <div class="er-status">응급병상: <strong>' + hvec + '</strong></div>';
+                        // 🔥 여기 수정: 크기 증가
+                        listHtml += '    <div class="er-status" style="font-size:18px; margin-bottom:5px;">병상: <strong style="font-size:22px; color:#333;">' + hvec + '개</strong></div>';
                         listHtml += '    <span class="er-badge ' + badgeClass + '">' + statusText + '</span>';
                         listHtml += '  </div>';
                         listHtml += '</div>';

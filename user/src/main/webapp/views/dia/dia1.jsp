@@ -464,13 +464,77 @@
             <p data-i18n="pageSubtitle">현재 불편하신 증상을 자세히 설명해주시면 AI가 분석해드립니다</p>
         </div>
 
+        <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e8f0fe 100%); border-radius: 15px; padding: 30px; margin-top: 25px; border-left: 5px solid #5B6FB5; box-shadow: 0 2px 10px rgba(91, 111, 181, 0.1);">
+            <h4 style="color: #2c3e50; font-size: 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <span data-i18n="howItWorks">AI 진단 시스템이 이렇게 작동합니다</span>
+            </h4>
+
+            <div style="display: grid; gap: 15px;">
+                <!-- 1단계 -->
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #667eea;">
+                    <div style="display: flex; align-items: start; gap: 15px;">
+                        <div style="background: #667eea; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">1</div>
+                        <div style="flex: 1;">
+                            <h5 style="color: #667eea; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="step1DetailTitle">증상 입력 및 수집</h5>
+                            <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="step1DetailDesc">
+                                텍스트, 음성, 이미지 등 다양한 방법으로 증상을 입력하시면 AI가 모든 정보를 수집합니다.
+                                "3일 전부터 두통과 발열" 같은 자연스러운 문장으로 작성하셔도 됩니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2단계 -->
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #764ba2;">
+                    <div style="display: flex; align-items: start; gap: 15px;">
+                        <div style="background: #764ba2; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">2</div>
+                        <div style="flex: 1;">
+                            <h5 style="color: #764ba2; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="step2DetailTitle">맞춤형 설문 생성</h5>
+                            <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="step2DetailDesc">
+                                입력하신 증상을 기반으로 AI가 추가로 필요한 정보를 파악하여 맞춤형 설문을 자동 생성합니다.
+                                예: 두통이라면 "통증 부위", "지속 시간", "강도" 등을 물어봅니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3단계 -->
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #5B6FB5;">
+                    <div style="display: flex; align-items: start; gap: 15px;">
+                        <div style="background: #5B6FB5; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">3</div>
+                        <div style="flex: 1;">
+                            <h5 style="color: #5B6FB5; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="step3DetailTitle">키워드 추출 및 RAG 검색</h5>
+                            <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="step3DetailDesc">
+                                AI가 증상에서 핵심 키워드("두통", "발열", "구토" 등)를 추출하고,
+                                이를 바탕으로 RAG(Retrieval-Augmented Generation)를 통해 방대한 의료 PDF 문서와 데이터베이스를 실시간 검색하여
+                                관련 질병, 증상 패턴, 치료법 정보를 수집합니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4단계 -->
+                <div style="background: white; padding: 20px; border-radius: 10px; border-left: 3px solid #28a745;">
+                    <div style="display: flex; align-items: start; gap: 15px;">
+                        <div style="background: #28a745; color: white; min-width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px;">4</div>
+                        <div style="flex: 1;">
+                            <h5 style="color: #28a745; font-size: 15px; margin-bottom: 8px; font-weight: 600;" data-i18n="step4DetailTitle">AI 종합 분석 및 병원 추천</h5>
+                            <p style="color: #666; font-size: 14px; line-height: 1.7; margin: 0;" data-i18n="step4DetailDesc">
+                                수집된 의료 정보와 설문 답변을 종합하여 AI가 증상을 분석하고,
+                                가장 적합한 진료과를 추천합니다. 동시에 위치 정보를 활용하여 근처의 적절한 병원(1차/2차/3차)을 찾아드립니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <form id="diagnosisForm" action="<c:url value='/dia/dia2'/>" method="post" enctype="multipart/form-data">
             <!-- 언어 정보 전송 -->
             <input type="hidden" id="languageInput" name="language" value="ko">
 
             <!-- 텍스트 입력 -->
             <div class="input-section">
-                <label for="symptomText" data-i18n="symptomLabel">증상 설명 *</label>
+                <label for="symptomText" data-i18n="symptomLabel">증상 설명</label>
                 <textarea
                         id="symptomText"
                         name="symptomText"
