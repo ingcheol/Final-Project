@@ -33,6 +33,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.175em;
             background-color: #f5f6fa;
             color: #333;
         }
@@ -74,7 +75,7 @@
 
         .nav-title {
             padding: 10px 20px;
-            font-size: 11px;
+            font-size: 14px; /* 기존 11px에서 14px로 증가 */
             text-transform: uppercase;
             color: #94a3b8;
             letter-spacing: 1px;
@@ -312,7 +313,7 @@
 <body>
 <div class="container">
     <aside class="sidebar">
-        <div class="logo">OSEN</div>
+        <div class="logo">선문 보건소</div>
 
         <div class="nav-section">
             <div class="nav-title">DASH</div>
@@ -322,19 +323,19 @@
             </a>
             <a href="<c:url value='/manage'/>" class="nav-item">
                 <span class="icon">🏥</span>
-                <span>Patient Manage</span>
+                <span>환자 관리</span>
             </a>
             <a href="<c:url value='/anage'/>" class="nav-item">
                 <span class="icon">👨‍⚕️</span>
-                <span>Adviser Manage</span>
+                <span>상담사 관리</span>
             </a>
             <a href="<c:url value='/consultation'/>" class="nav-item">
                 <span class="icon">📱</span>
-                <span>Consultation</span>
+                <span>상담 페이지</span>
             </a>
             <a href="<c:url value='/admin/appointments'/>" class="nav-item">
                 <span class="icon">📱</span>
-                <span>Appointments</span>
+                <span>예약 관리</span>
             </a>
           <a href="<c:url value='/admin/signlanguage'/>" class="nav-item">
             <span class="icon">👌</span>
@@ -475,7 +476,7 @@
           <%-- 9. 그 외의 경우 (초기 접속 등) --%>
             <c:otherwise>
                 <div class="welcome-screen">
-                    <h1>OSEN</h1>
+                    <h1>선문 보건소</h1>
                     <p>좌측 메뉴를 선택하여 작업을 시작하세요.</p>
                 </div>
             </c:otherwise>

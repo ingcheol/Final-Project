@@ -29,36 +29,36 @@
   .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
 
   /* 라벨 스타일 */
-  .form-group label { display: block; font-size: 14px; font-weight: 600; color: #495057; margin-bottom: 8px; }
+  .form-group label { display: block; font-size: 20px; font-weight: 600; color: #495057; margin-bottom: 10px; }
   .form-group label .required { color: #e74c3c; margin-left: 3px; }
 
   /* 입력창 스타일 */
-  .form-group input[type="text"], .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 14px; background: white; transition: border-color 0.2s; }
+  .form-group input[type="text"], .form-group select { width: 100%; padding: 14px 16px; border: 1px solid #ced4da; border-radius: 6px; font-size: 18px; background: white; transition: border-color 0.2s; }
   .form-group input[type="text"]:focus, .form-group select:focus { outline: none; border-color: #3498db; }
 
   /* 상병코드 예시 */
   .example-codes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .code-card { padding: 6px 12px; background: white; border: 1px solid #dee2e6; border-radius: 4px; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #495057; }
+  .code-card { padding: 10px 16px; background: white; border: 1px solid #dee2e6; border-radius: 4px; font-size: 17px; cursor: pointer; transition: all 0.2s; color: #495057; }
   .code-card:hover { background: #3498db; color: white; border-color: #3498db; }
 
   /* 버튼 */
-  .btn-search { width: 100%; padding: 14px; border: none; border-radius: 6px; background: #3498db; color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
+  .btn-search { width: 100%; padding: 18px; border: none; border-radius: 6px; background: #3498db; color: white; font-size: 20px; font-weight: 600; cursor: pointer; transition: background 0.2s; margin-top: 10px; }
   .btn-search:hover { background: #2980b9; }
 
   /* 도움말 툴팁 */
-  .help-icon { display: inline-block; width: 16px; height: 16px; background: #95a5a6; color: white; border-radius: 50%; text-align: center; line-height: 16px; font-size: 11px; margin-left: 5px; cursor: help; }
+  .help-icon { display: inline-block; width: 20px; height: 20px; background: #95a5a6; color: white; border-radius: 50%; text-align: center; line-height: 20px; font-size: 13px; margin-left: 5px; cursor: help; }
   .tooltip-custom { position: relative; display: inline-block; }
-  .tooltip-custom .tooltiptext { visibility: hidden; width: 240px; background-color: #34495e; color: white; text-align: left; border-radius: 6px; padding: 12px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -120px; opacity: 0; transition: opacity 0.3s; font-size: 12px; line-height: 1.6; }
+  .tooltip-custom .tooltiptext { visibility: hidden; width: 260px; background-color: #34495e; color: white; text-align: left; border-radius: 6px; padding: 14px; position: absolute; z-index: 1; bottom: 125%; left: 50%; margin-left: -130px; opacity: 0; transition: opacity 0.3s; font-size: 15px; line-height: 1.6; }
   .tooltip-custom:hover .tooltiptext { visibility: visible; opacity: 1; }
 
   /* 결과 요약 헤더 */
-  .results-header { padding: 16px 20px; background: #ecf0f1; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #3498db; }
-  .results-count { font-size: 16px; font-weight: 600; color: #2c3e50; }
-  .results-meta { font-size: 14px; color: #7f8c8d; }
+  .results-header { padding: 18px 22px; background: #ecf0f1; border-radius: 6px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 4px solid #3498db; }
+  .results-count { font-size: 20px; font-weight: 600; color: #2c3e50; }
+  .results-meta { font-size: 18px; color: #7f8c8d; }
 
   /* 테이블 스타일 */
   .stat-table { width: 100%; border-collapse: collapse; margin-top: 0; border: 1px solid #e9ecef; }
-  .stat-table th, .stat-table td { border: 1px solid #e9ecef; padding: 12px 15px; text-align: center; font-size: 14px; }
+  .stat-table th, .stat-table td { border: 1px solid #e9ecef; padding: 16px 18px; text-align: center; font-size: 18px; }
   .stat-table th { background: #f8f9fa; color: #495057; font-weight: 600; }
   .stat-table tr:hover { background-color: #f8f9fa; }
   .stat-table td:first-child { font-weight: 600; color: #3498db; }
@@ -66,36 +66,36 @@
   .stat-table td:last-child { font-weight: 600; color: #2c3e50; }
 
   /* 안내 박스 */
-  .info-box { padding: 16px 20px; background: #e8f4f8; border-left: 4px solid #3498db; border-radius: 4px; margin-bottom: 20px; color: #2c3e50; line-height: 1.8; }
-  .info-box h3 { margin-bottom: 12px; font-size: 16px; }
+  .info-box { padding: 20px 24px; background: #e8f4f8; border-left: 4px solid #3498db; border-radius: 4px; margin-bottom: 20px; color: #2c3e50; line-height: 1.8; font-size: 18px; }
+  .info-box h3 { margin-bottom: 14px; font-size: 20px; }
   .info-box ol { margin-left: 20px; }
-  .error-msg { padding: 16px 20px; background: #fee; border-left: 4px solid #e74c3c; border-radius: 4px; color: #c0392b; }
+  .error-msg { padding: 20px 24px; background: #fee; border-left: 4px solid #e74c3c; border-radius: 4px; color: #c0392b; font-size: 18px; }
 
   /* 차트 영역 */
-  .chart-container { margin-top: 40px; padding: 30px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
-  .chart-header { font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #3498db; }
-  .chart-wrapper { background: white; padding: 20px; border-radius: 6px; margin-bottom: 20px; }
-  .chart-wrapper canvas { max-height: 400px; }
+  .chart-header { font-size: 22px; font-weight: 600; color: #2c3e50; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #3498db; }
 
   /* AI 뉴스 섹션 */
-  .news-container { margin-top: 50px; padding-top: 30px; border-top: 2px solid #eee; }
-  .news-header { font-size: 22px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-  .ai-badge { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3); display: inline-block; vertical-align: middle; }
+  .news-header { font-size: 26px; font-weight: 700; color: #2c3e50; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+  .ai-badge { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 6px 16px; border-radius: 20px; font-size: 15px; font-weight: 600; box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3); display: inline-block; vertical-align: middle; }
 
-  .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
-  .news-card { background: white; border: 1px solid #e0e0e0; border-radius: 12px; padding: 24px; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; display: flex; flex-direction: column; justify-content: space-between; min-height: 200px; }
-  .news-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.08); border-color: #3498db; }
-
-  .news-title { font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .news-desc { font-size: 14px; color: #57606f; margin-bottom: 20px; line-height: 1.6; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .news-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #f1f2f6; padding-top: 15px; margin-top: auto; }
-  .news-date { font-size: 12px; color: #a4b0be; }
-  .news-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s; }
+  .news-title { font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 12px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .news-desc { font-size: 17px; color: #57606f; margin-bottom: 20px; line-height: 1.6; flex-grow: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .news-date { font-size: 15px; color: #a4b0be; }
+  .news-link { color: #3498db; text-decoration: none; font-weight: 600; font-size: 16px; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s; }
   .news-link:hover { color: #2980b9; text-decoration: underline; }
+
+  /* alert 박스 */
+  .alert { padding: 18px 22px; border-radius: 8px; margin-bottom: 20px; font-size: 18px; line-height: 1.6; }
+  .alert-info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; border-left: 5px solid #17a2b8; }
 </style>
 
 <div class="stat-container">
   <h2 class="stat-header-title">🏥 질병 통계 조회 시스템</h2>
+  <div class="alert alert-info shadow-sm" role="alert">
+    <i class="fas fa-database mr-2"></i>
+    본 페이지는 <strong>공공데이터 API</strong>를 연동하여 질병 발생 추이를 시각화한 통계 정보를 제공하며,
+    하단의 관련 뉴스는 <strong>AI(RAG) 기술</strong>을 활용하여 최신 기사를 분석해 제공합니다.
+  </div>
 
   <form class="search-form" method="GET" action="/statview">
     <div class="form-row">
@@ -223,13 +223,13 @@
               </div>
             </c:when>
             <c:when test="${not empty aiErrorMessage}">
-              <div style="padding: 20px; background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; color: #cf1322; text-align: center;">
+              <div style="padding: 20px; background: #fff1f0; border: 1px solid #ffa39e; border-radius: 8px; color: #cf1322; text-align: center; font-size: 16px;">
                 ⚠️ <strong>${aiErrorMessage}</strong><br>
-                <span style="font-size:13px; color:#888;">관리자에게 문의하거나 잠시 후 다시 시도해주세요.</span>
+                <span style="font-size:14px; color:#888;">관리자에게 문의하거나 잠시 후 다시 시도해주세요.</span>
               </div>
             </c:when>
             <c:otherwise>
-              <div style="text-align: center; color: #999; padding: 20px;">관련된 뉴스 데이터가 없습니다.</div>
+              <div style="text-align: center; color: #999; padding: 20px; font-size: 16px;">관련된 뉴스 데이터가 없습니다.</div>
             </c:otherwise>
           </c:choose>
         </div>
