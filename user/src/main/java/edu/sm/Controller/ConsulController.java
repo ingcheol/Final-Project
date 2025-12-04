@@ -1,4 +1,4 @@
-package edu.sm.controller;
+package edu.sm.Controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -7,10 +7,18 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+//consul2
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.servlet.http.HttpSession;
+
 import java.util.Map;
 
 @Slf4j
 @Controller
+
 public class ConsulController {
 
     private final SimpMessagingTemplate messagingTemplate;
@@ -64,4 +72,7 @@ public class ConsulController {
 //        // Patient가 구독하는 경로로 전송
 //        messagingTemplate.convertAndSend("/send/to/" + receiverId, message);
 //    }
+    // ========== 상담 신청 관련 ==========
+
+
 }

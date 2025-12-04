@@ -128,6 +128,59 @@ CREATE TABLE diagnosis_history (
 );
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+DROP TABLE IF EXISTS emr;
+DROP TABLE IF EXISTS consultation;
+DROP TABLE IF EXISTS statistics;
+DROP TABLE IF EXISTS recommendation;
+
+-- 2단계: patient 테이블을 직접 참조하는 테이블 (FK가 patient를 향함) 및 기타 자식 테이블 삭제
+DROP TABLE IF EXISTS schedule;
+DROP TABLE IF EXISTS chatbotlog;
+DROP TABLE IF EXISTS pre_diagnosis;
+DROP TABLE IF EXISTS appointment;
+DROP TABLE IF EXISTS admin_id; -- (patient 참조)
+DROP TABLE IF EXISTS searchlog;
+DROP TABLE IF EXISTS IOT;
+DROP TABLE IF EXISTS survey;
+DROP TABLE IF EXISTS notification;
+
+-- 3단계: 부모 테이블 (patient, hospital, adviser) 삭제
+DROP TABLE IF EXISTS patient;
+DROP TABLE IF EXISTS hospital;
+DROP TABLE IF EXISTS adviser;
+
+-- 4단계: 나머지 외래 키 관계가 없거나 단순한 부모 테이블 삭제
+DROP TABLE IF EXISTS vector_store;
+DROP TABLE IF EXISTS map;
+DROP TABLE IF EXISTS marker;
+DROP TABLE IF EXISTS menu_item;
+DROP TABLE IF EXISTS orders;
+DROP TABLE IF EXISTS product;
+DROP TABLE IF EXISTS baccarat_game;
+DROP TABLE IF EXISTS cart;
+DROP TABLE IF EXISTS cate;
+DROP TABLE IF EXISTS chat;
+DROP TABLE IF EXISTS cust;
+DROP TABLE IF EXISTS inquiry;
+DROP TABLE IF EXISTS admin; -- admin_id 테이블이 삭제되었으므로 이제 삭제 가능합니다.
+
+
 -- 상담
 
 CREATE TABLE appointment (

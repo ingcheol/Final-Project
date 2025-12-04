@@ -1,4 +1,4 @@
-package edu.sm.controller;
+package edu.sm.Controller;
 
 import edu.sm.app.dto.DiseaseStatsRequest;
 import edu.sm.app.dto.DiseaseSimpleStatsItem;
@@ -43,6 +43,7 @@ public class MainController {
         model.addAttribute("center", "consul");
         return "index";
     }
+
 
     @GetMapping("/statview")
     public String getStatview(DiseaseStatsRequest request, Model model) {
