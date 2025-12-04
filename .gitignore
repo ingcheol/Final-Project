@@ -38,6 +38,8 @@ out/
 
 .env
 
+.sql/
+
 # YML 파일
 **/application.yml
 **/application-dev.yml
