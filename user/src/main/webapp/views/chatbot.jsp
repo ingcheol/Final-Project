@@ -533,7 +533,15 @@
         ja: ['移動', '行く', '見せて', 'ページへ', '行きたい']
     };
 
+    // [추가됨] 음성 중단 공통 함수
+    function stopSpeech() {
+        if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
+    }
+
     function toggleLangDropdown() {
+        stopSpeech(); // 드롭다운 열 때 음성 중단
         document.getElementById("langDropdown").classList.toggle("show");
     }
 
@@ -550,6 +558,7 @@
     }
 
     function changeLang(lang) {
+        stopSpeech(); // 언어 변경 시 음성 중단
         currentLanguage = lang;
 
         document.getElementById('currentLangBtn').innerText = translations[lang].langName + ' ▼';
@@ -599,6 +608,7 @@
             btn.className = 'quick-reply-btn';
             btn.textContent = q;
             btn.onclick = function() {
+                stopSpeech(); // 퀵 버튼 클릭 시 음성 중단
                 document.getElementById('chatInput').value = q;
                 sendChatMessage();
             };
@@ -614,6 +624,7 @@
             toggleBtn.textContent = isQuickMenuExpanded ? '▲ 접기' : '...';
 
             toggleBtn.onclick = function() {
+                stopSpeech(); // 더보기/접기 버튼 클릭 시 음성 중단
                 isQuickMenuExpanded = !isQuickMenuExpanded; // 상태 토글
 
                 // 컨테이너 클래스 토글 (CSS 줄바꿈 적용)
@@ -644,6 +655,9 @@
             };
 
             recognition.onresult = function(event) {
+                // 음성 인식 결과가 나오면 이전 TTS 중단
+                stopSpeech();
+                
                 const transcript = event.results[0][0].transcript;
                 document.getElementById('chatInput').value = transcript;
                 setTimeout(() => sendChatMessage(), 500);
@@ -667,6 +681,12 @@
             alert('음성 인식을 지원하지 않는 브라우저입니다.');
             return;
         }
+        
+        // 음성 입력 시작할 때 이전 TTS 중단
+        if (!isListening) {
+            stopSpeech();
+        }
+        
         if (isListening) {
             recognition.stop();
         } else {
@@ -676,6 +696,9 @@
 
     function speakText(text) {
         if ('speechSynthesis' in window) {
+            // 이전 음성이 재생 중이면 중단
+            stopSpeech();
+            
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = langCodes[currentLanguage];
             utterance.rate = 1.0;
@@ -684,6 +707,7 @@
     }
 
     function toggleChatbot() {
+        stopSpeech(); // 챗봇 열기/닫기 시 음성 중단
         const modal = document.getElementById('chatbotModal');
         modal.classList.toggle('active');
         if(modal.classList.contains('active')) {
@@ -711,6 +735,9 @@
         const question = input.value.trim();
 
         if(!question) return;
+
+        // 새로운 질문이 들어오면 이전 음성 즉시 중단
+        stopSpeech();
 
         if (isNavigationRequest(question) && lastRecommendedPage) {
             addChatBubble(question, 'user');
@@ -782,7 +809,10 @@
             const navBtn = document.createElement('button');
             navBtn.className = 'page-nav-btn';
             navBtn.textContent = translations[currentLanguage].navButton;
-            navBtn.onclick = function() { window.location.href = page; };
+            navBtn.onclick = function() { 
+                stopSpeech(); // 페이지 이동 버튼 클릭 시 음성 중단
+                window.location.href = page; 
+            };
             bubbleDiv.appendChild(navBtn);
         }
 
