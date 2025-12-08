@@ -34,6 +34,7 @@ public class MainController {
     @RequestMapping("/")
     public String main(Model model) {
         model.addAttribute("sseUrl", sseUrl);
+        model.addAttribute("center", "dashboard");
         return "index";
     }
 
