@@ -410,6 +410,12 @@
 
         <%-- 동적 콘텐츠 영역 --%>
         <c:choose>
+
+            <%-- 대시보드 페이지 --%>
+            <c:when test="${center == 'dashboard'}">
+                <jsp:include page="dashboard.jsp" />
+            </c:when>
+
             <%-- 1. 환자 관리 페이지 --%>
             <c:when test="${center == 'manage'}">
                 <jsp:include page="patient/manage.jsp" />
@@ -475,10 +481,7 @@
 
           <%-- 9. 그 외의 경우 (초기 접속 등) --%>
             <c:otherwise>
-                <div class="welcome-screen">
-                    <h1>선문 보건소</h1>
-                    <p>좌측 메뉴를 선택하여 작업을 시작하세요.</p>
-                </div>
+                <jsp:include page="dashboard.jsp" />
             </c:otherwise>
         </c:choose>
     </main>
