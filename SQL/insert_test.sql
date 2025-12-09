@@ -63,3 +63,172 @@ INSERT INTO medical_documents (file_name, doc_title, file_path, file_size, creat
                                                                                            ('코로나19환자치료를위한 최신.pdf', '코로나19 환자 치료를 위한 최신', 'src/main/resources/medical-data/코로나19환자치료를위한 최신.pdf', '6,773KB', NOW()),
                                                                                            ('피부연조직감염항생제사용지침.pdf', '피부·연조직 감염 항생제 사용지침', 'src/main/resources/medical-data/피부연조직감염항생제사용지침.pdf', '842KB', NOW()),
                                                                                            ('한국에서의항생제스튜어드십프로그램 .pdf', '한국에서의 항생제 스튜어드십 프로그램', 'src/main/resources/medical-data/한국에서의항생제스튜어드십프로그램 .pdf', '2,779KB', NOW());
+
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '김민수', '010-1234-5678', 'minsu.kim@email.com', '1975-03-15', 'male', '서울시 서초구', '고혈압, 당뇨', '규칙적인 운동, 비흡연', 'active', 'ko', NOW());
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '김형경', '010-2122-5678', 'hyeong.kim@email.com', '2001-03-15', 'male', '천안시 서북구', '고혈압, 당뇨', '규칙적인 운동, 비흡연', 'active', 'ko', NOW());
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '김우성', '010-2122-5678', 'wuseong.kim@email.com', '2001-03-15', 'male', '천안시 동남구', '비만', '흡연', 'active', 'ko', NOW());
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '박태환', '010-2622-5678', 'tae.kim@email.com', '1999-04-15', 'male', '안양시', '비만', '흡연', 'active', 'ko', NOW());
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '김철수', '010-2022-5678', 'cheolsu.kim@email.com', '1979-04-15', 'male', '안성시', '비만', '흡연', 'active', 'ko', NOW());
+
+INSERT INTO patient (password, name, phone, email, dob, gender, address, medical_history, lifestyle_habits, account_status, language_preference, created_at) VALUES
+    ('$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW', '박용철', '010-2922-5678', 'youbg.kim@email.com', '1969-04-15', 'male', '제주특별자치도', '비만', '흡연', 'active', 'ko', NOW());
+
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser01',
+             '010-9874-5432', -- 임의의 연락처
+             'adviser02@sm.edu',
+             'A12345B6780', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser03',
+             '010-9846-5432', -- 임의의 연락처
+             'adviser03@sm.edu',
+             'A12355B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser04',
+             '010-9876-5432', -- 임의의 연락처
+             'adviser04@sm.edu',
+             'A42345B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser05',
+             '010-9871-5432', -- 임의의 연락처
+             'adviser05@sm.edu',
+             'A123455B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser06',
+             '010-6876-5432', -- 임의의 연락처
+             'adviser06@sm.edu',
+             'A52345B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser07',
+             '010-9870-5432', -- 임의의 연락처
+             'adviser07@sm.edu',
+             'A134545B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser08',
+             '010-9007-5432', -- 임의의 연락처
+             'adviser08@sm.edu',
+             'A012345B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+INSERT INTO adviser (
+    password,
+    name,
+    phone,
+    email,
+    license_number,
+    account_status,
+    created_at
+) VALUES (
+             '$2a$10$wr5kzCQSzfVibe/oHUrFVuUTOAtooXUDNTNNxjlApxk31srPO/ELW',
+             'adviser09',
+             '010-9999-5432', -- 임의의 연락처
+             'adviser09@sm.edu',
+             'A1992345B6789', -- 필수 입력 (NOT NULL)
+             'ACTIVE',
+             NOW()
+         );
+
+

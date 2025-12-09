@@ -279,4 +279,17 @@ public class EmrService {
   public Emr getEmr(Long emrId) throws Exception {
     return emrRepository.select(emrId);
   }
+  /**
+   * EMR 전체 목록 조회
+   */
+  public java.util.List<Emr> getEmrs() throws Exception {
+    return emrRepository.selectAll();
+  }
+
+  /**
+   * 특정 환자의 EMR 목록 조회 (필요 시 사용)
+   */
+  public java.util.List<Emr> getEmrsByPatientId(Long patientId) throws Exception {
+    return emrRepository.findByPatientId(patientId);
+  }
 }
