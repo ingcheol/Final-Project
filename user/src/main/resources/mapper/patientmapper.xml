@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org/DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.sm.app.repository.PatientRepository">
+  <resultMap id="PatientResultMap" type="Patient">
+    <id property="patientId" column="patient_id"/>
+    <result property="patientEmail" column="email"/>
+    <result property="patientPwd" column="password"/>
+    <result property="patientName" column="name"/>
+    <result property="patientPhone" column="phone"/>
+    <result property="patientDob" column="dob"/>
+    <result property="patientGender" column="gender"/>
+    <result property="patientAddr" column="address"/>
+    <result property="patientMedicalHistory" column="medical_history"/>
+    <result property="patientLifestyleHabits" column="lifestyle_habits"/>
+    <result property="patientAccountStatus" column="account_status"/>
+    <result property="languagePreference" column="language_preference"/>
+    <result property="patientRegdate" column="created_at"/>
+    <result property="patientUpdate" column="updated_at"/>
+    <result property="provider" column="provider"/>
+    <result property="providerId" column="provider_id"/>
+    <result property="userRole" column="user_role"/>
+  </resultMap>
+
+  <!-- 이메일로 환자 조회 -->
+  <select id="findByPatientEmail" parameterType="string" resultMap="PatientResultMap">
+    SELECT *
+    FROM patient
+    WHERE email = #{email}
+  </select>
+
+  <!-- OAuth 중복 체크 -->
+  <select id="findByProviderAndProviderId" resultMap="PatientResultMap">
+    SELECT *
+    FROM patient
+    WHERE provider = #{provider} AND provider_id = #{providerId}
+  </select>
+
+  <!-- 전체 환자 조회 -->
+  <select id="selectAll" resultMap="PatientResultMap">
+    SELECT * FROM patient
+  </select>
+
+  <!-- ID로 환자 조회 -->
+  <select id="select" parameterType="long" resultMap="PatientResultMap">
+    SELECT * FROM patient WHERE patient_id = #{patientId}
+  </select>
+
+  <select id="findByPatientId" parameterType="long" resultMap="PatientResultMap">
+    SELECT * FROM patient WHERE patient_id = #{patientId}
+  </select>
+
+  <!-- 환자 등록 -->
+  <insert id="insert" parameterType="Patient" useGeneratedKeys="true" keyProperty="patientId" keyColumn="patient_id">
+    INSERT INTO patient (
+      email, password, name, phone, dob,
+      gender, address, medical_history, lifestyle_habits,
+      account_status, language_preference,
+      provider, provider_id, user_role, created_at
+    ) VALUES (
+               #{patientEmail},
+               #{patientPwd},
+               #{patientName},
+               #{patientPhone},
+               #{patientDob},
+               #{patientGender},
+               #{patientAddr},
+               #{patientMedicalHistory},
+               #{patientLifestyleHabits},
+               COALESCE(#{patientAccountStatus}, 'active'),
+               COALESCE(#{languagePreference}, 'ko'),
+               #{provider},
+               #{providerId},
+               COALESCE(#{userRole}, 'ROLE_USER'),
+               NOW()
+             )
+  </insert>
+
+  <!-- 환자 정보 수정 -->
+  <update id="update" parameterType="Patient">
+    UPDATE patient
+    SET name = #{patientName},
+        phone = #{patientPhone},
+        address = #{patientAddr},
+        medical_history = #{patientMedicalHistory},
+        lifestyle_habits = #{patientLifestyleHabits},
+        language_preference = #{languagePreference},
+        updated_at = NOW()
+    WHERE patient_id = #{patientId}
+  </update>
+
+  <!-- 환자 삭제 -->
+  <delete id="delete" parameterType="long">
+    DELETE FROM patient WHERE patient_id = #{patientId}
+  </delete>
+
+  <delete id="deleteByEmail" parameterType="string">
+    DELETE FROM patient WHERE email = #{email}
+  </delete>
+
+</mapper>
