@@ -340,43 +340,11 @@
           <a href="<c:url value='/admin/signlanguage'/>" class="nav-item">
             <span class="icon">👌</span>
             <span>수어 번역</span>
+              <a href="<c:url value='/admin/emr'/>" class="nav-item">
+                  <span class="icon">📝</span>
+                  <span>EMR 관리</span>
+              </a>
           </a>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-title">APPS & PAGES</div>
-            <div class="nav-item">
-                <span class="icon">💬</span>
-                <span>Chat</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">📅</span>
-                <span>Calendar</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">✉️</span>
-                <span>Email</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">📁</span>
-                <span>File Manager</span>
-            </div>
-        </div>
-
-        <div class="nav-section">
-            <div class="nav-title">COMPONENTS</div>
-            <div class="nav-item">
-                <span class="icon">🧩</span>
-                <span>Base UI</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">📋</span>
-                <span>Forms</span>
-            </div>
-            <div class="nav-item">
-                <span class="icon">📊</span>
-                <span>Charts</span>
-            </div>
         </div>
     </aside>
 
@@ -477,6 +445,14 @@
                     <h1 style="color: #ef4444;">오류 발생</h1>
                     <p>${error}</p>
                 </div>
+            </c:when>
+
+            <%-- 6. EMR 관리 (새로 추가됨) --%>
+            <c:when test="${center == 'emr/list'}">
+                <jsp:include page="emr/list.jsp" />
+            </c:when>
+            <c:when test="${center == 'emr/detail'}">
+                <jsp:include page="emr/detail.jsp" />
             </c:when>
 
           <%-- 9. 그 외의 경우 (초기 접속 등) --%>
