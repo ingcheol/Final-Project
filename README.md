@@ -47,8 +47,10 @@ Spring AI, RAG, WebRTC 및 IoT 기술을 활용하여 의료 취약계층(고령
 
 ## 시스템 구조
 
-### 시스템 구성도
-[이미지]
+### 시스템 환경 및 구조도
+![시스템환경](https://user-images.githubusercontent.com/203218341/525334449-6aff016c-7d2a-460a-be97-cb32708d17d4.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0NTA4MjUsIm5iZiI6MTc2NTQ1MDUyNSwicGF0aCI6Ii8yMDMyMTgzNDEvNTI1MzM0NDQ5LTZhZmYwMTZjLTdkMmEtNDYwYS1iZTk3LWNiMzI3MDhkMTdkNC5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUxMjExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MTIxMVQxMDU1MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1kZmE0MDllOTlmMWI4ZmU2OGVjYjhiMDczMDI3OGVhYWVjYmMxZGU4MDM2OGVlZjBiZmZkMGUzMmM3ZjFkY2U0JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.QA_bTXuXzDAuTyk1vUaQEslumB8TLjM8pu8qnbAN5o8)
+
+![시스템구조도](https://user-images.githubusercontent.com/203218341/525333958-1aaec818-cf64-4187-9cdf-c18b76271c21.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NjU0NTA4MjUsIm5iZiI6MTc2NTQ1MDUyNSwicGF0aCI6Ii8yMDMyMTgzNDEvNTI1MzMzOTU4LTFhYWVjODE4LWNmNjQtNDE4Ny05Y2RmLWMxOGI3NjI3MWMyMS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjUxMjExJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MTIxMVQxMDU1MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT01ZmZjOGJjOWVkMGNiMTE0MmVmYTY0ZTBjYjBhNjlmM2Y3ZDUxN2ZkMmIxNTAwNmQwOTMxYTdiNzMzOGNkYzQ3JlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.vj4lMy2p-3yxGUpyrupbMwhRYbUd4IiIJZmKXRXlMqs)
 
 ### 요구사항 정의
 [이미지]
@@ -77,9 +79,7 @@ Kakao Map API를 활용하여 환자의 현재 위치 기반으로 인근 병원
 처방전이나 약 봉투를 촬영하면 OCR 및 AI 분석을 통해 복약 일정을 자동으로 캘린더에 등록합니다. 상담 예약 내역과 통합되어 환자가 건강 일정을 놓치지 않도록 관리합니다.
 
 ## 주요 기능 화면
-[이미지 또는 gif, 영상]
 
----
 ## 페이지 번역
 ![page.gif](img/page.gif)
 ---
