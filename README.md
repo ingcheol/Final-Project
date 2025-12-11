@@ -79,8 +79,33 @@ Kakao Map API를 활용하여 환자의 현재 위치 기반으로 인근 병원
 ## 주요 기능 화면
 [이미지 또는 gif, 영상]
 
+---
+## 페이지 번역
+![page.gif](img/page.gif)
+---
+## 메인화면 챗봇
+![chatbot.gif](img/chatbot.gif)
+---
+
+## 자가진단
+![myself.gif](img/myself.gif)
+---
+
+## 병원찾기
+![findhos.gif](img/findhos.gif)
+---
+## 채팅상담
+![chat.gif](img/chat.gif)
+---
+## 페이지 번역
+
+---
+
+
+
+
 ## 주요기술? 핵심구성?
 
 ## 참고 링크는 정리가 잘되어있으면 맨위에 아니면 밑에 
-- [Notion 문서 링크]
-- [프로젝트 시연 영상 링크]
+- [[Notion 문서 링크]](https://www.notion.so/SW-2-29ad38e51f1380d9a062c3084cec6a59?source=copy_link)
+- [[유튜브 시연영상 2조 메디 브릿지]](https://youtu.be/H9p4pMnvKjU)
