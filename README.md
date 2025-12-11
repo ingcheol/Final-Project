@@ -108,4 +108,4 @@ Kakao Map API를 활용하여 환자의 현재 위치 기반으로 인근 병원
 
 ## 참고 링크는 정리가 잘되어있으면 맨위에 아니면 밑에 
 - [[Notion 문서 링크]](https://www.notion.so/SW-2-29ad38e51f1380d9a062c3084cec6a59?source=copy_link)
-- [[유튜브 시연영상 2조 메디 브릿지]](https://youtu.be/H9p4pMnvKjU)
+- [[유튜브 시연영상 2조 메디 브릿지]](https://youtu.be/bM9ieKQDmkE)
