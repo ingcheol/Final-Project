@@ -48,7 +48,6 @@ Spring AI, RAG, WebRTC 및 IoT 기술을 활용하여 의료 취약계층(고령
 ## 시스템 환경
 ![gujo1.png](img/gujo1.png)
 
-
 ### 시스템 구조
 ![gujo2.png](img/gujo2.png)
 
@@ -99,23 +98,16 @@ Kakao Map API를 활용하여 환자의 현재 위치 기반으로 인근 병원
 ---
 
 ## 병원찾기
-
-
 ![findhos.gif](img/findhos.gif)
 ---
 ## 상담 번역
 ![chat.gif](img/chat.gif)
 ---
 ## 상담 수어 텍스트 변환
-
 ![1211 (1).gif](img/1211%20%281%29.gif)
 ---
 
 
-
-
-## 주요기술? 핵심구성?
-
-## 참고 링크는 정리가 잘되어있으면 맨위에 아니면 밑에 
+## 참고 링크
 - [[Notion 문서 링크]](https://www.notion.so/SW-2-29ad38e51f1380d9a062c3084cec6a59?source=copy_link)
 - [[유튜브 시연영상 2조 메디 브릿지]](https://youtu.be/bM9ieKQDmkE)
